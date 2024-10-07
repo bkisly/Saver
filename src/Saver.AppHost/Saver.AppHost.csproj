@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -11,6 +11,15 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="8.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Saver.BudgetService\Saver.BudgetService.csproj" />
+    <ProjectReference Include="..\Saver.Client\Saver.Client.csproj" />
+    <ProjectReference Include="..\Saver.FinanceService\Saver.FinanceService.csproj" />
+    <ProjectReference Include="..\Saver.Gateway\Saver.Gateway.csproj" />
+    <ProjectReference Include="..\Saver.IdentityService\Saver.IdentityService.csproj" />
+    <ProjectReference Include="..\Saver.PredictionsService\Saver.PredictionsService.csproj" />
   </ItemGroup>
 
 </Project>
