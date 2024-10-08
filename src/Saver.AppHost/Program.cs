@@ -1,15 +1,36 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddProject<Projects.Saver_Gateway>("saver-gateway");
+var redis = builder.AddRedis("redis");
+var rabbitMq = builder.AddRabbitMQ("rabbitmq");
+var postgres = builder.AddPostgres("postgres");
 
-builder.AddProject<Projects.Saver_IdentityService>("saver-identityservice");
+var identityServiceDb = postgres.AddDatabase("identityservice-db");
+var budgetServiceDb = postgres.AddDatabase("budgetservice-db");
+var financeServiceDb = postgres.AddDatabase("financeservice-db");
+var predictionsServiceDb = postgres.AddDatabase("predictionsservice-db");
 
-builder.AddProject<Projects.Saver_BudgetService>("saver-budgetservice");
+var identityService = builder.AddProject<Projects.Saver_IdentityService>("identityservice")
+    .WithReference(identityServiceDb)
+    .WithReference(rabbitMq);
 
-builder.AddProject<Projects.Saver_FinanceService>("saver-financeservice");
+var budgetService = builder.AddProject<Projects.Saver_BudgetService>("budgetservice")
+    .WithReference(budgetServiceDb)
+    .WithReference(rabbitMq);
 
-builder.AddProject<Projects.Saver_PredictionsService>("saver-predictionsservice");
+var financeService = builder.AddProject<Projects.Saver_FinanceService>("financeservice")
+    .WithReference(financeServiceDb)
+    .WithReference(rabbitMq)
+    .WithReference(redis);
 
-builder.AddProject<Projects.Saver_Client>("saver-client");
+var predictionsService = builder.AddProject<Projects.Saver_PredictionsService>("predictionsservice")
+    .WithReference(predictionsServiceDb)
+    .WithReference(rabbitMq);
+
+builder.AddProject<Projects.Saver_Client>("client")
+    .WithReference(identityService)
+    .WithReference(budgetService)
+    .WithReference(financeService)
+    .WithReference(predictionsService);
 
 builder.Build().Run();
+  
