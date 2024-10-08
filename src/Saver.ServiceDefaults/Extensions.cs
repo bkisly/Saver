@@ -41,6 +41,13 @@ namespace Microsoft.Extensions.Hosting
             return builder;
         }
 
+        public static IHostApplicationBuilder AddDefaultSwagger(this IHostApplicationBuilder builder)
+        {
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+            return builder;
+        }
+
         public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder)
         {
             builder.Logging.AddOpenTelemetry(logging =>
@@ -113,6 +120,16 @@ namespace Microsoft.Extensions.Hosting
                 });
             }
 
+            return app;
+        }
+
+        public static WebApplication UseDefaultSwagger(this WebApplication app)
+        {
+            if (!app.Environment.IsDevelopment()) 
+                return app;
+
+            app.UseSwagger();
+            app.UseSwaggerUI();
             return app;
         }
     }
