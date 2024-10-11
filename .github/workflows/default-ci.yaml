@@ -7,12 +7,6 @@ on:
   pull_request:
     branches:
       - master
-    branches-ignore:
-      - 'dev/budgetservice/**'
-      - 'dev/identityservice/**'
-      - 'dev/financeservice/**'
-      - 'dev/predictionsservice/**'
-      - 'dev/client/**'
 
 jobs:
   build:
