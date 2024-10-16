@@ -31,6 +31,7 @@ jobs:
       run: dotnet build -c Release
 
     - name: Check for vulnerabilities
+      working-directory: .
       run: |
         chmod +x ./scripts/dotnet-vulnerable.sh
         ./scripts/dotnet-vulnerable.sh
