@@ -1,0 +1,22 @@
+name: CI/CD pipeline for BudgetService
+
+on:
+  push:
+    branches:
+      - dev/BudgetService/**
+      - release/BudgetService/**
+  pull_request:
+    branches:
+      - release/BudgetService/**
+
+jobs:
+  build:
+    uses: ./.github/workflows/service-build.yaml
+    with:
+      service-name: BudgetService
+
+  release:
+    needs: build
+    uses: ./.github/workflows/service-release.yaml
+    with:
+      service-name: BudgetService

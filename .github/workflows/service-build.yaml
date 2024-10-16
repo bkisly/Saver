@@ -1,0 +1,41 @@
+name: Build and test a microservice
+
+on:
+  workflow_call:
+    inputs:
+      service-name:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./src/Saver.${{ inputs.service-name }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build -c Release
+
+    - name: Check for vulnerabilities
+      run: |
+        chmod +x ./scripts/dotnet-vulnerable.sh
+        ./scripts/dotnet-vulnerable.sh
+
+    - name: Test
+      working-directory: ./test/Saver.${{ inputs.service-name }}.Tests
+      run: dotnet test -c Release --no-build -v normal
+

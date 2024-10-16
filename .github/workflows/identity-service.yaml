@@ -1,0 +1,19 @@
+name: CI/CD pipeline for IdentityService
+
+on:
+  push:
+    branches:
+      - dev/IdentityService/**
+      - release/IdentityService/**
+
+jobs:
+  build:
+    uses: ./.github/workflows/service-build.yaml
+    with:
+      service-name: IdentityService
+
+  release:
+    needs: build
+    uses: ./.github/workflows/service-release.yaml
+    with:
+      service-name: IdentityService

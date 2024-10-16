@@ -1,0 +1,51 @@
+name: Release a microservice
+
+on:
+  workflow_call:
+    inputs:
+      service-name:
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref, format('release/{0}/', inputs.service-name)) }}
+    env:
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
+      AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install azd
+      uses: Azure/setup-azd@v1.0.0
+
+    - name: Install .NET Aspire workload
+      run: dotnet workload install aspire
+
+    - name: Log in with Azure
+      run: |
+        azd auth login `
+          --client-id "$Env:AZURE_CLIENT_ID" `
+          --federated-credential-provider "github" `
+          --tenant-id "$Env:AZURE_TENANT_ID"
+      shell: pwsh
+
+    - name: Provision infrastructure
+      run: azd provision --no-prompt
+      env:
+        AZD_INITIAL_ENVIRONMENT_CONFIG: ${{ secrets.AZD_INITIAL_ENVIRONMENT_CONFIG }}
+
+    - name: Deploy service
+      run: |
+        SERVICE_NAME=$(echo "${{ inputs.service-name }}" | tr '[:upper:]' '[:lower:]')
+        azd deploy $SERVICE_NAME --no-prompt

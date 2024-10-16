@@ -1,0 +1,19 @@
+name: CI/CD pipeline for Client
+
+on:
+  push:
+    branches:
+      - dev/Client/**
+      - release/Client/**
+
+jobs:
+  build:
+    uses: ./.github/workflows/service-build.yaml
+    with:
+      service-name: Client
+
+  release:
+    needs: build
+    uses: ./.github/workflows/service-release.yaml
+    with:
+      service-name: Client

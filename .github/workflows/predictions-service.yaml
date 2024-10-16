@@ -1,0 +1,19 @@
+name: CI/CD pipeline for PredictionsService
+
+on:
+  push:
+    branches:
+      - dev/PredictionsService/**
+      - release/PredictionsService/**
+
+jobs:
+  build:
+    uses: ./.github/workflows/service-build.yaml
+    with:
+      service-name: PredictionsService
+
+  release:
+    needs: build
+    uses: ./.github/workflows/service-release.yaml
+    with:
+      service-name: PredictionsService

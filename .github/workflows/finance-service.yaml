@@ -1,0 +1,19 @@
+name: CI/CD pipeline for FinanceService
+
+on:
+  push:
+    branches:
+      - dev/FinanceService/**
+      - release/FinanceService/**
+
+jobs:
+  build:
+    uses: ./.github/workflows/service-build.yaml
+    with:
+      service-name: FinanceService
+
+  release:
+    needs: build
+    uses: ./.github/workflows/service-release.yaml
+    with:
+      service-name: FinanceService
