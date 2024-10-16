@@ -28,13 +28,13 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build -c Release
+      run: dotnet build -c Release --no-restore
 
     - name: Check for vulnerabilities
       working-directory: .
       run: |
         chmod +x ./scripts/dotnet-vulnerable.sh
-        ./scripts/dotnet-vulnerable.sh
+        ./scripts/dotnet-vulnerable.sh ./src/Saver.${{ inputs.service-name }}
 
     - name: Test
       working-directory: ./test/Saver.${{ inputs.service-name }}.Tests
