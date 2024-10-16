@@ -37,7 +37,8 @@ jobs:
     - name: Check for vulnerabilities
       run: |
         dotnet list package --vulnerable 2>&1 | tee ./build.log
-        grep -q -i "critical\|high" ./build.log; [ $? -eq 1 ]
+        echo "Analyzing log file for vulnerabilities..."
+        grep -q -i "critical\|high" ./build.log; [ $? -eq 1 ] && echo "Analysis complete." && exit 0
 
     - name: Test
       run: dotnet test -c Release --no-build -v normal
