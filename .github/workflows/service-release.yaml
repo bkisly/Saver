@@ -14,7 +14,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: github.ref == format('heads/refs/release/{0}', inputs.service-name)
+    if: github.ref == format('refs/heads/release/{0}', inputs.service-name)
     env:
       AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
