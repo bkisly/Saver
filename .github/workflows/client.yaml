@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - dev/Client/**
-      - release/Client/**
+      - release/Client
 
 jobs:
   build:

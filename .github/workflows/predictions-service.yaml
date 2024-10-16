@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - dev/PredictionsService/**
-      - release/PredictionsService/**
+      - release/PredictionsService
 
 jobs:
   build:

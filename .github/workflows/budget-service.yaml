@@ -4,10 +4,7 @@ on:
   push:
     branches:
       - dev/BudgetService/**
-      - release/BudgetService/**
-  pull_request:
-    branches:
-      - release/BudgetService/**
+      - release/BudgetService
 
 jobs:
   build:
