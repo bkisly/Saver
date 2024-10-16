@@ -30,6 +30,11 @@ jobs:
     - name: Build
       run: dotnet build -c Release
 
+    - name: Check for vulnerabilities
+      run: |
+        chmod +x ./scripts/dotnet-vulnerable.sh
+        ./scripts/dotnet-vulnerable.sh
+
     - name: Test
       working-directory: ./test/Saver.${{ inputs.service-name }}.Tests
       run: dotnet test -c Release --no-build -v normal
