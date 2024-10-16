@@ -36,7 +36,10 @@ jobs:
         chmod +x ./scripts/dotnet-vulnerable.sh
         ./scripts/dotnet-vulnerable.sh ./src/Saver.${{ inputs.service-name }}
 
+    - name: Install test dependencies
+      working-directory: ./test/Saver.${{ inputs.service-name }}.Tests
+      run: dotnet restore
+
     - name: Test
       working-directory: ./test/Saver.${{ inputs.service-name }}.Tests
-      run: dotnet test -c Release -v normal
-
+      run: dotnet test -c Release -v normal --no-build
