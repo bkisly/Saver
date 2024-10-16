@@ -1,6 +1,7 @@
 #!/bin/bash
+$PROJECT=$1
 echo "Beginning vulnerable packages check..."
-dotnet list package --vulnerable 2>&1 | tee ./build.log
+dotnet list $PROJECT package --vulnerable 2>&1 | tee ./build.log
 grep -q -i "critical\|high" ./build.log
 rc=$?
 
