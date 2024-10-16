@@ -38,5 +38,5 @@ jobs:
 
     - name: Test
       working-directory: ./test/Saver.${{ inputs.service-name }}.Tests
-      run: dotnet test -c Release --no-build -v normal
+      run: dotnet test -c Release -v normal
 
