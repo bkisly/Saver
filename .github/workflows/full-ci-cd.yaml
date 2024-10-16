@@ -35,7 +35,9 @@ jobs:
       run: dotnet build -c Release
 
     - name: Check for vulnerabilities
-      run: ./scripts/dotnet-vulnerable.sh
+      run: |
+        chmod +x ./scripts/dotnet-vulnerable.sh
+        ./scripts/dotnet-vulnerable.sh
 
     - name: Test
       run: dotnet test -c Release --no-build -v normal
