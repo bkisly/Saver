@@ -1,11 +1,11 @@
 name: CI/CD pipeline for BudgetService
 
 on:
-  pull_request:
-    branches:
-      - master
-      - release/BudgetService/**
   push:
+    branches:
+      - dev/BudgetService/**
+      - release/BudgetService/**
+  pull_request:
     branches:
       - release/BudgetService/**
 

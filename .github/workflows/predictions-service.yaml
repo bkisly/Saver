@@ -1,12 +1,9 @@
 name: CI/CD pipeline for PredictionsService
 
 on:
-  pull_request:
-    branches:
-      - master
-      - release/PredictionsService/**
   push:
     branches:
+      - dev/PredictionsService/**
       - release/PredictionsService/**
 
 jobs:

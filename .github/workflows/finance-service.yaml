@@ -1,12 +1,9 @@
 name: CI/CD pipeline for FinanceService
 
 on:
-  pull_request:
-    branches:
-      - master
-      - release/FinanceService/**
   push:
     branches:
+      - dev/FinanceService/**
       - release/FinanceService/**
 
 jobs:

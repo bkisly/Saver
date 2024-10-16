@@ -1,12 +1,9 @@
 name: CI/CD pipeline for IdentityService
 
 on:
-  pull_request:
-    branches:
-      - master
-      - release/IdentityService/**
   push:
     branches:
+      - dev/IdentityService/**
       - release/IdentityService/**
 
 jobs:

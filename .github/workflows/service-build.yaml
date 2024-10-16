@@ -10,7 +10,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ startsWith(github.ref, format('dev/{0}/', inputs.service-name)) || startsWith(github.event.pull_request.base.ref, format('release/{0}/', inputs.service-name)) }}
 
     defaults:
       run:

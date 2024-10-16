@@ -1,12 +1,9 @@
 name: CI/CD pipeline for Client
 
 on:
-  pull_request:
-    branches:
-      - master
-      - release/Client/**
   push:
     branches:
+      - dev/Client/**
       - release/Client/**
 
 jobs:
