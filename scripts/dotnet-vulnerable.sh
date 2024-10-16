@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "Beginning vulnerable packages check..."
 dotnet list package --vulnerable 2>&1 | tee ./build.log
 echo "Analyzing log file for vulnerabilities..."
 grep -q -i "critical\|high" ./build.log
