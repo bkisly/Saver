@@ -25,15 +25,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.PredictionsService", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.Client", "src\Saver.Client\Saver.Client.csproj", "{C19D175C-3FB7-4049-9485-E096EB888194}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saver.IntegrationTests", "test\Saver.IntegrationTests\Saver.IntegrationTests.csproj", "{334B996C-CA19-4923-8B95-D7ACA49C964A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.IntegrationTests", "test\Saver.IntegrationTests\Saver.IntegrationTests.csproj", "{334B996C-CA19-4923-8B95-D7ACA49C964A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saver.BudgetService.Tests", "test\Saver.BudgetService.Tests\Saver.BudgetService.Tests.csproj", "{2777088E-32B1-4A4E-A414-DFA69FD7CEBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.BudgetService.Tests", "test\Saver.BudgetService.Tests\Saver.BudgetService.Tests.csproj", "{2777088E-32B1-4A4E-A414-DFA69FD7CEBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saver.FinanceService.Tests", "test\Saver.FinanceService.Tests\Saver.FinanceService.Tests.csproj", "{6E51725A-8C37-4E6B-9322-B634E0835D4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.FinanceService.Tests", "test\Saver.FinanceService.Tests\Saver.FinanceService.Tests.csproj", "{6E51725A-8C37-4E6B-9322-B634E0835D4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saver.PredictionsService.Tests", "test\Saver.PredictionsService.Tests\Saver.PredictionsService.Tests.csproj", "{76A68DE8-822C-4017-8ECA-77172A2D479D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.PredictionsService.Tests", "test\Saver.PredictionsService.Tests\Saver.PredictionsService.Tests.csproj", "{76A68DE8-822C-4017-8ECA-77172A2D479D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saver.IdentityService.Tests", "test\Saver.IdentityService.Tests\Saver.IdentityService.Tests.csproj", "{81356018-6376-4DC6-96FD-1CB825372C35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.IdentityService.Tests", "test\Saver.IdentityService.Tests\Saver.IdentityService.Tests.csproj", "{81356018-6376-4DC6-96FD-1CB825372C35}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saver.EventBus", "src\Saver.EventBus\Saver.EventBus.csproj", "{954CC57A-4D70-40E8-9253-3FF663AA3429}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +91,10 @@ Global
 		{81356018-6376-4DC6-96FD-1CB825372C35}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81356018-6376-4DC6-96FD-1CB825372C35}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81356018-6376-4DC6-96FD-1CB825372C35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{954CC57A-4D70-40E8-9253-3FF663AA3429}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{954CC57A-4D70-40E8-9253-3FF663AA3429}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{954CC57A-4D70-40E8-9253-3FF663AA3429}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{954CC57A-4D70-40E8-9253-3FF663AA3429}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
