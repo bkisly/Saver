@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Saver.IdentityService.Data;
+using Saver.ServiceDefaults;
 
 namespace Saver.IdentityService.Extensions;
 
@@ -10,7 +11,7 @@ public static class Extensions
     {
         var services = builder.Services;
 
-        builder.AddNpgsqlDbContext<ApplicationDbContext>("identityservice-db");
+        builder.AddNpgsqlDbContext<ApplicationDbContext>(ServicesNames.IdentityServiceDatabase);
 
         services.AddIdentityApiEndpoints<IdentityUser>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
