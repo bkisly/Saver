@@ -1,9 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ServiceDiscovery;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -101,6 +101,17 @@ namespace Microsoft.Extensions.Hosting
                 // Add a default liveness check to ensure app is responsive
                 .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
 
+            return builder;
+        }
+
+        public static IHostApplicationBuilder AddEndpointsAuthorization(this IHostApplicationBuilder builder)
+        {
+            builder.Services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
             return builder;
         }
 
