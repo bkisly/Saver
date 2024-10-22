@@ -1,9 +1,11 @@
 using Saver.FinanceService.Api;
+using Saver.FinanceService.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.AddDefaultSwagger();
+builder.AddApplicationServices();
 
 var app = builder.Build();
 
