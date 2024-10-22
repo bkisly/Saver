@@ -1,0 +1,1 @@
+global using Saver.Common.DDD;

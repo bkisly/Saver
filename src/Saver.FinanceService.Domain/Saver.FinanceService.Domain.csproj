@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Saver.Common\Saver.Common\Saver.Common.csproj" />
+  </ItemGroup>
+
 </Project>
