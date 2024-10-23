@@ -37,11 +37,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.IdentityService.Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.EventBus", "src\Saver.EventBus\Saver.EventBus.csproj", "{954CC57A-4D70-40E8-9253-3FF663AA3429}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saver.FinanceService.Domain", "src\Saver.FinanceService.Domain\Saver.FinanceService.Domain.csproj", "{7CBE3591-4544-40D3-A018-E49AE50EF216}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.FinanceService.Domain", "src\Saver.FinanceService.Domain\Saver.FinanceService.Domain.csproj", "{7CBE3591-4544-40D3-A018-E49AE50EF216}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saver.FinanceService.Infrastructure", "src\Saver.FinanceService.Infrastructure\Saver.FinanceService.Infrastructure.csproj", "{6D1C02C5-412B-4E9D-8520-3674FB0076C8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saver.Common", "src\Saver.Common\Saver.Common\Saver.Common.csproj", "{5673A5D7-ED4C-4608-AED8-43C24B905B13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.FinanceService.Infrastructure", "src\Saver.FinanceService.Infrastructure\Saver.FinanceService.Infrastructure.csproj", "{6D1C02C5-412B-4E9D-8520-3674FB0076C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -109,10 +107,6 @@ Global
 		{6D1C02C5-412B-4E9D-8520-3674FB0076C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D1C02C5-412B-4E9D-8520-3674FB0076C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D1C02C5-412B-4E9D-8520-3674FB0076C8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5673A5D7-ED4C-4608-AED8-43C24B905B13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5673A5D7-ED4C-4608-AED8-43C24B905B13}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5673A5D7-ED4C-4608-AED8-43C24B905B13}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5673A5D7-ED4C-4608-AED8-43C24B905B13}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
