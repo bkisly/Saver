@@ -1,3 +1,5 @@
+using CSharpFunctionalExtensions;
+
 namespace Saver.FinanceService.Domain;
 
 public class TransactionData : ValueObject, ICloneable

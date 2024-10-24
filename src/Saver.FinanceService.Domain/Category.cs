@@ -1,6 +1,6 @@
 namespace Saver.FinanceService.Domain;
 
-public class Category : Entity<Guid>
+public class Category : EventPublishingEntity<Guid>
 {
     private string _name = null!;
     public string Name
