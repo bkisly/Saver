@@ -1,14 +1,14 @@
 namespace Saver.FinanceService.Domain;
 
-public class Transaction(TransactionDefinition definition, DateTime creationDate) : Entity<Guid>
+public class Transaction(TransactionData data, DateTime creationDate) : Entity<Guid>, IAggregateRoot
 {
-    private TransactionDefinition _definition = (TransactionDefinition)definition.Clone();
-    public TransactionDefinition TransactionDefinition
+    private TransactionData _data = (TransactionData)data.Clone();
+    public TransactionData TransactionData
     {
-        get => _definition;
-        set => _definition = (TransactionDefinition)value.Clone();
+        get => _data;
+        set => _data = (TransactionData)value.Clone();
     }
 
     public DateTime CreationDate { get; } = creationDate;
-    public TransactionType TransactionType => TransactionDefinition.Value > 0 ? TransactionType.Income : TransactionType.Outcome;
+    public TransactionType TransactionType => TransactionData.Value > 0 ? TransactionType.Income : TransactionType.Outcome;
 }

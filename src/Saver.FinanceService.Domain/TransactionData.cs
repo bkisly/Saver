@@ -1,13 +1,13 @@
 namespace Saver.FinanceService.Domain;
 
-public class TransactionDefinition : ValueObject, ICloneable
+public class TransactionData : ValueObject, ICloneable
 {
     public string Name { get; }
     public string? Description { get; }
     public decimal Value { get; }
     public Category? Category { get; }
 
-    public TransactionDefinition(string name, string? description, decimal value, Category? category)
+    public TransactionData(string name, string? description, decimal value, Category? category)
     {
         if (string.IsNullOrEmpty(name))
             throw new FinanceDomainException("Transaction name cannot be empty.");
