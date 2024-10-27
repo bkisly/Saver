@@ -1,4 +1,4 @@
-namespace Saver.FinanceService.Domain;
+namespace Saver.FinanceService.Domain.TransactionModel;
 
 public enum TransactionType
 {

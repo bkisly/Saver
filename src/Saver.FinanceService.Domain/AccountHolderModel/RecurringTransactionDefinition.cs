@@ -1,6 +1,7 @@
 using Quartz;
+using Saver.FinanceService.Domain.TransactionModel;
 
-namespace Saver.FinanceService.Domain;
+namespace Saver.FinanceService.Domain.AccountHolderModel;
 
 public class RecurringTransactionDefinition : EventPublishingEntity<Guid>
 {

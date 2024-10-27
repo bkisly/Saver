@@ -1,12 +1,14 @@
-namespace Saver.FinanceService.Domain;
+using CSharpFunctionalExtensions;
 
-public class Category : EventPublishingEntity<Guid>
+namespace Saver.FinanceService.Domain.AccountHolderModel;
+
+public class Category : Entity<Guid>
 {
     private string _name = null!;
     public string Name
     {
         get => _name;
-        set
+        internal set
         {
             if (string.IsNullOrEmpty(value))
                 throw new FinanceDomainException("Name of the category cannot be empty.");

@@ -1,9 +1,8 @@
 using CSharpFunctionalExtensions;
-using Saver.FinanceService.Domain.BankAccounts;
 
-namespace Saver.FinanceService.Domain;
+namespace Saver.FinanceService.Domain.AccountHolderModel;
 
-public class AccountHolder : Entity<Guid>, IAggregateRoot
+public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
 {
     private readonly List<BankAccount> _accounts = [];
     private readonly List<Category> _categories = [];
@@ -71,18 +70,16 @@ public class AccountHolder : Entity<Guid>, IAggregateRoot
 
     private BankAccount FindAccountById(Guid accountId)
     {
-        var account = _accounts.SingleOrDefault(x => x.Id == accountId);
-        if (account == null)
-            throw new FinanceDomainException($"Account with ID {accountId} does not exist.");
+        var account = _accounts.SingleOrDefault(x => x.Id == accountId)
+            ?? throw new FinanceDomainException($"Account with ID {accountId} does not exist.");
 
         return account;
     }
 
     private Category FindCategoryById(Guid categoryId)
     {
-        var category = _categories.SingleOrDefault(x => x.Id == categoryId);
-        if (category == null)
-            throw new FinanceDomainException($"Category with ID {categoryId} does not exist.");
+        var category = _categories.SingleOrDefault(x => x.Id == categoryId)
+            ?? throw new FinanceDomainException($"Category with ID {categoryId} does not exist.");
 
         return category;
     }

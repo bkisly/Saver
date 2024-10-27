@@ -1,4 +1,6 @@
-namespace Saver.FinanceService.Domain.BankAccounts;
+using Saver.FinanceService.Domain.TransactionModel;
+
+namespace Saver.FinanceService.Domain.AccountHolderModel;
 
 public class ManualBankAccount : BankAccount
 {

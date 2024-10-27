@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
+using Saver.FinanceService.Domain.AccountHolderModel;
 
-namespace Saver.FinanceService.Domain;
+namespace Saver.FinanceService.Domain.TransactionModel;
 
 public class TransactionData : ValueObject, ICloneable
 {
@@ -26,8 +27,8 @@ public class TransactionData : ValueObject, ICloneable
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Name;
-        
-        if (Description != null) 
+
+        if (Description != null)
             yield return Description;
 
         yield return Value;

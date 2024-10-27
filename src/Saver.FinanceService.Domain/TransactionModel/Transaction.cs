@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 
-namespace Saver.FinanceService.Domain;
+namespace Saver.FinanceService.Domain.TransactionModel;
 
 public class Transaction(Guid accountId, TransactionData data, DateTime creationDate) : Entity<Guid>, IAggregateRoot
 {
