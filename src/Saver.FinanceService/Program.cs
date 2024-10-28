@@ -19,4 +19,9 @@ app.MapAccountsApi()
 
 app.UseDefaultSwagger();
 
+if (app.Environment.IsDevelopment())
+{
+    app.ApplyMigrations();
+}
+
 app.Run();

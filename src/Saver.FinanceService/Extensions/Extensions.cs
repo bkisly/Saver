@@ -21,4 +21,12 @@ public static class Extensions
         
         return builder;
     }
+
+    public static WebApplication ApplyMigrations(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<FinanceDbContext>();
+        context.Database.Migrate();
+        return app;
+    }
 }
