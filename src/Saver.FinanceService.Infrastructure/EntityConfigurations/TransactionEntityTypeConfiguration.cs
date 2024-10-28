@@ -1,17 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Saver.FinanceService.Domain.AccountHolderModel;
+using Saver.FinanceService.Domain.TransactionModel;
 
 namespace Saver.FinanceService.Infrastructure.EntityConfigurations;
 
-internal class RecurringTransactionDefinitionEntityTypeConfiguration
-    : IEntityTypeConfiguration<RecurringTransactionDefinition>
+internal class TransactionEntityTypeConfiguration : IEntityTypeConfiguration<Transaction>
 {
-    public void Configure(EntityTypeBuilder<RecurringTransactionDefinition> builder)
+    public void Configure(EntityTypeBuilder<Transaction> builder)
     {
-        builder.ToTable("recurringTransactionDefinitions");
-
-        builder.Ignore(x => x.DomainEvents);
+        builder.ToTable("transactions");
 
         builder.HasKey(t => t.Id);
 
@@ -29,7 +27,9 @@ internal class RecurringTransactionDefinitionEntityTypeConfiguration
             .WithMany()
             .OnDelete(DeleteBehavior.SetNull);
 
-        builder.Property(x => x.Cron)
-            .IsRequired();
+        builder.HasOne<BankAccount>()
+            .WithMany()
+            .HasForeignKey(x => x.AccountId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
