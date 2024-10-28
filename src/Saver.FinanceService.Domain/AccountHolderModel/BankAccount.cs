@@ -18,12 +18,18 @@ public abstract class BankAccount : EventPublishingEntity<Guid>
     }
 
     public decimal Balance { get; protected set; }
-    public string Currency { get; protected set; }
+    public string Currency { get; protected set; } = null!;
 
-    protected BankAccount(string name, string currency)
+    public Guid AccountHolderId { get; private set; }
+
+    protected BankAccount()
+    { }
+
+    protected BankAccount(string name, string currency, Guid accountHolderId)
     {
         Name = name;
         Currency = currency;
+        AccountHolderId = accountHolderId;
     }
 
     public void CreateTransaction(TransactionData data)

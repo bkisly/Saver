@@ -30,6 +30,7 @@ internal class RecurringTransactionDefinitionEntityTypeConfiguration
             .OnDelete(DeleteBehavior.SetNull);
 
         builder.Property(x => x.Cron)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(256);
     }
 }

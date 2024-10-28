@@ -10,6 +10,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     public IReadOnlyList<BankAccount> Accounts => _accounts.AsReadOnly();
     public IReadOnlyList<Category> Categories => _categories.AsReadOnly();
 
+    public Guid? DefaultAccountId { get; private set; }
     public BankAccount? DefaultAccount { get; private set; }
 
     public void CreateManualAccount(string name, string currency, decimal initialBalance)
@@ -17,7 +18,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         if (_accounts.Any(x => x.Name == name))
             throw new FinanceDomainException($"An account with name: {name} already exists.");
 
-        var account = new ManualBankAccount(name, currency, initialBalance);
+        var account = new ManualBankAccount(name, currency, initialBalance, Id);
         _accounts.Add(account);
         DefaultAccount ??= account;
     }

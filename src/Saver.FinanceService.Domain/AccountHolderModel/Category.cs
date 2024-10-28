@@ -19,6 +19,9 @@ public class Category : Entity<Guid>
 
     public string? Description { get; set; }
 
+    private Category()
+    { }
+
     public Category(string name, string? description)
     {
         Name = name;

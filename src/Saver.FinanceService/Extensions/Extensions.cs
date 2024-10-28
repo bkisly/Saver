@@ -1,4 +1,7 @@
 ﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
+using Saver.FinanceService.Infrastructure;
+using Saver.ServiceDefaults;
 
 namespace Saver.FinanceService.Extensions;
 
@@ -11,6 +14,11 @@ public static class Extensions
             configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
 
+        builder.Services.AddDbContext<FinanceDbContext>(options =>
+        {
+            options.UseNpgsql(builder.Configuration.GetConnectionString(ServicesNames.FinanceServiceDatabase));
+        });
+        
         return builder;
     }
 }

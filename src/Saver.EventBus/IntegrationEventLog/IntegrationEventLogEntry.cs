@@ -4,20 +4,32 @@ using System.Text.Json;
 
 namespace Saver.EventBus.IntegrationEventLog;
 
-public class IntegrationEventLogEntry(IntegrationEvent e, Guid transactionId)
+public class IntegrationEventLogEntry
 {
     private static readonly JsonSerializerOptions IndentedOptions = new() { WriteIndented = true };
     private static readonly JsonSerializerOptions CaseInsensitiveOptions = new() { PropertyNameCaseInsensitive = true };
 
-    public Guid EventId { get; private set; } = e.Id;
-    [Required] public string EventTypeName { get; private set; } = e.GetType().FullName ?? string.Empty;
+    private IntegrationEventLogEntry()
+    { }
+
+    public IntegrationEventLogEntry(IntegrationEvent integrationEvent, Guid transactionId)
+    {
+        EventId = integrationEvent.Id;
+        EventTypeName = integrationEvent.GetType().FullName ?? string.Empty;
+        CreationTime = integrationEvent.CreationDate;
+        Content = JsonSerializer.Serialize(integrationEvent, integrationEvent.GetType(), IndentedOptions);
+        TransactionId = transactionId;
+    }
+
+    public Guid EventId { get; private set; }
+    [Required] public string EventTypeName { get; private set; } = null!;
     [NotMapped] public string EventTypeShortName => EventTypeName.Split('.').Last();
     [NotMapped] public IntegrationEvent? IntegrationEvent { get; private set; }
     public EventState State { get; set; } = EventState.NotPublished;
     public int TimesSent { get; set; } = 0;
-    public DateTime CreationTime { get; private set; } = e.CreationDate;
-    [Required] public string Content { get; private set; } = JsonSerializer.Serialize(e, e.GetType(), IndentedOptions);
-    public Guid TransactionId { get; private set; } = transactionId;
+    public DateTime CreationTime { get; private set; }
+    [Required] public string Content { get; private set; } = null!;
+    public Guid TransactionId { get; private set; }
 
     public IntegrationEventLogEntry DeserializeJsonContent(Type type)
     {

@@ -8,7 +8,11 @@ public class ManualBankAccount : BankAccount
     public IReadOnlyCollection<RecurringTransactionDefinition> RecurringTransactions =>
         _recurringTransactions.AsReadOnly();
 
-    public ManualBankAccount(string name, string currency, decimal initialBalance) : base(name, currency)
+    private ManualBankAccount()
+    { }
+
+    public ManualBankAccount(string name, string currency, decimal initialBalance, Guid accountHolderId) 
+        : base(name, currency, accountHolderId)
     {
         Balance = initialBalance;
     }

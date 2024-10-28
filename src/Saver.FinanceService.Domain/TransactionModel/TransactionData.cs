@@ -5,10 +5,13 @@ namespace Saver.FinanceService.Domain.TransactionModel;
 
 public class TransactionData : ValueObject, ICloneable
 {
-    public string Name { get; }
+    public string Name { get; } = null!;
     public string? Description { get; }
     public decimal Value { get; }
     public Category? Category { get; }
+
+    private TransactionData()
+    { }
 
     public TransactionData(string name, string? description, decimal value, Category? category)
     {

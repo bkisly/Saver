@@ -14,14 +14,20 @@ internal class AccountHolderEntityTypeConfiguration : IEntityTypeConfiguration<A
 
         builder.HasKey(x => x.Id);
 
-        builder.HasMany(x => x.Accounts)
-            .WithOne()
-            .OnDelete(DeleteBehavior.Cascade);
-
         builder.HasMany(x => x.Categories)
             .WithOne();
 
+        builder.HasMany(x => x.Accounts)
+            .WithOne()
+            .HasForeignKey(x => x.AccountHolderId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasOne(x => x.DefaultAccount)
-            .WithOne();
+            .WithMany()
+            .HasForeignKey(x => x.DefaultAccountId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(x => x.DefaultAccountId)
+            .IsUnique();
     }
 }

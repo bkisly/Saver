@@ -5,8 +5,11 @@ namespace Saver.FinanceService.Domain.AccountHolderModel;
 
 public class RecurringTransactionDefinition : EventPublishingEntity<Guid>
 {
-    public string Cron { get; private set; }
-    public TransactionData TransactionData { get; set; }
+    public string Cron { get; private set; } = null!;
+    public TransactionData TransactionData { get; set; } = null!;
+
+    private RecurringTransactionDefinition()
+    { }
 
     public RecurringTransactionDefinition(TransactionData data, string cron)
     {
