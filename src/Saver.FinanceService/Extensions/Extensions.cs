@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Saver.FinanceService.Domain.Repositories;
 using Saver.FinanceService.Infrastructure;
+using Saver.FinanceService.Infrastructure.Repositories;
 using Saver.ServiceDefaults;
 
 namespace Saver.FinanceService.Extensions;
@@ -9,15 +11,20 @@ public static class Extensions
 {
     public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
     {
-        builder.Services.AddMediatR(configuration =>
+        var services = builder.Services;
+
+        services.AddMediatR(configuration =>
         {
             configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
 
-        builder.Services.AddDbContext<FinanceDbContext>(options =>
+        services.AddDbContext<FinanceDbContext>(options =>
         {
             options.UseNpgsql(builder.Configuration.GetConnectionString(ServicesNames.FinanceServiceDatabase));
         });
+
+        services.AddScoped<IAccountHolderRepository, AccountHolderRepository>();
+        services.AddScoped<ITransactionRepository, TransactionRepository>();
         
         return builder;
     }
