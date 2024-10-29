@@ -8,12 +8,13 @@ public class TransactionData : ValueObject, ICloneable
     public string Name { get; } = null!;
     public string? Description { get; }
     public decimal Value { get; }
+    public Currency Currency { get; } = null!;
     public Category? Category { get; }
 
     private TransactionData()
     { }
 
-    public TransactionData(string name, string? description, decimal value, Category? category)
+    public TransactionData(string name, string? description, decimal value, Currency currency, Category? category)
     {
         if (string.IsNullOrEmpty(name))
             throw new FinanceDomainException("Transaction name cannot be empty.");
@@ -35,6 +36,7 @@ public class TransactionData : ValueObject, ICloneable
             yield return Description;
 
         yield return Value;
+        yield return Currency;
 
         if (Category != null)
             yield return Category;

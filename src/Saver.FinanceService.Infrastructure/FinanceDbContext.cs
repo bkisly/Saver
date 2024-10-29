@@ -18,12 +18,14 @@ public class FinanceDbContext(IMediator mediator, DbContextOptions<FinanceDbCont
     public DbSet<ManualBankAccount> ManualBankAccounts { get; set; }
     public DbSet<RecurringTransactionDefinition> RecurringTransactionDefinitions { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<Currency> Currencies { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("finance");
         modelBuilder.ApplyConfiguration(new CategoryEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new CurrencyEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new RecurringTransactionDefinitionEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new BankAccountEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new ManualBankAccountEntityTypeConfiguration());

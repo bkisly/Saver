@@ -1,0 +1,56 @@
+namespace Saver.FinanceService.Domain.AccountHolderModel;
+
+public class Currency(int id, string name) : Enumeration(id, name)
+{
+    public static readonly Currency AED = new(1, "AED");
+    public static readonly Currency ARS = new(2, "ARS");
+    public static readonly Currency AUD = new(3, "AUD");
+    public static readonly Currency BGN = new(4, "BGN");
+    public static readonly Currency BRL = new(5, "BRL");
+    public static readonly Currency BSD = new(6, "BSD");
+    public static readonly Currency CAD = new(7, "CAD");
+    public static readonly Currency CHF = new(8, "CHF");
+    public static readonly Currency CLP = new(9, "CLP");
+    public static readonly Currency CNY = new(10, "CNY");
+    public static readonly Currency COP = new(11, "COP");
+    public static readonly Currency CZK = new(12, "CZK");
+    public static readonly Currency DKK = new(13, "DKK");
+    public static readonly Currency DOP = new(14, "DOP");
+    public static readonly Currency EGP = new(15, "EGP");
+    public static readonly Currency EUR = new(16, "EUR");
+    public static readonly Currency FJD = new(17, "FJD");
+    public static readonly Currency GBP = new(18, "GBP");
+    public static readonly Currency GTQ = new(19, "GTQ");
+    public static readonly Currency HKD = new(20, "HKD");
+    public static readonly Currency HRK = new(21, "HRK");
+    public static readonly Currency HUF = new(22, "HUF");
+    public static readonly Currency IDR = new(23, "IDR");
+    public static readonly Currency ILS = new(24, "ILS");
+    public static readonly Currency INR = new(25, "INR");
+    public static readonly Currency ISK = new(26, "ISK");
+    public static readonly Currency JPY = new(27, "JPY");
+    public static readonly Currency KRW = new(28, "KRW");
+    public static readonly Currency KZT = new(29, "KZT");
+    public static readonly Currency MXN = new(30, "MXN");
+    public static readonly Currency MYR = new(31, "MYR");
+    public static readonly Currency NOK = new(32, "NOK");
+    public static readonly Currency NZD = new(33, "NZD");
+    public static readonly Currency PAB = new(34, "PAB");
+    public static readonly Currency PEN = new(35, "PEN");
+    public static readonly Currency PHP = new(36, "PHP");
+    public static readonly Currency PKR = new(37, "PKR");
+    public static readonly Currency PLN = new(38, "PLN");
+    public static readonly Currency PYG = new(39, "PYG");
+    public static readonly Currency RON = new(40, "RON");
+    public static readonly Currency RUB = new(41, "RUB");
+    public static readonly Currency SAR = new(42, "SAR");
+    public static readonly Currency SEK = new(43, "SEK");
+    public static readonly Currency SGD = new(44, "SGD");
+    public static readonly Currency THB = new(45, "THB");
+    public static readonly Currency TRY = new(46, "TRY");
+    public static readonly Currency TWD = new(47, "TWD");
+    public static readonly Currency UAH = new(48, "UAH");
+    public static readonly Currency USD = new(49, "USD");
+    public static readonly Currency UYU = new(50, "UYU");
+    public static readonly Currency ZAR = new(51, "ZAR");
+}

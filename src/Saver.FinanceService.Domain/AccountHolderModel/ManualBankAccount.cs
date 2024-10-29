@@ -11,7 +11,7 @@ public class ManualBankAccount : BankAccount
     private ManualBankAccount()
     { }
 
-    public ManualBankAccount(string name, string currency, decimal initialBalance, Guid accountHolderId) 
+    public ManualBankAccount(string name, Currency currency, decimal initialBalance, Guid accountHolderId) 
         : base(name, currency, accountHolderId)
     {
         Balance = initialBalance;
@@ -29,7 +29,7 @@ public class ManualBankAccount : BankAccount
         // @TODO: launch transaction deleted domain event
     }
 
-    public void ChangeAccountCurrency(string newCurrency)
+    public void ChangeAccountCurrency(Currency newCurrency)
     {
         Currency = newCurrency;
         // @TODO: launch transaction currency changed event

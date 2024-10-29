@@ -5,7 +5,7 @@ public class ExternalBankAccount : BankAccount
     private ExternalBankAccount()
     { }
 
-    public ExternalBankAccount(string name, string currency, Guid accountHolderId) 
+    public ExternalBankAccount(string name, Currency currency, Guid accountHolderId) 
         : base(name, currency, accountHolderId)
     { }
 }

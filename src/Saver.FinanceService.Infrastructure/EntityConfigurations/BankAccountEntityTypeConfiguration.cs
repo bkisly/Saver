@@ -21,8 +21,7 @@ internal class BankAccountEntityTypeConfiguration : IEntityTypeConfiguration<Ban
             .IsRequired()
             .HasMaxLength(256);
 
-        builder.Property(x => x.Currency)
-            .IsRequired()
-            .HasMaxLength(256);
+        builder.HasOne(x => x.Currency)
+            .WithMany();
     }
 }

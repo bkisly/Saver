@@ -1,5 +1,3 @@
-using CSharpFunctionalExtensions;
-
 namespace Saver.FinanceService.Domain.AccountHolderModel;
 
 public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
@@ -13,7 +11,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     public Guid? DefaultAccountId { get; private set; }
     public BankAccount? DefaultAccount { get; private set; }
 
-    public void CreateManualAccount(string name, string currency, decimal initialBalance)
+    public void CreateManualAccount(string name, Currency currency, decimal initialBalance)
     {
         if (_accounts.Any(x => x.Name == name))
             throw new FinanceDomainException($"An account with name: {name} already exists.");
