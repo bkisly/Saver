@@ -33,12 +33,20 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     public void SetDefaultAccount(Guid accountId)
     {
         DefaultAccount = FindAccountById(accountId);
+        DefaultAccountId = accountId;
     }
 
     public void RemoveAccount(Guid accountId)
     {
         var accountToRemove = FindAccountById(accountId);
         _accounts.Remove(accountToRemove);
+
+        if (DefaultAccount == accountToRemove)
+        {
+            DefaultAccount = null;
+            DefaultAccountId = null;
+        }
+
         // @TODO: publish event that account was removed.
     }
 
