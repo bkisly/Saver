@@ -35,7 +35,7 @@ public class AccountHolderAggregateTests
 
         // Assert
         Assert.Equal(expectedAccount, accountHolder.DefaultAccount);
-        Assert.Equal(expectedAccount.Id, accountHolder.Accounts.Last().Id);
+        Assert.Equal(expectedAccount.Id, accountHolder.Accounts[^1].Id);
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class AccountHolderAggregateTests
 
         // Assert
         Assert.Equal(expectedDefaultAccount, accountHolder.DefaultAccount);
-        Assert.Equal(expectedDefaultAccount.Id, accountHolder.Accounts.Last().Id);
+        Assert.Equal(expectedDefaultAccount.Id, accountHolder.Accounts[^1].Id);
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public class AccountHolderAggregateTests
         var accountHolder = new AccountHolder();
         accountHolder.CreateManualAccount("Account1", Currency.USD, 20.35M);
         accountHolder.CreateManualAccount("Account2", Currency.USD, 20.35M);
-        var testAccount = accountHolder.Accounts.Last();
+        var testAccount = accountHolder.Accounts[^1];
 
         // Assert
         Assert.Throws<FinanceDomainException>(() => accountHolder.RenameAccount(testAccount.Id, "Account1"));

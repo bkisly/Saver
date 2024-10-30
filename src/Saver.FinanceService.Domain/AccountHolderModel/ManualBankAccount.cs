@@ -1,3 +1,4 @@
+using Saver.FinanceService.Domain.Events;
 using Saver.FinanceService.Domain.TransactionModel;
 
 namespace Saver.FinanceService.Domain.AccountHolderModel;
@@ -20,30 +21,35 @@ public class ManualBankAccount : BankAccount
     public void UpdateTransaction(Guid transactionId, TransactionData oldTransaction, TransactionData newTransaction)
     {
         Balance += newTransaction.Value - oldTransaction.Value;
-        // @TODO: launch transaction updated domain event
+        AddDomainEvent(new TransactionUpdatedDomainEvent(transactionId, newTransaction));
     }
 
     public void DeleteTransaction(Guid transactionId, TransactionData dataToDelete)
     {
         Balance -= dataToDelete.Value;
-        // @TODO: launch transaction deleted domain event
+        AddDomainEvent(new TransactionDeletedDomainEvent(transactionId));
     }
 
-    public void ChangeAccountCurrency(Currency newCurrency)
+    public void ChangeAccountCurrency(Currency newCurrency, decimal exchangeRate)
     {
+        if (exchangeRate < 0)
+            throw new FinanceDomainException("Exchange rate must be a number greater than 0.");
+
+        Balance *= exchangeRate;
         Currency = newCurrency;
-        // @TODO: launch transaction currency changed event
+        AddDomainEvent(new AccountCurrencyChangedDomainEvent(Id, newCurrency, exchangeRate));
     }
 
     public void CreateRecurringTransaction(TransactionData data, string cron)
     {
-        _recurringTransactions.Add(new RecurringTransactionDefinition(data, cron));
-        // @TODO: launch recurring transaction
+        var transaction = new RecurringTransactionDefinition(data, cron);
+        _recurringTransactions.Add(transaction);
+        AddDomainEvent(new RecurringTransactionCreatedDomainEvent(Id, transaction));
     }
 
     public void DeleteRecurringTransaction(RecurringTransactionDefinition recurringTransaction)
     {
         _recurringTransactions.Remove(recurringTransaction);
-        // @TODO: launch recurring deleted
+        AddDomainEvent(new RecurringTransactionDeletedDomainEvent(recurringTransaction.Id));
     }
 }

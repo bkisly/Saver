@@ -1,3 +1,4 @@
+using Saver.FinanceService.Domain.Events;
 using Saver.FinanceService.Domain.TransactionModel;
 
 namespace Saver.FinanceService.Domain.AccountHolderModel;
@@ -32,15 +33,15 @@ public abstract class BankAccount : EventPublishingEntity<Guid>
         AccountHolderId = accountHolderId;
     }
 
-    public void CreateTransaction(TransactionData data)
+    public void CreateTransaction(TransactionData data, DateTime creationDate)
     {
         Balance += data.Value;
-        // @TODO: transaction created domain event
+        AddDomainEvent(new TransactionCreatedDomainEvent(Id, data, creationDate));
     }
 
-    public void CreateTransactions(IEnumerable<(TransactionData Data, DateTime CreationDate)> transactions)
+    public void CreateTransactions(List<(TransactionData Data, DateTime CreationDate)> transactions)
     {
         Balance += transactions.Sum(x => x.Data.Value);
-        // @TODO: transaction created domain event
+        AddDomainEvent(new TransactionsCreatedDomainEvent(Id, transactions));
     }
 }
