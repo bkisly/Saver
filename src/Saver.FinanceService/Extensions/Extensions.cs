@@ -3,6 +3,7 @@ using Saver.FinanceService.Behaviors;
 using Saver.FinanceService.Domain.Repositories;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Infrastructure.Repositories;
+using Saver.FinanceService.Services;
 using Saver.ServiceDefaults;
 
 namespace Saver.FinanceService.Extensions;
@@ -26,6 +27,9 @@ public static class Extensions
 
         services.AddScoped<IAccountHolderRepository, AccountHolderRepository>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
+
+        services.AddTransient<IIdentityService, IdentityService>();
+        services.AddTransient<IEventBusService, EventBusService>();
         
         return builder;
     }

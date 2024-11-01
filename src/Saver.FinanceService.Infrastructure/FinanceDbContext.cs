@@ -23,8 +23,8 @@ public class FinanceDbContext(IMediator mediator, DbContextOptions<FinanceDbCont
     public DbSet<Currency> Currencies { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
 
-    private IDbContextTransaction? _currentTransaction;
-    public bool HasActiveTransaction => _currentTransaction != null;
+    public IDbContextTransaction? CurrentTransaction { get; private set; }
+    public bool HasActiveTransaction => CurrentTransaction != null;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -52,21 +52,21 @@ public class FinanceDbContext(IMediator mediator, DbContextOptions<FinanceDbCont
         if (HasActiveTransaction)
             return null;
 
-        _currentTransaction = await Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
-        return _currentTransaction;
+        CurrentTransaction = await Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+        return CurrentTransaction;
     }
 
     public async Task CommitTransactionAsync(IDbContextTransaction transaction)
     {
         ArgumentNullException.ThrowIfNull(transaction);
 
-        if (transaction != _currentTransaction)
+        if (transaction != CurrentTransaction)
             throw new InvalidOperationException("Tried to commit other transaction than currently processed.");
 
         try
         {
             await SaveChangesAsync();
-            await _currentTransaction.CommitAsync();
+            await CurrentTransaction.CommitAsync();
         }
         catch
         {
@@ -77,8 +77,8 @@ public class FinanceDbContext(IMediator mediator, DbContextOptions<FinanceDbCont
         {
             if (HasActiveTransaction)
             {
-                _currentTransaction?.Dispose();
-                _currentTransaction = null;
+                CurrentTransaction?.Dispose();
+                CurrentTransaction = null;
             }
         }
     }
@@ -87,14 +87,14 @@ public class FinanceDbContext(IMediator mediator, DbContextOptions<FinanceDbCont
     {
         try
         {
-            _currentTransaction?.Rollback();
+            CurrentTransaction?.Rollback();
         }
         finally
         {
             if (HasActiveTransaction)
             {
-                _currentTransaction?.Dispose();
-                _currentTransaction = null;
+                CurrentTransaction?.Dispose();
+                CurrentTransaction = null;
             }
         }
     }
