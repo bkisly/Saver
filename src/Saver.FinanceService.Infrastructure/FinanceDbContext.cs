@@ -58,6 +58,8 @@ public class FinanceDbContext(IMediator mediator, DbContextOptions<FinanceDbCont
 
     public async Task CommitTransactionAsync(IDbContextTransaction transaction)
     {
+        ArgumentNullException.ThrowIfNull(transaction);
+
         if (transaction != _currentTransaction)
             throw new InvalidOperationException("Tried to commit other transaction than currently processed.");
 

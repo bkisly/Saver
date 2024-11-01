@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Saver.FinanceService.Behaviors;
 using Saver.FinanceService.Domain.Repositories;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Infrastructure.Repositories;
@@ -15,7 +15,8 @@ public static class Extensions
 
         services.AddMediatR(configuration =>
         {
-            configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+            configuration.RegisterServicesFromAssemblyContaining(typeof(Program));
+            configuration.AddOpenBehavior(typeof(TransactionBehavior<,>));
         });
 
         services.AddDbContext<FinanceDbContext>(options =>
