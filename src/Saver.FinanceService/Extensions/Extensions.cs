@@ -1,9 +1,13 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Saver.EventBus.IntegrationEventLog;
+using Saver.EventBus.RabbitMQ;
 using Saver.FinanceService.Behaviors;
 using Saver.FinanceService.Domain.Repositories;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Infrastructure.Repositories;
+using Saver.FinanceService.Middleware;
+using Saver.FinanceService.Queries;
 using Saver.FinanceService.Services;
 using Saver.ServiceDefaults;
 
@@ -29,11 +33,21 @@ public static class Extensions
             options.UseNpgsql(builder.Configuration.GetConnectionString(ServicesNames.FinanceServiceDatabase));
         });
 
+        builder.EnrichNpgsqlDbContext<FinanceDbContext>();
+
+        services.AddHttpContextAccessor();
+
+        builder.AddRabbitMQEventBus(ServicesNames.RabbitMQ)
+            .WithIntegrationEventLogs<FinanceDbContext>();
+
         services.AddScoped<IAccountHolderRepository, AccountHolderRepository>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
 
         services.AddTransient<IIdentityService, IdentityService>();
         services.AddTransient<IEventBusService, EventBusService>();
+        services.AddTransient<ValidationExceptionHandlingMiddleware>();
+
+        services.AddScoped<IAccountsQueries, AccountsQueries>();
         
         return builder;
     }

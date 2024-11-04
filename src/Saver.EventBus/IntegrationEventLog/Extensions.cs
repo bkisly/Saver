@@ -15,10 +15,9 @@ public static class Extensions
         });
     }
 
-    public static IServiceCollection AddIntegrationEventLogs<TContext>(this IServiceCollection services) 
+    public static void WithIntegrationEventLogs<TContext>(this EventBusBuilder builder) 
         where TContext : DbContext
     {
-        services.AddTransient<IIntegrationEventLogService, IntegrationEventLogService<TContext>>();
-        return services;
+        builder.Services.AddTransient<IIntegrationEventLogService, IntegrationEventLogService<TContext>>();
     }
 }

@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.2.2" />
     <PackageReference Include="FluentValidation" Version="11.10.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="MediatR" Version="12.4.1" />
@@ -24,6 +25,10 @@
     <ProjectReference Include="..\Saver.FinanceService.Domain\Saver.FinanceService.Domain.csproj" />
     <ProjectReference Include="..\Saver.FinanceService.Infrastructure\Saver.FinanceService.Infrastructure.csproj" />
     <ProjectReference Include="..\Saver.ServiceDefaults\Saver.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Commands\" />
   </ItemGroup>
 
 </Project>
