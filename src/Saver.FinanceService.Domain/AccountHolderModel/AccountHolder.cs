@@ -14,7 +14,8 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     public void CreateManualAccount(string name, Currency currency, decimal initialBalance)
     {
         if (_accounts.Any(x => x.Name == name))
-            throw new FinanceDomainException($"An account with name: {name} already exists.");
+            throw new FinanceDomainException($"An account with name: {name} already exists.", 
+                FinanceDomainErrorCode.NameConflict);
 
         var account = new ManualBankAccount(name, currency, initialBalance, Id);
         _accounts.Add(account);
@@ -24,7 +25,8 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     public void RenameAccount(Guid accountId, string newName)
     {
         if (_accounts.Any(x => x.Name == newName))
-            throw new FinanceDomainException($"An account with name: {newName} already exists.");
+            throw new FinanceDomainException($"An account with name: {newName} already exists.", 
+                FinanceDomainErrorCode.NameConflict);
 
         var account = FindAccountById(accountId);
         account.Name = newName;
@@ -41,19 +43,18 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         var accountToRemove = FindAccountById(accountId);
         _accounts.Remove(accountToRemove);
 
-        if (DefaultAccount == accountToRemove)
-        {
-            DefaultAccount = null;
-            DefaultAccountId = null;
-        }
+        if (DefaultAccount != accountToRemove) 
+            return;
 
-        // @TODO: publish event that account was removed.
+        DefaultAccount = null;
+        DefaultAccountId = null;
     }
 
     public void CreateCategory(string name, string? description)
     {
         if (_categories.Any(x => x.Name == name))
-            throw new FinanceDomainException($"A category with name: {name} already exists.");
+            throw new FinanceDomainException($"A category with name: {name} already exists.", 
+                FinanceDomainErrorCode.NameConflict);
 
         var category = new Category(name, description);
         _categories.Add(category);
@@ -62,7 +63,8 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     public void RenameCategory(Guid categoryId, string newName)
     {
         if (_accounts.Any(x => x.Name == newName))
-            throw new FinanceDomainException($"An account with name: {newName} already exists.");
+            throw new FinanceDomainException($"An account with name: {newName} already exists.", 
+                FinanceDomainErrorCode.NameConflict);
 
         var category = FindCategoryById(categoryId);
         category.Name = newName;
@@ -72,13 +74,13 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     {
         var categoryToRemove = FindCategoryById(categoryId);
         _categories.Remove(categoryToRemove);
-        // @TODO: publish event that category was removed.
     }
 
     private BankAccount FindAccountById(Guid accountId)
     {
         var account = _accounts.SingleOrDefault(x => x.Id == accountId)
-            ?? throw new FinanceDomainException($"Account with ID {accountId} does not exist.");
+            ?? throw new FinanceDomainException($"Account with ID {accountId} does not exist.", 
+                FinanceDomainErrorCode.NotFound);
 
         return account;
     }
@@ -86,7 +88,8 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     private Category FindCategoryById(Guid categoryId)
     {
         var category = _categories.SingleOrDefault(x => x.Id == categoryId)
-            ?? throw new FinanceDomainException($"Category with ID {categoryId} does not exist.");
+            ?? throw new FinanceDomainException($"Category with ID {categoryId} does not exist.", 
+                FinanceDomainErrorCode.NotFound);
 
         return category;
     }

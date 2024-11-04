@@ -12,7 +12,8 @@ public abstract class BankAccount : EventPublishingEntity<Guid>
         internal set
         {
             if (string.IsNullOrEmpty(value))
-                throw new FinanceDomainException("Account name cannot be empty");
+                throw new FinanceDomainException("Account name cannot be empty", 
+                    FinanceDomainErrorCode.EmptyValue);
 
             _name = value;
         }

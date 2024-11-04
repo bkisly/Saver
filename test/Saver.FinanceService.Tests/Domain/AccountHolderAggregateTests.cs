@@ -62,7 +62,8 @@ public class AccountHolderAggregateTests
         accountHolder.CreateManualAccount("Account1", Currency.USD, 20.35M);
 
         // Assert
-        Assert.Throws<FinanceDomainException>(() => accountHolder.CreateManualAccount("Account1", Currency.USD, 20M));
+        var exception = Assert.Throws<FinanceDomainException>(() => accountHolder.CreateManualAccount("Account1", Currency.USD, 20M));
+        Assert.Equal(FinanceDomainErrorCode.NameConflict, exception.ErrorCode);
         Assert.Single(accountHolder.Accounts);
     }
 
@@ -76,7 +77,8 @@ public class AccountHolderAggregateTests
         var testAccount = accountHolder.Accounts[^1];
 
         // Assert
-        Assert.Throws<FinanceDomainException>(() => accountHolder.RenameAccount(testAccount.Id, "Account1"));
+        var exception = Assert.Throws<FinanceDomainException>(() => accountHolder.RenameAccount(testAccount.Id, "Account1"));
+        Assert.Equal(FinanceDomainErrorCode.NameConflict, exception.ErrorCode);
         Assert.Equal("Account2", testAccount.Name);
     }
 }

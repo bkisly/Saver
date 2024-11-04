@@ -17,15 +17,16 @@ public class TransactionData : ValueObject, ICloneable
     public TransactionData(string name, string? description, decimal value, Currency currency, Category? category)
     {
         if (string.IsNullOrEmpty(name))
-            throw new FinanceDomainException("Transaction name cannot be empty.");
+            throw new FinanceDomainException("Transaction name cannot be empty.", FinanceDomainErrorCode.EmptyValue);
 
         if (value == 0)
-            throw new FinanceDomainException("Transaction value cannot be 0.");
+            throw new FinanceDomainException("Transaction value cannot be 0.", FinanceDomainErrorCode.InvalidValue);
 
         Name = name;
         Description = description;
         Value = value;
         Category = category;
+        Currency = currency;
     }
 
     protected override IEnumerable<object> GetEqualityComponents()

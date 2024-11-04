@@ -11,7 +11,8 @@ public class Category : Entity<Guid>
         internal set
         {
             if (string.IsNullOrEmpty(value))
-                throw new FinanceDomainException("Name of the category cannot be empty.");
+                throw new FinanceDomainException("Name of the category cannot be empty.", 
+                    FinanceDomainErrorCode.EmptyValue);
 
             _name = value;
         }

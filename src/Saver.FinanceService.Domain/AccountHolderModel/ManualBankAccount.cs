@@ -33,7 +33,8 @@ public class ManualBankAccount : BankAccount
     public void ChangeAccountCurrency(Currency newCurrency, decimal exchangeRate)
     {
         if (exchangeRate < 0)
-            throw new FinanceDomainException("Exchange rate must be a number greater than 0.");
+            throw new FinanceDomainException("Exchange rate must be a number greater than 0.", 
+                FinanceDomainErrorCode.InvalidValue);
 
         Balance *= exchangeRate;
         Currency = newCurrency;
