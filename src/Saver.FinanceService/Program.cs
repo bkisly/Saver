@@ -1,5 +1,6 @@
 using Saver.FinanceService.Api;
 using Saver.FinanceService.Extensions;
+using Saver.FinanceService.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ app.MapAccountsApi()
    .MapReportsApi();
 
 app.UseDefaultSwagger();
+app.UseMiddleware<ValidationExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
