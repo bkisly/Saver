@@ -1,4 +1,3 @@
-using Quartz;
 using Saver.FinanceService.Domain.Events;
 using Saver.FinanceService.Domain.TransactionModel;
 
@@ -14,10 +13,6 @@ public class RecurringTransactionDefinition : EventPublishingEntity<Guid>
 
     public RecurringTransactionDefinition(TransactionData data, string cron)
     {
-        if (!CronExpression.IsValidExpression(cron))
-            throw new FinanceDomainException($"Given expression ({cron}) is not a valid cron expression", 
-                FinanceDomainErrorCode.InvalidValue);
-
         TransactionData = data;
         Cron = cron;
     }
@@ -30,10 +25,6 @@ public class RecurringTransactionDefinition : EventPublishingEntity<Guid>
 
     public void UpdateCron(string cron)
     {
-        if (!CronExpression.IsValidExpression(cron))
-            throw new FinanceDomainException($"Given expression ({cron}) is not a valid cron expression", 
-                FinanceDomainErrorCode.InvalidValue);
-
         Cron = cron;
         AddDomainEvent(new RecurringTransactionUpdatedDomainEvent(this));
     }

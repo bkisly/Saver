@@ -5,19 +5,7 @@ namespace Saver.FinanceService.Domain.AccountHolderModel;
 
 public abstract class BankAccount : EventPublishingEntity<Guid>
 {
-    private string _name = null!;
-    public string Name
-    {
-        get => _name;
-        internal set
-        {
-            if (string.IsNullOrEmpty(value))
-                throw new FinanceDomainException("Account name cannot be empty", 
-                    FinanceDomainErrorCode.EmptyValue);
-
-            _name = value;
-        }
-    }
+    public string Name { get; internal set; }
 
     public decimal Balance { get; protected set; }
     public Currency Currency { get; protected set; } = null!;

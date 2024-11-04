@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Saver.FinanceService.Behaviors;
 using Saver.FinanceService.Domain.Repositories;
 using Saver.FinanceService.Infrastructure;
@@ -14,9 +15,12 @@ public static class Extensions
     {
         var services = builder.Services;
 
+        services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+
         services.AddMediatR(configuration =>
         {
             configuration.RegisterServicesFromAssemblyContaining(typeof(Program));
+            configuration.AddOpenBehavior(typeof(ValidationBehavior<,>));
             configuration.AddOpenBehavior(typeof(TransactionBehavior<,>));
         });
 
