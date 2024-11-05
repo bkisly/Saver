@@ -43,6 +43,7 @@ public static class Extensions
         services.AddScoped<IAccountHolderRepository, AccountHolderRepository>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
 
+        services.AddTransient<IAccountHolderService, AccountHolderService>();
         services.AddTransient<IIdentityService, IdentityService>();
         services.AddTransient<IEventBusService, EventBusService>();
         services.AddTransient<ValidationExceptionHandlingMiddleware>();

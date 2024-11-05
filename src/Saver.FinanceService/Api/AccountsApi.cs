@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Saver.FinanceService.Commands;
 using Saver.FinanceService.Domain.AccountHolderModel;
 using Saver.FinanceService.Queries;
 
@@ -14,7 +16,7 @@ public static class AccountsApi
         api.MapGet("/", GetAccountsAsync);
         api.MapGet("/default", GetDefaultAccountAsync);
         api.MapGet("/{id:guid}", GetAccountByIdAsync);
-        api.MapPost("/default", SetAccountAsDefault);
+        api.MapPut("/default/{id:guid}", SetAccountAsDefault);
         api.MapPost("/", CreateAccount);
         api.MapPut("/{id:guid}", EditAccount);
         api.MapDelete("/{id:guid}", DeleteAccount);
@@ -38,12 +40,15 @@ public static class AccountsApi
         Guid id, [FromServices] IAccountsQueries accountQueries)
     {
         var account = await accountQueries.FindAccountByIdAsync(id);
-        return account != null ? TypedResults.Ok(account) : TypedResults.NotFound();
+        return account is not null ? TypedResults.Ok(account) : TypedResults.NotFound();
     }
 
-    private static void SetAccountAsDefault()
+    private static async Task<Results<NoContent, ProblemHttpResult>> SetAccountAsDefault(
+        Guid id, [FromServices] IMediator mediator)
     {
-
+        var command = new SetAccountAsDefaultCommand(id);
+        var result = await mediator.Send(command);
+        return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
     }
 
     private static void CreateAccount()
