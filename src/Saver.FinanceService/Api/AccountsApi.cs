@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Saver.FinanceService.Commands;
 using Saver.FinanceService.Domain.AccountHolderModel;
+using Saver.FinanceService.Dto;
 using Saver.FinanceService.Queries;
 
 namespace Saver.FinanceService.Api;
@@ -17,7 +18,7 @@ public static class AccountsApi
         api.MapGet("/default", GetDefaultAccountAsync);
         api.MapGet("/{id:guid}", GetAccountByIdAsync);
         api.MapPut("/default/{id:guid}", SetAccountAsDefault);
-        api.MapPost("/", CreateAccount);
+        api.MapPost("/manual", CreateManualAccount);
         api.MapPut("/{id:guid}", EditAccount);
         api.MapDelete("/{id:guid}", DeleteAccount);
 
@@ -51,9 +52,12 @@ public static class AccountsApi
         return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
     }
 
-    private static void CreateAccount()
+    private static async Task<Results<Created, ProblemHttpResult>> CreateManualAccount(
+        CreateBankAccountDto bankAccount, [FromServices] IMediator mediator)
     {
-
+        var command = new CreateManualAccountCommand(bankAccount);
+        var result = await mediator.Send(command);
+        return result.IsSuccess ? TypedResults.Created() : result.ToHttpProblem();
     }
 
     private static void EditAccount()
