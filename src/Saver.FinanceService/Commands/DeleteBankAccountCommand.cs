@@ -4,22 +4,22 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record SetAccountAsDefaultCommand(Guid AccountId) : IRequest<CommandResult>;
+public record DeleteBankAccountCommand(Guid AccountId) : IRequest<CommandResult>;
 
-public class SetAccountAsDefaultCommandHandler(IAccountHolderService accountHolderService) 
-    : IRequestHandler<SetAccountAsDefaultCommand, CommandResult>
+public class DeleteBankAccountCommandHandler(IAccountHolderService accountHolderService) 
+    : IRequestHandler<DeleteBankAccountCommand, CommandResult>
 {
-    public async Task<CommandResult> Handle(SetAccountAsDefaultCommand request, CancellationToken cancellationToken)
+    public async Task<CommandResult> Handle(DeleteBankAccountCommand request, CancellationToken cancellationToken)
     {
         var accountHolder = await accountHolderService.GetCurrentAccountHolder();
         var repository = accountHolderService.Repository;
 
-        if (accountHolder == null)
+        if (accountHolder is null)
             return CommandResult.Error(FinanceDomainErrorCode.NotFound);
 
         try
         {
-            accountHolder.SetDefaultAccount(request.AccountId);
+            accountHolder.RemoveAccount(request.AccountId);
         }
         catch (FinanceDomainException ex)
         {

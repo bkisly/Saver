@@ -4,9 +4,9 @@ using Saver.FinanceService.Domain.AccountHolderModel;
 
 namespace Saver.FinanceService.Commands.Validators;
 
-public class CreateManualAccountCommandValidator : AbstractValidator<CreateManualAccountCommand>
+public class EditBankAccountCommandValidator : AbstractValidator<EditBankAccountCommand>
 {
-	public CreateManualAccountCommandValidator()
+    public EditBankAccountCommandValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty();
