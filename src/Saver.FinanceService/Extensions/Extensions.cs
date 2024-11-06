@@ -33,6 +33,8 @@ public static class Extensions
             options.UseNpgsql(builder.Configuration.GetConnectionString(ServicesNames.FinanceServiceDatabase));
         });
 
+        services.AddAutoMapper(typeof(Program));
+
         builder.EnrichNpgsqlDbContext<FinanceDbContext>();
 
         services.AddHttpContextAccessor();
@@ -49,6 +51,7 @@ public static class Extensions
         services.AddTransient<ValidationExceptionHandlingMiddleware>();
 
         services.AddScoped<IAccountsQueries, AccountsQueries>();
+        services.AddScoped<ICategoryQueries, CategoryQueries>();
 
         services.AddCommandValidators();
         

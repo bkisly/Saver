@@ -22,10 +22,10 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         DefaultAccount ??= account;
     }
 
-    public void RenameAccount(Guid accountId, string newName)
+    public void EditAccount(Guid accountId, string newName)
     {
         if (_accounts.Any(x => x.Name == newName))
-            throw new FinanceDomainException($"An account with name: {newName} already exists.", 
+            throw new FinanceDomainException($"An account with name: {newName} already exists.",
                 FinanceDomainErrorCode.NameConflict);
 
         var account = FindAccountById(accountId);
@@ -60,14 +60,15 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         _categories.Add(category);
     }
 
-    public void RenameCategory(Guid categoryId, string newName)
+    public void EditCategory(Guid categoryId, string newName, string? newDescription)
     {
-        if (_accounts.Any(x => x.Name == newName))
-            throw new FinanceDomainException($"An account with name: {newName} already exists.", 
+        if (_categories.Any(x => x.Name == newName))
+            throw new FinanceDomainException($"A category with name: {newName} already exists.",
                 FinanceDomainErrorCode.NameConflict);
 
         var category = FindCategoryById(categoryId);
         category.Name = newName;
+        category.Description = newDescription;
     }
 
     public void RemoveCategory(Guid categoryId)

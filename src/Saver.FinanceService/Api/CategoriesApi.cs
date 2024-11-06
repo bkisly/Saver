@@ -1,4 +1,11 @@
-﻿namespace Saver.FinanceService.Api;
+﻿using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Saver.FinanceService.Commands;
+using Saver.FinanceService.Dto;
+using Saver.FinanceService.Queries;
+
+namespace Saver.FinanceService.Api;
 
 public static class CategoriesApi
 {
@@ -6,37 +13,47 @@ public static class CategoriesApi
     {
         var api = builder.MapGroup("/api/finance/categories");
 
-        api.MapGet("/", GetCategories);
-        api.MapGet("/{id:int}", GetCategoryById);
-        api.MapPost("/", CreateCategory);
-        api.MapPut("/{id:int}", EditCategory);
-        api.MapDelete("/{id:int}", DeleteCategory);
+        api.MapGet("/", GetCategoriesAsync);
+        api.MapGet("/{id:guid}", GetCategoryByIdAsync);
+        api.MapPost("/", CreateCategoryAsync);
+        api.MapPut("/{id:guid}", EditCategoryAsync);
+        api.MapDelete("/{id:guid}", DeleteCategoryAsync);
 
         return builder;
     }
 
-    private static void GetCategories()
+    private static async Task<Ok<IEnumerable<CategoryDto>>> GetCategoriesAsync(
+        [FromServices] ICategoryQueries categoryQueries)
     {
-
+        return TypedResults.Ok(await categoryQueries.GetCategoriesAsync());
     }
 
-    private static void GetCategoryById()
+    private static async Task<Results<Ok<CategoryDto>, NotFound>> GetCategoryByIdAsync(
+        Guid id, [FromServices] ICategoryQueries categoryQueries)
     {
-
+        var category = await categoryQueries.GetCategoryByIdAsync(id);
+        return category is not null ? TypedResults.Ok(category) : TypedResults.NotFound();
     }
 
-    private static void CreateCategory()
+    private static async Task<Results<Created, ProblemHttpResult>> CreateCategoryAsync(
+        CreateCategoryCommand command, [FromServices] IMediator mediator)
     {
-
+        var result = await mediator.Send(command);
+        return result.IsSuccess ? TypedResults.Created() : result.ToHttpProblem();
     }
 
-    private static void EditCategory()
+    private static async Task<Results<NoContent, ProblemHttpResult>> EditCategoryAsync(
+        Guid id, [FromBody] EditCategoryCommand command, [FromServices] IMediator mediator)
     {
-
+        var result = await mediator.Send(command);
+        return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
     }
 
-    private static void DeleteCategory()
+    private static async Task<Results<NoContent, ProblemHttpResult>> DeleteCategoryAsync(
+        Guid id, [FromServices] IMediator mediator)
     {
-
+        var command = new DeleteCategoryCommand(id);
+        var result = await mediator.Send(command);
+        return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
     }
 }
