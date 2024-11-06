@@ -5,7 +5,7 @@ namespace Saver.FinanceService.Domain.AccountHolderModel;
 
 public abstract class BankAccount : EventPublishingEntity<Guid>
 {
-    public string Name { get; internal set; }
+    public string Name { get; internal set; } = null!;
 
     public decimal Balance { get; protected set; }
     public Currency Currency { get; protected set; } = null!;

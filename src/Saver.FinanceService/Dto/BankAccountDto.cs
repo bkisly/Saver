@@ -2,10 +2,10 @@
 
 public record BankAccountDto
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
-    public string? Description { get; set; }
-    public decimal Balance { get; set; }
-    public string CurrencyCode { get; set; } = null!;
-    public bool IsDefault { get; set; }
+    public required Guid Id { get; init; }
+    public required string Name { get; init; }
+    public required string? Description { get; init; }
+    public required decimal Balance { get; init; }
+    public required string CurrencyCode { get; set; }
+    public required bool IsDefault { get; init; }
 }

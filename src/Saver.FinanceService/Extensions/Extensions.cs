@@ -1,10 +1,7 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Saver.EventBus.IntegrationEventLog;
 using Saver.EventBus.RabbitMQ;
 using Saver.FinanceService.Behaviors;
-using Saver.FinanceService.Commands;
-using Saver.FinanceService.Commands.Validators;
 using Saver.FinanceService.Domain.Repositories;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Infrastructure.Repositories;
@@ -52,17 +49,9 @@ public static class Extensions
 
         services.AddScoped<IAccountsQueries, AccountsQueries>();
         services.AddScoped<ICategoryQueries, CategoryQueries>();
-
-        services.AddCommandValidators();
+        services.AddScoped<ITransactionQueries, TransactionQueries>();
         
         return builder;
-    }
-
-    private static IServiceCollection AddCommandValidators(this IServiceCollection services)
-    {
-        services.AddSingleton<IValidator<CreateManualAccountCommand>, CreateManualAccountCommandValidator>();
-
-        return services;
     }
 
     public static WebApplication ApplyMigrations(this WebApplication app)

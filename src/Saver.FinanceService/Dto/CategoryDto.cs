@@ -1,8 +1,8 @@
 ﻿namespace Saver.FinanceService.Dto;
 
-public class CategoryDto
+public record CategoryDto
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
-    public string? Description { get; set; }
+    public required Guid Id { get; init; }
+    public required string Name { get; init; }
+    public required string? Description { get; init; }
 }

@@ -11,6 +11,7 @@ internal class ManualBankAccountEntityTypeConfiguration : IEntityTypeConfigurati
         builder.HasBaseType<BankAccount>();
 
         builder.HasMany(x => x.RecurringTransactions)
-            .WithOne();
+            .WithOne()
+            .HasForeignKey(x => x.ManualBankAccountId);
     }
 }

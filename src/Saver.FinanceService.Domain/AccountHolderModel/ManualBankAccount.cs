@@ -43,7 +43,7 @@ public class ManualBankAccount : BankAccount
 
     public void CreateRecurringTransaction(TransactionData data, string cron)
     {
-        var transaction = new RecurringTransactionDefinition(data, cron);
+        var transaction = new RecurringTransactionDefinition(data, cron, Id);
         _recurringTransactions.Add(transaction);
         AddDomainEvent(new RecurringTransactionCreatedDomainEvent(Id, transaction));
     }

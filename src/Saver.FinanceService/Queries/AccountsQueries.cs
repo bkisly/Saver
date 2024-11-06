@@ -32,6 +32,7 @@ public class AccountsQueries(IAccountHolderService accountHolderService)
         {
             Id = entity.Id,
             Name = entity.Name,
+            Description = null,
             Balance = entity.Balance,
             CurrencyCode = entity.Currency.Name,
             IsDefault = accountHolder.DefaultAccount?.Id == entity.Id

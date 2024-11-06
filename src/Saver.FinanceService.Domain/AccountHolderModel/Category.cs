@@ -4,7 +4,7 @@ namespace Saver.FinanceService.Domain.AccountHolderModel;
 
 public class Category : Entity<Guid>
 {
-    public string Name { get; internal set; }
+    public string Name { get; internal set; } = null!;
     public string? Description { get; set; }
 
     private Category()

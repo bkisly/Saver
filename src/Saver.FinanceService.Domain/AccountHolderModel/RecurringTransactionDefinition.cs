@@ -7,14 +7,16 @@ public class RecurringTransactionDefinition : EventPublishingEntity<Guid>
 {
     public string Cron { get; private set; } = null!;
     public TransactionData TransactionData { get; set; } = null!;
+    public Guid ManualBankAccountId { get; private set; }
 
     private RecurringTransactionDefinition()
     { }
 
-    public RecurringTransactionDefinition(TransactionData data, string cron)
+    public RecurringTransactionDefinition(TransactionData data, string cron, Guid manualBankAccountId)
     {
         TransactionData = data;
         Cron = cron;
+        ManualBankAccountId = manualBankAccountId;
     }
 
     public void UpdateTransactionData(TransactionData transactionData)
