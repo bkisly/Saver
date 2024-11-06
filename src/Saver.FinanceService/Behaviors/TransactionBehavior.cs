@@ -4,7 +4,7 @@ using Saver.FinanceService.Infrastructure;
 
 namespace Saver.FinanceService.Behaviors;
 
-public class TransactionBehavior<TRequest, TResult>(FinanceDbContext context) 
+public sealed class TransactionBehavior<TRequest, TResult>(FinanceDbContext context) 
     : IPipelineBehavior<TRequest, TResult> where TRequest : IRequest<TResult>
 {
     public async Task<TResult> Handle(TRequest request, RequestHandlerDelegate<TResult> next, CancellationToken cancellationToken)

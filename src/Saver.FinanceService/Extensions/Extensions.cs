@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Saver.EventBus.IntegrationEventLog;
 using Saver.EventBus.RabbitMQ;
 using Saver.FinanceService.Behaviors;
+using Saver.FinanceService.Commands;
+using Saver.FinanceService.Commands.Validators;
 using Saver.FinanceService.Domain.Repositories;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Infrastructure.Repositories;
@@ -18,8 +20,6 @@ public static class Extensions
     public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
     {
         var services = builder.Services;
-
-        services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
         services.AddMediatR(configuration =>
         {
@@ -49,8 +49,17 @@ public static class Extensions
         services.AddTransient<ValidationExceptionHandlingMiddleware>();
 
         services.AddScoped<IAccountsQueries, AccountsQueries>();
+
+        services.AddCommandValidators();
         
         return builder;
+    }
+
+    private static IServiceCollection AddCommandValidators(this IServiceCollection services)
+    {
+        services.AddSingleton<IValidator<CreateManualAccountCommand>, CreateManualAccountCommandValidator>();
+
+        return services;
     }
 
     public static WebApplication ApplyMigrations(this WebApplication app)

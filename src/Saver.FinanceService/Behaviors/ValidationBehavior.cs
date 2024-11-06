@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Saver.FinanceService.Behaviors;
 
-public sealed class ValidationBehavior<TRequest, TResult>(IEnumerable<IValidator> validators) 
+public sealed class ValidationBehavior<TRequest, TResult>(IEnumerable<IValidator<TRequest>> validators) 
     : IPipelineBehavior<TRequest, TResult>
     where TRequest : IRequest<TResult>
 {
