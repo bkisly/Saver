@@ -77,7 +77,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         _categories.Remove(categoryToRemove);
     }
 
-    private BankAccount FindAccountById(Guid accountId)
+    public BankAccount FindAccountById(Guid accountId)
     {
         var account = _accounts.SingleOrDefault(x => x.Id == accountId)
             ?? throw new FinanceDomainException($"Account with ID {accountId} does not exist.", 
@@ -86,7 +86,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         return account;
     }
 
-    private Category FindCategoryById(Guid categoryId)
+    public Category FindCategoryById(Guid categoryId)
     {
         var category = _categories.SingleOrDefault(x => x.Id == categoryId)
             ?? throw new FinanceDomainException($"Category with ID {categoryId} does not exist.", 

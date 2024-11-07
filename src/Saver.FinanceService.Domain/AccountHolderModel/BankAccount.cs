@@ -1,3 +1,4 @@
+using CSharpFunctionalExtensions;
 using Saver.FinanceService.Domain.Events;
 using Saver.FinanceService.Domain.TransactionModel;
 
@@ -24,12 +25,20 @@ public abstract class BankAccount : EventPublishingEntity<Guid>
 
     public void CreateTransaction(TransactionData data, DateTime creationDate)
     {
+        if (!data.Currency.Equals(Currency))
+            throw new FinanceDomainException("Cannot create a transaction in different currency than account's.",
+                FinanceDomainErrorCode.InvalidValue);
+
         Balance += data.Value;
         AddDomainEvent(new TransactionCreatedDomainEvent(Id, data, creationDate));
     }
 
     public void CreateTransactions(List<(TransactionData Data, DateTime CreationDate)> transactions)
     {
+        if (transactions.Select(x => x.Data.Currency).Any(x => !x.Equals(Currency)))
+            throw new FinanceDomainException("Cannot create a transaction in different currency than account's.",
+                FinanceDomainErrorCode.InvalidValue);
+
         Balance += transactions.Sum(x => x.Data.Value);
         AddDomainEvent(new TransactionsCreatedDomainEvent(Id, transactions));
     }
