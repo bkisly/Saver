@@ -29,4 +29,8 @@
     <ProjectReference Include="..\Saver.ServiceDefaults\Saver.ServiceDefaults.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="EventHandlers\Domain\" />
+  </ItemGroup>
+
 </Project>

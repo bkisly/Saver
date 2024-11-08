@@ -38,4 +38,14 @@ public class Transaction : EventPublishingEntity<Guid>, IAggregateRoot
         if (newCreatedDate != CreationDate)
             CreationDate = newCreatedDate;
     }
+
+    public void ChangeExchangeRate(decimal exchangeRate)
+    {
+        if (exchangeRate <= 0)
+            throw new FinanceDomainException("Cannot apply 0 or less exchange rate.",
+                FinanceDomainErrorCode.InvalidValue);
+
+        TransactionData = new TransactionData(TransactionData.Name, TransactionData.Description,
+            TransactionData.Value * exchangeRate, TransactionData.Category);
+    }
 }
