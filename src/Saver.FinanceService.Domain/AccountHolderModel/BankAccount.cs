@@ -1,4 +1,3 @@
-using CSharpFunctionalExtensions;
 using Saver.FinanceService.Domain.Events;
 using Saver.FinanceService.Domain.TransactionModel;
 

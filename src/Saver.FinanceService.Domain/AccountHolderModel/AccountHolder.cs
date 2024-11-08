@@ -99,14 +99,38 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
 
     public void EditTransaction(Guid accountId, TransactionData oldData, TransactionData newData)
     {
-        if (FindAccountById(accountId) is not ManualBankAccount account)
-            throw new FinanceDomainException("Transactions are editable only for manual accounts.",
-                FinanceDomainErrorCode.InvalidOperation);
-
-        account.UpdateTransaction(oldData, newData);
+        FindManualBankAccountById(accountId).UpdateTransaction(oldData, newData);
     }
 
     public void DeleteTransaction(Guid accountId, Guid transactionId, TransactionData deletedData)
+    {
+        FindManualBankAccountById(accountId).DeleteTransaction(transactionId, deletedData);
+    }
+
+    public void CreateRecurringTransaction(Guid accountId, TransactionData transactionData, string cron)
+    {
+        FindManualBankAccountById(accountId).CreateRecurringTransaction(transactionData, cron);
+    }
+
+    public void DeleteRecurringTransaction(Guid recurringTransactionId)
+    {
+        var account = Accounts.Where(x => x is ManualBankAccount)
+            .Cast<ManualBankAccount>()
+            .SingleOrDefault(x => x.RecurringTransactions
+                .Select(r => r.Id)
+                .Contains(recurringTransactionId));
+
+        if (account is null)
+            throw new FinanceDomainException("No manual account found which contains requested recurring transaction.",
+                FinanceDomainErrorCode.NotFound);
+
+        var transactionToDelete = account.RecurringTransactions
+            .Single(x => x.Id == recurringTransactionId);
+
+        account.DeleteRecurringTransaction(transactionToDelete);
+    }
+
+    private ManualBankAccount FindManualBankAccountById(Guid accountId)
     {
         if (FindAccountById(accountId) is not { } account)
             throw new FinanceDomainException("Transaction does not belong to any holder's account.",
@@ -116,6 +140,6 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
             throw new FinanceDomainException("Transactions are only removable for manual accounts.",
                 FinanceDomainErrorCode.InvalidOperation);
 
-        manualAccount.DeleteTransaction(transactionId, deletedData);
+        return manualAccount;
     }
 }

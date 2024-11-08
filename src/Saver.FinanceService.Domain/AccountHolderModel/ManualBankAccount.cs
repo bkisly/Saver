@@ -18,18 +18,18 @@ public class ManualBankAccount : BankAccount
         Balance = initialBalance;
     }
 
-    public void UpdateTransaction(TransactionData oldTransaction, TransactionData newTransaction)
+    internal void UpdateTransaction(TransactionData oldTransaction, TransactionData newTransaction)
     {
         Balance += newTransaction.Value - oldTransaction.Value;
     }
 
-    public void DeleteTransaction(Guid transactionId, TransactionData dataToDelete)
+    internal void DeleteTransaction(Guid transactionId, TransactionData dataToDelete)
     {
         Balance -= dataToDelete.Value;
         AddDomainEvent(new TransactionDeletedDomainEvent(transactionId));
     }
 
-    public void ChangeAccountCurrency(Currency newCurrency, decimal exchangeRate)
+    internal void ChangeAccountCurrency(Currency newCurrency, decimal exchangeRate)
     {
         if (exchangeRate < 0)
             throw new FinanceDomainException("Exchange rate must be a number greater than 0.", 
@@ -40,14 +40,14 @@ public class ManualBankAccount : BankAccount
         AddDomainEvent(new AccountCurrencyChangedDomainEvent(Id, newCurrency, exchangeRate));
     }
 
-    public void CreateRecurringTransaction(TransactionData data, string cron)
+    internal void CreateRecurringTransaction(TransactionData data, string cron)
     {
         var transaction = new RecurringTransactionDefinition(data, cron, Id);
         _recurringTransactions.Add(transaction);
         AddDomainEvent(new RecurringTransactionCreatedDomainEvent(Id, transaction));
     }
 
-    public void DeleteRecurringTransaction(RecurringTransactionDefinition recurringTransaction)
+    internal void DeleteRecurringTransaction(RecurringTransactionDefinition recurringTransaction)
     {
         _recurringTransactions.Remove(recurringTransaction);
         AddDomainEvent(new RecurringTransactionDeletedDomainEvent(recurringTransaction.Id));

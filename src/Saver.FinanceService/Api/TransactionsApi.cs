@@ -21,9 +21,8 @@ public static class TransactionsApi
 
         api.MapGet("/recurring/account/{id:guid}", GetRecurringTransactionsForAccountAsync);
         api.MapGet("/recurring/{id:guid}", GetRecurringTransactionByIdAsync);
-        api.MapPost("/recurring", CreateRecurringTransaction);
-        api.MapPut("/recurring/{id:guid}", EditRecurringTransaction);
-        api.MapDelete("/recurring/{id:guid}", DeleteRecurringTransaction);
+        api.MapPost("/recurring", CreateRecurringTransactionAsync);
+        api.MapDelete("/recurring/{id:guid}", DeleteRecurringTransactionAsync);
 
         return builder;
     }
@@ -78,18 +77,18 @@ public static class TransactionsApi
         return definition is not null ? TypedResults.Ok(definition) : TypedResults.NotFound();
     }
 
-    private static void CreateRecurringTransaction()
+    private static async Task<Results<Created, ProblemHttpResult>> CreateRecurringTransactionAsync(
+        CreateRecurringTransactionCommand command, [FromServices] IMediator mediator)
     {
-
+        var result = await mediator.Send(command);
+        return result.IsSuccess ? TypedResults.Created() : result.ToHttpProblem();
     }
 
-    private static void EditRecurringTransaction()
+    private static async Task<Results<NoContent, ProblemHttpResult>> DeleteRecurringTransactionAsync(
+        Guid id, [FromServices] IMediator mediator)
     {
-
-    }
-
-    private static void DeleteRecurringTransaction()
-    {
-
+        var command = new DeleteRecurringTransactionCommand(id);
+        var result = await mediator.Send(command);
+        return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
     }
 }
