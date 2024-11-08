@@ -1,3 +1,5 @@
+using Saver.FinanceService.Domain.TransactionModel;
+
 namespace Saver.FinanceService.Domain.AccountHolderModel;
 
 public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
@@ -93,5 +95,27 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
                 FinanceDomainErrorCode.NotFound);
 
         return category;
+    }
+
+    public void EditTransaction(Guid accountId, TransactionData oldData, TransactionData newData)
+    {
+        if (FindAccountById(accountId) is not ManualBankAccount account)
+            throw new FinanceDomainException("Transactions are editable only for manual accounts.",
+                FinanceDomainErrorCode.InvalidOperation);
+
+        account.UpdateTransaction(oldData, newData);
+    }
+
+    public void DeleteTransaction(Guid accountId, Guid transactionId, TransactionData deletedData)
+    {
+        if (FindAccountById(accountId) is not { } account)
+            throw new FinanceDomainException("Transaction does not belong to any holder's account.",
+                FinanceDomainErrorCode.InvalidOperation);
+
+        if (account is not ManualBankAccount manualAccount)
+            throw new FinanceDomainException("Transactions are only removable for manual accounts.",
+                FinanceDomainErrorCode.InvalidOperation);
+
+        manualAccount.DeleteTransaction(transactionId, deletedData);
     }
 }

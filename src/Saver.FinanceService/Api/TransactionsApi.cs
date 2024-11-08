@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Saver.FinanceService.Commands;
 using Saver.FinanceService.Dto;
 using Saver.FinanceService.Queries;
 
@@ -13,8 +15,8 @@ public static class TransactionsApi
 
         api.MapGet("/account/{id:guid}", GetTransactionsForAccountAsync);
         api.MapGet("/{id:guid}", GetTransactionByIdAsync);
-        api.MapPost("/", CreateTransaction);
-        api.MapPut("/{id:guid}", EditTransaction);
+        api.MapPost("/", CreateTransactionAsync);
+        api.MapPut("/{id:guid}", EditTransactionAsync);
         api.MapDelete("/{id:guid}", DeleteTransaction);
 
         api.MapGet("/recurring/account/{id:guid}", GetRecurringTransactionsForAccountAsync);
@@ -40,19 +42,26 @@ public static class TransactionsApi
         return transaction is not null ? TypedResults.Ok(transaction) : TypedResults.NotFound();
     }
 
-    private static void CreateTransaction()
+    private static async Task<Results<Created, ProblemHttpResult>> CreateTransactionAsync(
+        CreateTransactionCommand command, [FromServices] IMediator mediator)
     {
-
+        var result = await mediator.Send(command);
+        return result.IsSuccess ? TypedResults.Created() : result.ToHttpProblem();
     }
 
-    private static void EditTransaction()
+    private static async Task<Results<NoContent, ProblemHttpResult>> EditTransactionAsync(
+        Guid id, [FromBody] EditTransactionCommand command, [FromServices] IMediator mediator)
     {
-
+        var result = await mediator.Send(command);
+        return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
     }
 
-    private static void DeleteTransaction()
+    private static async Task<Results<NoContent, ProblemHttpResult>> DeleteTransaction(
+        Guid id, [FromServices] IMediator mediator)
     {
-
+        var command = new DeleteTransactionCommand(id);
+        var result = await mediator.Send(command);
+        return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
     }
 
     private static async Task<Results<Ok<IEnumerable<RecurringTransactionDefinitionDto>>, NotFound>> GetRecurringTransactionsForAccountAsync(

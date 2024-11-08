@@ -19,13 +19,14 @@ public class TransactionQueries(
         if (await accountHolderService.GetCurrentAccountHolder() is not { } accountHolder)
             return null;
 
-        if (accountHolder.Accounts.All(x => x.Id != accountId))
+        var account = accountHolder.Accounts.SingleOrDefault(x => x.Id == accountId);
+        if (account is null)
             return null;
 
         return context.Transactions
             .Where(x => x.AccountId == accountId)
             .ToList()
-            .Select(MapFromEntity);
+            .Select(x => MapFromEntity(x, account));
     }
 
     public async Task<TransactionDto?> GetTransactionByIdAsync(Guid transactionId)
@@ -38,7 +39,11 @@ public class TransactionQueries(
             .Where(x => accountIds.Contains(x.AccountId))
             .SingleOrDefaultAsync(x => x.Id == transactionId);
 
-        return transaction is not null ? MapFromEntity(transaction) : null;
+        if (transaction is null)
+            return null;
+
+        var account = accountHolder.Accounts.Single(x => x.Id == transaction.AccountId);
+        return MapFromEntity(transaction, account);
     }
 
     public async Task<IEnumerable<RecurringTransactionDefinitionDto>?> GetRecurringTransactionDefinitionsForAccountAsync(Guid accountId)
@@ -46,13 +51,14 @@ public class TransactionQueries(
         if (await accountHolderService.GetCurrentAccountHolder() is not { } accountHolder)
             return null;
 
-        if (accountHolder.Accounts.All(x => x.Id != accountId))
+        var account = accountHolder.Accounts.SingleOrDefault(x => x.Id == accountId);
+        if (account is null)
             return null;
 
         return context.RecurringTransactionDefinitions
             .Where(x => x.ManualBankAccountId == accountId)
             .ToList()
-            .Select(MapFromEntity);
+            .Select(x => MapFromEntity(x, account));
     }
 
     public async Task<RecurringTransactionDefinitionDto?> GetRecurringTransactionDefinitionByIdAsync(Guid id)
@@ -65,10 +71,14 @@ public class TransactionQueries(
             .Where(x => holderAccountsIds.Contains(x.ManualBankAccountId))
             .SingleOrDefaultAsync(x => x.Id == id);
 
-        return definition is not null ? MapFromEntity(definition) : null;
+        if (definition is null)
+            return null;
+
+        var account = accountHolder.Accounts.Single(x => x.Id == definition.ManualBankAccountId);
+        return MapFromEntity(definition, account);
     }
 
-    private TransactionDto MapFromEntity(Transaction entity)
+    private TransactionDto MapFromEntity(Transaction entity, BankAccount account)
     {
         var category = entity.TransactionData.Category;
         return new TransactionDto
@@ -78,12 +88,12 @@ public class TransactionQueries(
             CreatedDate = entity.CreationDate,
             Description = entity.TransactionData.Description,
             Value = entity.TransactionData.Value,
-            CurrencyCode = entity.TransactionData.Currency.Name,
+            CurrencyCode = account.Currency.Name,
             Category = category is not null ? mapper.Map<Category, CategoryDto>(category) : null
         };
     }
 
-    private RecurringTransactionDefinitionDto MapFromEntity(RecurringTransactionDefinition entity)
+    private RecurringTransactionDefinitionDto MapFromEntity(RecurringTransactionDefinition entity, BankAccount account)
     {
         var category = entity.TransactionData.Category;
         return new RecurringTransactionDefinitionDto
@@ -94,7 +104,7 @@ public class TransactionQueries(
             Value = entity.TransactionData.Value,
             Cron = entity.Cron,
             Category = category is not null ? mapper.Map<Category, CategoryDto>(category) : null,
-            CurrencyCode = entity.TransactionData.Currency.Name
+            CurrencyCode = account.Currency.Name
         };
     }
 }

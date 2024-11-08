@@ -16,6 +16,8 @@ public record CommandResult
     public static CommandResult Error(FinanceDomainErrorCode? errorCode = null, string message = "") =>
         new() { DomainErrorCode = errorCode, Message = message };
 
+    public static CommandResult Error(string message) => new() { Message = message };
+
     public ProblemHttpResult ToHttpProblem()
     {
         if (IsSuccess)
@@ -23,8 +25,11 @@ public record CommandResult
 
         return DomainErrorCode switch
         {
-            FinanceDomainErrorCode.NameConflict => TypedResults.Problem(Message, statusCode: StatusCodes.Status409Conflict),
-            FinanceDomainErrorCode.EmptyValue or FinanceDomainErrorCode.InvalidValue => TypedResults.Problem(Message, statusCode: StatusCodes.Status400BadRequest),
+            FinanceDomainErrorCode.NameConflict => TypedResults.Problem(Message,
+                statusCode: StatusCodes.Status409Conflict),
+            FinanceDomainErrorCode.EmptyValue or FinanceDomainErrorCode.InvalidValue
+                or FinanceDomainErrorCode.InvalidOperation => TypedResults.Problem(Message,
+                    statusCode: StatusCodes.Status400BadRequest),
             FinanceDomainErrorCode.NotFound => TypedResults.Problem(Message, statusCode: StatusCodes.Status404NotFound),
             _ => TypedResults.Problem(Message, statusCode: StatusCodes.Status500InternalServerError)
         };

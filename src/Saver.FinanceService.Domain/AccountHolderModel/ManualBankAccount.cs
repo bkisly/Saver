@@ -18,10 +18,9 @@ public class ManualBankAccount : BankAccount
         Balance = initialBalance;
     }
 
-    public void UpdateTransaction(Guid transactionId, TransactionData oldTransaction, TransactionData newTransaction)
+    public void UpdateTransaction(TransactionData oldTransaction, TransactionData newTransaction)
     {
         Balance += newTransaction.Value - oldTransaction.Value;
-        AddDomainEvent(new TransactionUpdatedDomainEvent(transactionId, newTransaction));
     }
 
     public void DeleteTransaction(Guid transactionId, TransactionData dataToDelete)

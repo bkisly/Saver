@@ -1,4 +1,3 @@
-using CSharpFunctionalExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Saver.Common.DDD;

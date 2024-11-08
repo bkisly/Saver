@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Saver.FinanceService.Domain.AccountHolderModel;
 using Saver.FinanceService.Domain.Exceptions;
 using Saver.FinanceService.Domain.Repositories;
 using Saver.FinanceService.Domain.TransactionModel;
@@ -18,26 +17,23 @@ public class EditTransactionCommandHandler(IAccountHolderService accountHolderSe
         if (await accountHolderService.GetCurrentAccountHolder() is not { } accountHolder)
             return CommandResult.Error(FinanceDomainErrorCode.NotFound, "Account holder not found.");
 
-        var account = accountHolder.Accounts.SingleOrDefault(x => x.Id == request.AccountId);
-        if (account is not ManualBankAccount manualAccount)
-            return CommandResult.Error(FinanceDomainErrorCode.NotFound, "Manual account not found.");
-
         var transaction = await transactionRepository.FindByIdAsync(request.TransactionId);
         if (transaction is null)
             return CommandResult.Error(FinanceDomainErrorCode.NotFound, "Transaction not found");
 
-        var category = accountHolder.Categories.SingleOrDefault(x => x.Id == request.CategoryId);
-
         try
         {
-            var newData = new TransactionData(request.Name, request.Description, request.Value, manualAccount.Currency, category);
-            manualAccount.UpdateTransaction(request.TransactionId, transaction.TransactionData, newData);
+            var category = request.CategoryId.HasValue ? accountHolder.FindCategoryById(request.CategoryId.Value) : null;
+            var newData = new TransactionData(request.Name, request.Description, request.Value, category);
+            transaction.EditTransaction(newData, request.CreatedTime);
         }
         catch (FinanceDomainException ex)
         {
             return CommandResult.Error(ex.ErrorCode, ex.Message);
         }
-
-
+        
+        transactionRepository.Update(transaction);
+        var result = await transactionRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
+        return result ? CommandResult.Success() : CommandResult.Error(message: "Cannot save changes.");
     }
 }

@@ -6,4 +6,5 @@ public enum FinanceDomainErrorCode
     NotFound,
     EmptyValue,
     InvalidValue,
+    InvalidOperation
 }

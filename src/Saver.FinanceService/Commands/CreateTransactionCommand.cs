@@ -23,7 +23,7 @@ public class CreateTransactionCommandHandler(IAccountHolderService accountHolder
                 ? accountHolder.FindCategoryById(request.CategoryId.Value) 
                 : null;
 
-            var transactionData = new TransactionData(request.Name, request.Description, request.Value, account.Currency, category);
+            var transactionData = new TransactionData(request.Name, request.Description, request.Value, category);
             account.CreateTransaction(transactionData, request.CreatedTime);
         }
         catch (FinanceDomainException ex)

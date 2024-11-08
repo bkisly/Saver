@@ -27,6 +27,6 @@ public class CreateCategoryCommandHandler(IAccountHolderService accountHolderSer
 
         repository.Update(accountHolder);
         var result = await repository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
-        return result ? CommandResult.Success() : CommandResult.Error(message: "Unable to save entities.");
+        return result ? CommandResult.Success() : CommandResult.Error("Unable to save entities.");
     }
 }
