@@ -33,4 +33,17 @@ public abstract class Enumeration(int id, string name) : IComparable
     public override int GetHashCode() => Id.GetHashCode();
 
     public override string ToString() => Name;
+
+    public static T FromName<T>(string name) where T : Enumeration
+    {
+        return GetAll<T>()
+            .Single(x => x.Name == name);
+    }
+
+    public static bool HasName<T>(string name) where T : Enumeration
+    {
+        return GetAll<T>()
+            .Select(x => x.Name)
+            .Contains(name);
+    }
 }

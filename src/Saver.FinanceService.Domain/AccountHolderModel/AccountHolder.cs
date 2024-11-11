@@ -24,14 +24,16 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         DefaultAccount ??= account;
     }
 
-    public void EditAccount(Guid accountId, string newName)
+    public void EditManualAccount(Guid accountId, string newName, Currency newCurrency, decimal exchangeRate)
     {
-        if (_accounts.Any(x => x.Name == newName))
+        var account = FindManualBankAccountById(accountId);
+
+        if (account.Name != newName && _accounts.Any(x => x.Name == newName))
             throw new FinanceDomainException($"An account with name: {newName} already exists.",
                 FinanceDomainErrorCode.NameConflict);
 
-        var account = FindAccountById(accountId);
         account.Name = newName;
+        
     }
 
     public void SetDefaultAccount(Guid accountId)
@@ -133,11 +135,11 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     private ManualBankAccount FindManualBankAccountById(Guid accountId)
     {
         if (FindAccountById(accountId) is not { } account)
-            throw new FinanceDomainException("Transaction does not belong to any holder's account.",
+            throw new FinanceDomainException("Could not find requested manual account.",
                 FinanceDomainErrorCode.InvalidOperation);
 
         if (account is not ManualBankAccount manualAccount)
-            throw new FinanceDomainException("Transactions are only removable for manual accounts.",
+            throw new FinanceDomainException("Operation is possible to perform only for manual accounts.",
                 FinanceDomainErrorCode.InvalidOperation);
 
         return manualAccount;

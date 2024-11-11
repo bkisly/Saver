@@ -18,7 +18,7 @@ public static class AccountsApi
         api.MapGet("/{id:guid}", GetAccountByIdAsync);
         api.MapPut("/default/{id:guid}", SetAccountAsDefaultAsync);
         api.MapPost("/manual", CreateManualAccountAsync);
-        api.MapPut("/{id:guid}", EditAccountAsync);
+        api.MapPut("/manual", EditManualAccountAsync);
         api.MapDelete("/{id:guid}", DeleteAccountAsync);
 
         return builder;
@@ -58,8 +58,8 @@ public static class AccountsApi
         return result.IsSuccess ? TypedResults.Created() : result.ToHttpProblem();
     }
 
-    private static async Task<Results<NoContent, ProblemHttpResult>> EditAccountAsync(
-        Guid id, [FromBody] EditBankAccountCommand command, [FromServices] IMediator mediator)
+    private static async Task<Results<NoContent, ProblemHttpResult>> EditManualAccountAsync(
+        [FromBody] EditManualBankAccountCommand command, [FromServices] IMediator mediator)
     {
         var result = await mediator.Send(command);
         return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();

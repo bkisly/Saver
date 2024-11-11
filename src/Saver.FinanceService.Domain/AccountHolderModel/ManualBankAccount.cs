@@ -29,7 +29,14 @@ public class ManualBankAccount : BankAccount
         AddDomainEvent(new TransactionDeletedDomainEvent(transactionId));
     }
 
-    internal void ChangeAccountCurrency(Currency newCurrency, decimal exchangeRate)
+    internal void EditAccount(string newName, Currency newCurrency, decimal exchangeRate)
+    {
+        Name = newName;
+        if (!Currency.Equals(newCurrency))
+            ChangeAccountCurrency(newCurrency, exchangeRate);
+    }
+
+    private void ChangeAccountCurrency(Currency newCurrency, decimal exchangeRate)
     {
         if (exchangeRate < 0)
             throw new FinanceDomainException("Exchange rate must be a number greater than 0.", 
