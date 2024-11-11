@@ -7,4 +7,5 @@ public record TransactionUpdatedDomainEvent(
     Guid TransactionId, 
     Guid AccountId, 
     TransactionData OldTransactionData, 
-    TransactionData NewTransactionData) : INotification;
+    TransactionData NewTransactionData,
+    DateTime NewCreatedDate) : INotification;

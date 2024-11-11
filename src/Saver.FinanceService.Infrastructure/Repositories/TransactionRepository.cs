@@ -16,6 +16,13 @@ public class TransactionRepository(FinanceDbContext context) : ITransactionRepos
         return transaction;
     }
 
+    public async Task<IEnumerable<Transaction>> FindByAccountIdAsync(Guid accountId)
+    {
+        return await Task.FromResult(context.Transactions
+            .Where(x => x.AccountId == accountId)
+            .ToList());
+    }
+
     public Transaction Add(Transaction transaction)
     {
         return context.Transactions.Add(transaction).Entity;
