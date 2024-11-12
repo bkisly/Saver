@@ -21,6 +21,8 @@ public static class AccountsApi
         api.MapPut("/manual", EditManualAccountAsync);
         api.MapDelete("/{id:guid}", DeleteAccountAsync);
 
+        api.RequireAuthorization();
+
         return builder;
     }
 

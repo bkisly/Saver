@@ -19,6 +19,8 @@ public static class CategoriesApi
         api.MapPut("/{id:guid}", EditCategoryAsync);
         api.MapDelete("/{id:guid}", DeleteCategoryAsync);
 
+        api.RequireAuthorization();
+
         return builder;
     }
 

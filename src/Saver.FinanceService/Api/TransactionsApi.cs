@@ -24,6 +24,8 @@ public static class TransactionsApi
         api.MapPost("/recurring", CreateRecurringTransactionAsync);
         api.MapDelete("/recurring/{id:guid}", DeleteRecurringTransactionAsync);
 
+        api.RequireAuthorization();
+
         return builder;
     }
 

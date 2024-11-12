@@ -14,9 +14,9 @@ app.MapDefaultEndpoints();
 app.MapGet("/", () => "Hello World!");
 
 app.MapAccountsApi()
-   .MapTransactionsApi()
-   .MapCategoriesApi()
-   .MapReportsApi();
+    .MapTransactionsApi()
+    .MapCategoriesApi()
+    .MapReportsApi();
 
 app.UseDefaultSwagger();
 app.UseMiddleware<ValidationExceptionHandlingMiddleware>();

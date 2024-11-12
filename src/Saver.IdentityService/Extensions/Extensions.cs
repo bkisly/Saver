@@ -11,7 +11,12 @@ public static class Extensions
     {
         var services = builder.Services;
 
-        builder.AddNpgsqlDbContext<ApplicationDbContext>(ServicesNames.IdentityServiceDatabase);
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        {
+            options.UseNpgsql(builder.Configuration.GetConnectionString(ServicesNames.IdentityServiceDatabase));
+        });
+
+        builder.EnrichNpgsqlDbContext<ApplicationDbContext>();
 
         services.AddIdentityApiEndpoints<IdentityUser>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -19,10 +24,8 @@ public static class Extensions
         services.AddAuthorization();
         services.Configure<IdentityOptions>(options =>
         {
-            options.SignIn.RequireConfirmedEmail = true;
+            options.SignIn.RequireConfirmedEmail = false;
         });
-
-        builder.EnrichNpgsqlDbContext<ApplicationDbContext>();
 
         return builder;
     }

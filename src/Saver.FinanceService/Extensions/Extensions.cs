@@ -1,10 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Net;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 using Saver.EventBus.IntegrationEventLog;
 using Saver.EventBus.RabbitMQ;
 using Saver.FinanceService.Behaviors;
 using Saver.FinanceService.Domain.Repositories;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Infrastructure.Repositories;
+using Saver.FinanceService.Infrastructure.ServiceAgents;
 using Saver.FinanceService.Middleware;
 using Saver.FinanceService.Queries;
 using Saver.FinanceService.Services;
@@ -17,6 +20,11 @@ public static class Extensions
     public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
     {
         var services = builder.Services;
+
+        services.AddAuthentication()
+            .AddCookie();
+
+        services.AddAuthorization();
 
         services.AddMediatR(configuration =>
         {
@@ -50,6 +58,8 @@ public static class Extensions
         services.AddScoped<IAccountsQueries, AccountsQueries>();
         services.AddScoped<ICategoryQueries, CategoryQueries>();
         services.AddScoped<ITransactionQueries, TransactionQueries>();
+
+        services.AddSingleton<IExchangeRateServiceAgent, ExchangeRateServiceAgent>();
         
         return builder;
     }

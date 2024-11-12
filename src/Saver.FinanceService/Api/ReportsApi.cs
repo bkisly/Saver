@@ -9,6 +9,8 @@ public static class ReportsApi
         api.MapGet("/balance-history/{id:int}", GetBalanceHistoryReport);
         api.MapGet("/categories/{id:int}", GetCategoriesReport);
 
+        api.RequireAuthorization();
+
         return builder;
     }
 
