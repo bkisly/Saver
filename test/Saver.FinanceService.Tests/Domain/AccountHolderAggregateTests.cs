@@ -77,7 +77,7 @@ public class AccountHolderAggregateTests
         var testAccount = accountHolder.Accounts[^1];
 
         // Assert
-        var exception = Assert.Throws<FinanceDomainException>(() => accountHolder.EditManualAccount(testAccount.Id, "Account1"));
+        var exception = Assert.Throws<FinanceDomainException>(() => accountHolder.EditManualAccount(testAccount.Id, "Account1", Currency.EUR, 1.2M));
         Assert.Equal(FinanceDomainErrorCode.NameConflict, exception.ErrorCode);
         Assert.Equal("Account2", testAccount.Name);
     }

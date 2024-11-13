@@ -2,7 +2,7 @@ using Saver.FinanceService.Domain.TransactionModel;
 
 namespace Saver.FinanceService.Domain.AccountHolderModel;
 
-public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
+public sealed class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
 {
     private readonly List<BankAccount> _accounts = [];
     private readonly List<Category> _categories = [];
@@ -12,6 +12,11 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
 
     public Guid? DefaultAccountId { get; private set; }
     public BankAccount? DefaultAccount { get; private set; }
+
+    public AccountHolder()
+    {
+        Id = Guid.NewGuid();
+    }
 
     public void CreateManualAccount(string name, Currency currency, decimal initialBalance)
     {
@@ -32,8 +37,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
             throw new FinanceDomainException($"An account with name: {newName} already exists.",
                 FinanceDomainErrorCode.NameConflict);
 
-        account.Name = newName;
-        
+        account.EditAccount(newName, newCurrency, exchangeRate);
     }
 
     public void SetDefaultAccount(Guid accountId)
@@ -83,7 +87,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
 
     public BankAccount FindAccountById(Guid accountId)
     {
-        var account = _accounts.SingleOrDefault(x => x.Id == accountId)
+        var account = _accounts.FirstOrDefault(x => x.Id == accountId)
             ?? throw new FinanceDomainException($"Account with ID {accountId} does not exist.", 
                 FinanceDomainErrorCode.NotFound);
 
@@ -92,7 +96,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
 
     public Category FindCategoryById(Guid categoryId)
     {
-        var category = _categories.SingleOrDefault(x => x.Id == categoryId)
+        var category = _categories.FirstOrDefault(x => x.Id == categoryId)
             ?? throw new FinanceDomainException($"Category with ID {categoryId} does not exist.", 
                 FinanceDomainErrorCode.NotFound);
 

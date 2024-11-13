@@ -10,6 +10,7 @@ using Saver.FinanceService.Infrastructure.Repositories;
 using Saver.FinanceService.Infrastructure.ServiceAgents;
 using Saver.FinanceService.Middleware;
 using Saver.FinanceService.Queries;
+using Saver.FinanceService.Queries.Reports;
 using Saver.FinanceService.Services;
 using Saver.ServiceDefaults;
 
@@ -55,9 +56,11 @@ public static class Extensions
         services.AddTransient<IEventBusService, EventBusService>();
         services.AddTransient<ValidationExceptionHandlingMiddleware>();
 
+        services.AddScoped<IReportQueryBuilder, ReportQueryBuilder>();
         services.AddScoped<IAccountsQueries, AccountsQueries>();
         services.AddScoped<ICategoryQueries, CategoryQueries>();
         services.AddScoped<ITransactionQueries, TransactionQueries>();
+        services.AddScoped<IReportsQueries, ReportsQueries>();
 
         services.AddSingleton<IExchangeRateServiceAgent, ExchangeRateServiceAgent>();
         
