@@ -9,13 +9,18 @@ namespace Saver.FinanceService.Commands;
 
 public record EditManualBankAccountCommand(Guid AccountId, string Name, string? Description, string CurrencyCode) : IRequest<CommandResult>;
 
-public class EditManualBankAccountCommandHandler(IAccountHolderService accountHolderService, IExchangeRateServiceAgent exchangeRateServiceAgent) 
+public class EditManualBankAccountCommandHandler(
+    IAccountHolderService accountHolderService, 
+    IExchangeRateServiceAgent exchangeRateServiceAgent, 
+    IUnitOfWork unitOfWork) 
     : IRequestHandler<EditManualBankAccountCommand, CommandResult>
 {
     public async Task<CommandResult> Handle(EditManualBankAccountCommand request, CancellationToken cancellationToken)
     {
         if (await accountHolderService.GetCurrentAccountHolder() is not { } accountHolder)
+        {
             return CommandResult.Error(FinanceDomainErrorCode.NotFound);
+        }
 
         try
         {
@@ -30,9 +35,8 @@ public class EditManualBankAccountCommandHandler(IAccountHolderService accountHo
             return CommandResult.Error(ex.ErrorCode, ex.Message);
         }
 
-        var repository = accountHolderService.Repository;
-        repository.Update(accountHolder);
-        var result = await repository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
+        accountHolderService.Repository.Update(accountHolder);
+        var result = await unitOfWork.SaveEntitiesAsync(cancellationToken);
         return result ? CommandResult.Success() : CommandResult.Error("Unable to save changes.");
     }
 }

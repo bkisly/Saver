@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Saver.Common.DDD;
 using Saver.FinanceService.Domain.Exceptions;
 using Saver.FinanceService.Services;
 
@@ -6,16 +7,17 @@ namespace Saver.FinanceService.Commands;
 
 public record DeleteBankAccountCommand(Guid AccountId) : IRequest<CommandResult>;
 
-public class DeleteBankAccountCommandHandler(IAccountHolderService accountHolderService) 
+public class DeleteBankAccountCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork) 
     : IRequestHandler<DeleteBankAccountCommand, CommandResult>
 {
     public async Task<CommandResult> Handle(DeleteBankAccountCommand request, CancellationToken cancellationToken)
     {
         var accountHolder = await accountHolderService.GetCurrentAccountHolder();
-        var repository = accountHolderService.Repository;
 
         if (accountHolder is null)
+        {
             return CommandResult.Error(FinanceDomainErrorCode.NotFound);
+        }
 
         try
         {
@@ -26,8 +28,8 @@ public class DeleteBankAccountCommandHandler(IAccountHolderService accountHolder
             return CommandResult.Error(ex.ErrorCode, ex.Message);
         }
 
-        repository.Update(accountHolder);
-        var result = await repository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
-        return result ? CommandResult.Success() : CommandResult.Error(message: "Unable to save changes.");
+        accountHolderService.Repository.Update(accountHolder);
+        var result = await unitOfWork.SaveEntitiesAsync(cancellationToken);
+        return result ? CommandResult.Success() : CommandResult.Error("Unable to save changes.");
     }
 }

@@ -9,7 +9,7 @@ namespace Saver.FinanceService.Commands;
 public record CreateManualAccountCommand(string Name, string? Description, string CurrencyCode, decimal InitialBalance) 
     : IRequest<CommandResult>;
 
-public class CreateManualAccountCommandHandler(IAccountHolderService accountHolderService)
+public class CreateManualAccountCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork)
     : IRequestHandler<CreateManualAccountCommand, CommandResult>
 {
     public async Task<CommandResult> Handle(CreateManualAccountCommand request, CancellationToken cancellationToken)
@@ -32,7 +32,7 @@ public class CreateManualAccountCommandHandler(IAccountHolderService accountHold
         }
 
         repository.Update(accountHolder);
-        var result = await repository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
+        var result = await unitOfWork.SaveEntitiesAsync(cancellationToken);
         return result ? CommandResult.Success() : CommandResult.Error(message: "Unable to save changes.");
     }
 }

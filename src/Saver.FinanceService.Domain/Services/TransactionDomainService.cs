@@ -40,13 +40,9 @@ public class TransactionDomainService(IAccountHolderRepository accountHolderRepo
     public async Task EditTransactionAsync(AccountHolder accountHolder, Guid transactionId, TransactionData newTransactionData, DateTime newCreationDate)
     {
         var belongingAccounts = accountHolder.Accounts.Select(x => x.Id);
-        var transaction = await transactionRepository.FindByIdAsync(transactionId);
-
-        if (transaction is null)
-        {
-            throw new FinanceDomainException($"Could not find transaction with ID {transactionId}",
-                FinanceDomainErrorCode.NotFound);
-        }
+        var transaction = await transactionRepository.FindByIdAsync(transactionId) 
+                          ?? throw new FinanceDomainException($"Could not find transaction with ID {transactionId}", 
+                              FinanceDomainErrorCode.NotFound);
 
         if (!belongingAccounts.Contains(transaction.AccountId))
         {
@@ -74,13 +70,9 @@ public class TransactionDomainService(IAccountHolderRepository accountHolderRepo
     public async Task DeleteTransactionAsync(AccountHolder accountHolder, Guid transactionId)
     {
         var belongingAccounts = accountHolder.Accounts.Select(x => x.Id);
-        var transaction = await transactionRepository.FindByIdAsync(transactionId);
-
-        if (transaction is null)
-        {
-            throw new FinanceDomainException($"Could not find transaction with ID {transactionId}",
-                FinanceDomainErrorCode.NotFound);
-        }
+        var transaction = await transactionRepository.FindByIdAsync(transactionId) 
+                          ?? throw new FinanceDomainException($"Could not find transaction with ID {transactionId}", 
+                              FinanceDomainErrorCode.NotFound);
 
         if (!belongingAccounts.Contains(transaction.AccountId))
         {

@@ -1,10 +1,11 @@
 ﻿using MediatR;
+using Saver.Common.DDD;
 using Saver.FinanceService.Domain.Events;
 using Saver.FinanceService.Domain.Repositories;
 
 namespace Saver.FinanceService.EventHandlers.Domain;
 
-public class AccountCurrencyChangedDomainEventHandler(ITransactionRepository transactionRepository) : INotificationHandler<AccountCurrencyChangedDomainEvent>
+public class AccountCurrencyChangedDomainEventHandler(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork) : INotificationHandler<AccountCurrencyChangedDomainEvent>
 {
     public async Task Handle(AccountCurrencyChangedDomainEvent notification, CancellationToken cancellationToken)
     {
@@ -15,6 +16,6 @@ public class AccountCurrencyChangedDomainEventHandler(ITransactionRepository tra
             transactionRepository.Update(transaction);
         }
 
-        await transactionRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
+        await unitOfWork.SaveEntitiesAsync(cancellationToken);
     }
 }

@@ -127,11 +127,9 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
             .Cast<ManualBankAccount>()
             .SingleOrDefault(x => x.RecurringTransactions
                 .Select(r => r.Id)
-                .Contains(recurringTransactionId));
-
-        if (account is null)
-            throw new FinanceDomainException("No manual account found which contains requested recurring transaction.",
-                FinanceDomainErrorCode.NotFound);
+                .Contains(recurringTransactionId)) 
+                      ?? throw new FinanceDomainException("No manual account found which contains requested recurring transaction.", 
+                          FinanceDomainErrorCode.NotFound);
 
         var transactionToDelete = account.RecurringTransactions
             .Single(x => x.Id == recurringTransactionId);

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Saver.Common.DDD;
 using Saver.FinanceService.Domain.Exceptions;
 using Saver.FinanceService.Services;
 
@@ -6,16 +7,15 @@ namespace Saver.FinanceService.Commands;
 
 public record SetAccountAsDefaultCommand(Guid AccountId) : IRequest<CommandResult>;
 
-public class SetAccountAsDefaultCommandHandler(IAccountHolderService accountHolderService) 
+public class SetAccountAsDefaultCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork) 
     : IRequestHandler<SetAccountAsDefaultCommand, CommandResult>
 {
     public async Task<CommandResult> Handle(SetAccountAsDefaultCommand request, CancellationToken cancellationToken)
     {
-        var accountHolder = await accountHolderService.GetCurrentAccountHolder();
-        var repository = accountHolderService.Repository;
-
-        if (accountHolder == null)
+        if (await accountHolderService.GetCurrentAccountHolder() is not { } accountHolder)
+        {
             return CommandResult.Error(FinanceDomainErrorCode.NotFound);
+        }
 
         try
         {
@@ -26,8 +26,8 @@ public class SetAccountAsDefaultCommandHandler(IAccountHolderService accountHold
             return CommandResult.Error(ex.ErrorCode, ex.Message);
         }
 
-        repository.Update(accountHolder);
-        var result = await repository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
-        return result ? CommandResult.Success() : CommandResult.Error(message: "Unable to save changes.");
+        accountHolderService.Repository.Update(accountHolder);
+        var result = await unitOfWork.SaveEntitiesAsync(cancellationToken);
+        return result ? CommandResult.Success() : CommandResult.Error("Unable to save changes.");
     }
 }

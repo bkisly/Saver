@@ -30,15 +30,11 @@ public class Transaction : EventPublishingEntity<Guid>, IAggregateRoot
 
     public void EditTransaction(TransactionData newTransactionData, DateTime newCreatedDate)
     {
-        var oldData = TransactionData;
-
         if (TransactionData != newTransactionData)
             TransactionData = newTransactionData;
 
         if (newCreatedDate != CreationDate)
             CreationDate = newCreatedDate;
-
-        AddDomainEvent(new TransactionUpdatedDomainEvent(Id, AccountId, oldData, TransactionData, newCreatedDate));
     }
 
     public void ChangeExchangeRate(decimal exchangeRate)

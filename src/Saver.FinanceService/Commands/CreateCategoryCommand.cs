@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Saver.Common.DDD;
 using Saver.FinanceService.Domain.Exceptions;
 using Saver.FinanceService.Services;
 
@@ -6,7 +7,7 @@ namespace Saver.FinanceService.Commands;
 
 public record CreateCategoryCommand(string Name, string? Description) : IRequest<CommandResult>;
 
-public class CreateCategoryCommandHandler(IAccountHolderService accountHolderService) : IRequestHandler<CreateCategoryCommand, CommandResult>
+public class CreateCategoryCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork) : IRequestHandler<CreateCategoryCommand, CommandResult>
 {
     public async Task<CommandResult> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
@@ -26,7 +27,7 @@ public class CreateCategoryCommandHandler(IAccountHolderService accountHolderSer
         }
 
         repository.Update(accountHolder);
-        var result = await repository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
+        var result = await unitOfWork.SaveEntitiesAsync(cancellationToken);
         return result ? CommandResult.Success() : CommandResult.Error("Unable to save entities.");
     }
 }

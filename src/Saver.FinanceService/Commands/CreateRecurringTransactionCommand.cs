@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Saver.Common.DDD;
 using Saver.FinanceService.Domain.Exceptions;
 using Saver.FinanceService.Domain.TransactionModel;
 using Saver.FinanceService.Services;
@@ -8,7 +9,7 @@ namespace Saver.FinanceService.Commands;
 public record CreateRecurringTransactionCommand(string Name, string? Description, decimal Value, Guid CategoryId, Guid AccountId, string Cron)
     : IRequest<CommandResult>;
 
-public class CreateRecurringTransactionCommandHandler(IAccountHolderService accountHolderService)
+public class CreateRecurringTransactionCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork)
     : IRequestHandler<CreateRecurringTransactionCommand, CommandResult>
 {
     public async Task<CommandResult> Handle(CreateRecurringTransactionCommand request, CancellationToken cancellationToken)
@@ -29,7 +30,7 @@ public class CreateRecurringTransactionCommandHandler(IAccountHolderService acco
 
         var repository = accountHolderService.Repository;
         repository.Update(accountHolder);
-        var result = await repository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
+        var result = await unitOfWork.SaveEntitiesAsync(cancellationToken);
         return result ? CommandResult.Success() : CommandResult.Error("Unable to save changes");
     }
 }
