@@ -4,6 +4,8 @@ namespace Saver.FinanceService.Domain.TransactionModel;
 
 public class Transaction : EventPublishingEntity<Guid>, IAggregateRoot
 {
+    public override Guid Id { get; protected set; } = Guid.NewGuid();
+
     private TransactionData _data = null!;
     public TransactionData TransactionData
     {

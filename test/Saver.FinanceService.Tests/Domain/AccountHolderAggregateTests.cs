@@ -9,8 +9,7 @@ public class AccountHolderAggregateTests
     public void CanCreateManualAccount()
     {
         // Arrange
-        var accountHolder = new AccountHolder();
-        var expectedAccount = new ManualBankAccount("Account1", Currency.USD, 20.35M, accountHolder.Id);
+        var accountHolder = new AccountHolder(Guid.NewGuid());
 
         // Act
         accountHolder.CreateManualAccount("Account1", Currency.USD, 20.5M);
@@ -20,45 +19,44 @@ public class AccountHolderAggregateTests
 
         var addedAccount = accountHolder.Accounts.Single();
         Assert.IsType<ManualBankAccount>(addedAccount);
-        Assert.Equal(expectedAccount, addedAccount);
+        Assert.Equal("Account1", addedAccount.Name);
+        Assert.Equal(Currency.USD, addedAccount.Currency);
+        Assert.Equal(20.5M, addedAccount.Balance);
     }
 
     [Fact]
     public void ShouldSetFirstNewAccountAsDefault()
     {
         // Arrange
-        var accountHolder = new AccountHolder();
-        var expectedAccount = new ManualBankAccount("Account1", Currency.USD, 20.35M, accountHolder.Id);
+        var accountHolder = new AccountHolder(Guid.NewGuid());
 
         // Act
         accountHolder.CreateManualAccount("Account1", Currency.USD, 20.5M);
 
         // Assert
-        Assert.Equal(expectedAccount, accountHolder.DefaultAccount);
-        Assert.Equal(expectedAccount.Id, accountHolder.Accounts[^1].Id);
+        Assert.Equal(accountHolder.Accounts[^1], accountHolder.DefaultAccount);
     }
 
     [Fact]
     public void ShouldNotChangeDefaultAccountIfAnyExists()
     {
         // Arrange
-        var accountHolder = new AccountHolder();
-        var expectedDefaultAccount = new ManualBankAccount("Account1", Currency.USD, 20.35M, accountHolder.Id);
-        accountHolder.CreateManualAccount(expectedDefaultAccount.Name, expectedDefaultAccount.Currency, expectedDefaultAccount.Balance);
+        var accountHolder = new AccountHolder(Guid.NewGuid());
+        accountHolder.CreateManualAccount("Account1", Currency.USD, 20.35M);
+        var expectedDefaultAccount = accountHolder.Accounts[^1];
 
         // Act
         accountHolder.CreateManualAccount("Account2", Currency.USD, 20.5M);
 
         // Assert
         Assert.Equal(expectedDefaultAccount, accountHolder.DefaultAccount);
-        Assert.Equal(expectedDefaultAccount.Id, accountHolder.Accounts[^1].Id);
     }
 
     [Fact]
     public void CannotCreateDuplicateNameAccount()
     {
         // Arrange
-        var accountHolder = new AccountHolder();
+        var accountHolder = new AccountHolder(Guid.NewGuid());
         accountHolder.CreateManualAccount("Account1", Currency.USD, 20.35M);
 
         // Assert
@@ -71,7 +69,7 @@ public class AccountHolderAggregateTests
     public void CannotRenameToExistingAccount()
     {
         // Arrange
-        var accountHolder = new AccountHolder();
+        var accountHolder = new AccountHolder(Guid.NewGuid());
         accountHolder.CreateManualAccount("Account1", Currency.USD, 20.35M);
         accountHolder.CreateManualAccount("Account2", Currency.USD, 20.35M);
         var testAccount = accountHolder.Accounts[^1];

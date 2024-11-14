@@ -29,5 +29,8 @@ internal class AccountHolderEntityTypeConfiguration : IEntityTypeConfiguration<A
 
         builder.HasIndex(x => x.DefaultAccountId)
             .IsUnique();
+
+        builder.HasIndex(x => x.UserId)
+            .IsUnique();
     }
 }

@@ -1,10 +1,30 @@
-﻿using Saver.FinanceService.Queries.Reports;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using Saver.FinanceService.Queries.Reports;
 
 namespace Saver.FinanceService.Dto;
 
-public record ReportFiltersDto
+public record ReportFiltersDto : IParsable<ReportFiltersDto>
 {
     public required List<IReportFilter> Filters { get; init; }
+
+    public static ReportFiltersDto Parse(string s, IFormatProvider? provider)
+    {
+        return JsonSerializer.Deserialize<ReportFiltersDto>(s) 
+               ?? throw new FormatException($"Input string {s} was not in correct format.");
+    }
+
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out ReportFiltersDto result)
+    {
+        result = default;
+        if (s is null)
+        {
+            return false;
+        }
+
+        result = JsonSerializer.Deserialize<ReportFiltersDto>(s);
+        return result is not null;
+    }
 }
 
 public record ReportDto

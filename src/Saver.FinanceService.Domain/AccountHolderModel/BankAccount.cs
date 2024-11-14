@@ -5,6 +5,7 @@ namespace Saver.FinanceService.Domain.AccountHolderModel;
 
 public abstract class BankAccount : EventPublishingEntity<Guid>
 {
+    public override Guid Id { get; protected set; } = Guid.NewGuid();
     public string Name { get; internal set; } = null!;
 
     public decimal Balance { get; protected set; }

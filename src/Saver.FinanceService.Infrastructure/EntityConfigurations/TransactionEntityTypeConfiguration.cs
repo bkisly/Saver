@@ -13,6 +13,8 @@ internal class TransactionEntityTypeConfiguration : IEntityTypeConfiguration<Tra
 
         builder.HasKey(t => t.Id);
 
+        builder.Ignore(x => x.DomainEvents);
+
         var transactionDataBuilder = builder.OwnsOne(x => x.TransactionData);
 
         transactionDataBuilder.Property(x => x.Name)

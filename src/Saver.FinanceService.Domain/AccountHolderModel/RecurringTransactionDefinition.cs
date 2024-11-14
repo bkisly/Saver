@@ -5,6 +5,7 @@ namespace Saver.FinanceService.Domain.AccountHolderModel;
 
 public class RecurringTransactionDefinition : EventPublishingEntity<Guid>
 {
+    public override Guid Id { get; protected set; } = Guid.NewGuid();
     public string Cron { get; private set; } = null!;
     public TransactionData TransactionData { get; set; } = null!;
     public Guid ManualBankAccountId { get; private set; }
