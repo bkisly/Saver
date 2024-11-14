@@ -20,7 +20,7 @@ public class ReportQueryBuilder(IQueryable<Transaction> transactions) : IReportQ
             reportFilter.AcceptBuilder(this);
         }
 
-        return _transactions.ToList();
+        return [.. _transactions.OrderBy(t => t.CreationDate)];
     }
 
     public void VisitFilter(DateRangeReportFilter filter)

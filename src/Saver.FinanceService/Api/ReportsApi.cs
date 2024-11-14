@@ -47,9 +47,9 @@ public static class ReportsApi
     }
 
     private static async Task<Results<Ok<BalanceReportDto>, NotFound>> GetBalanceReportAsync(
-        Guid accountId, [FromServices] IReportsQueries reportsQueries)
+        Guid id, [FromServices] IReportsQueries reportsQueries)
     {
-        var report = await reportsQueries.GetBalanceReportForAccountAsync(accountId);
+        var report = await reportsQueries.GetBalanceReportForAccountAsync(id);
 
         if (report is null)
         {
