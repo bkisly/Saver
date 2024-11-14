@@ -18,17 +18,6 @@ public class ManualBankAccount : BankAccount
         Balance = initialBalance;
     }
 
-    internal void UpdateTransaction(TransactionData oldTransaction, TransactionData newTransaction)
-    {
-        Balance += newTransaction.Value - oldTransaction.Value;
-    }
-
-    internal void DeleteTransaction(Guid transactionId, TransactionData dataToDelete)
-    {
-        Balance -= dataToDelete.Value;
-        AddDomainEvent(new TransactionDeletedDomainEvent(transactionId));
-    }
-
     internal void EditAccount(string newName, Currency newCurrency, decimal exchangeRate)
     {
         Name = newName;

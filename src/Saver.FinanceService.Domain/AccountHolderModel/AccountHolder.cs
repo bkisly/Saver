@@ -24,7 +24,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         UserId = userId;
     }
 
-    public void CreateManualAccount(string name, Currency currency, decimal initialBalance)
+    public ManualBankAccount CreateManualAccount(string name, Currency currency, decimal initialBalance)
     {
         if (_accounts.Any(x => x.Name == name))
             throw new FinanceDomainException($"An account with name: {name} already exists.", 
@@ -33,6 +33,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         var account = new ManualBankAccount(name, currency, initialBalance, Id);
         _accounts.Add(account);
         DefaultAccount ??= account;
+        return account;
     }
 
     public void EditManualAccount(Guid accountId, string newName, Currency newCurrency, decimal exchangeRate)
@@ -57,14 +58,14 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         var accountToRemove = FindAccountById(accountId);
         _accounts.Remove(accountToRemove);
 
-        if (DefaultAccount != accountToRemove) 
+        if (accountToRemove != DefaultAccount) 
             return;
 
-        DefaultAccount = null;
-        DefaultAccountId = null;
+        DefaultAccount = _accounts.FirstOrDefault();
+        DefaultAccountId = DefaultAccount?.Id;
     }
 
-    public void CreateCategory(string name, string? description)
+    public Category CreateCategory(string name, string? description)
     {
         if (_categories.Any(x => x.Name == name))
             throw new FinanceDomainException($"A category with name: {name} already exists.", 
@@ -72,6 +73,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
 
         var category = new Category(name, description);
         _categories.Add(category);
+        return category;
     }
 
     public void EditCategory(Guid categoryId, string newName, string? newDescription)
@@ -109,14 +111,9 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         return category;
     }
 
-    public void EditTransaction(Guid accountId, TransactionData oldData, TransactionData newData)
+    public void UpdateBalance(Guid accountId, decimal newBalance)
     {
-        FindManualBankAccountById(accountId).UpdateTransaction(oldData, newData);
-    }
-
-    public void DeleteTransaction(Guid accountId, Guid transactionId, TransactionData deletedData)
-    {
-        FindManualBankAccountById(accountId).DeleteTransaction(transactionId, deletedData);
+        FindAccountById(accountId).UpdateBalance(newBalance);
     }
 
     public void CreateRecurringTransaction(Guid accountId, TransactionData transactionData, string cron)

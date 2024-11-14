@@ -4,7 +4,6 @@ namespace Saver.FinanceService.Domain.Repositories;
 
 public interface IAccountHolderRepository : IRepository<AccountHolder>
 {
-    Task<AccountHolder?> FindByIdAsync(Guid id);
     Task<AccountHolder?> FindByUserIdAsync(Guid userId);
     AccountHolder Add(AccountHolder accountHolder);
     void Update(AccountHolder accountHolder);

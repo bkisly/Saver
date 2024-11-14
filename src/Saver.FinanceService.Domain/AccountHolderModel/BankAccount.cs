@@ -6,7 +6,7 @@ namespace Saver.FinanceService.Domain.AccountHolderModel;
 public abstract class BankAccount : EventPublishingEntity<Guid>
 {
     public override Guid Id { get; protected set; } = Guid.NewGuid();
-    public string Name { get; internal set; } = null!;
+    public string Name { get; protected set; } = null!;
 
     public decimal Balance { get; protected set; }
     public Currency Currency { get; protected set; } = null!;
@@ -23,15 +23,8 @@ public abstract class BankAccount : EventPublishingEntity<Guid>
         AccountHolderId = accountHolderId;
     }
 
-    public void CreateTransaction(TransactionData data, DateTime creationDate)
+    internal void UpdateBalance(decimal newBalance)
     {
-        Balance += data.Value;
-        AddDomainEvent(new TransactionCreatedDomainEvent(Id, data, creationDate));
-    }
-
-    public void CreateTransactions(List<(TransactionData Data, DateTime CreationDate)> transactions)
-    {
-        Balance += transactions.Sum(x => x.Data.Value);
-        AddDomainEvent(new TransactionsCreatedDomainEvent(Id, transactions));
+        Balance = newBalance;
     }
 }
