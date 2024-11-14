@@ -1,6 +1,4 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Saver.EventBus.IntegrationEventLog;
 using Saver.EventBus.RabbitMQ;
 using Saver.FinanceService.Behaviors;
@@ -56,13 +54,13 @@ public static class Extensions
         services.AddTransient<IEventBusService, EventBusService>();
         services.AddTransient<ValidationExceptionHandlingMiddleware>();
 
-        services.AddScoped<IReportQueryBuilder, ReportQueryBuilder>();
         services.AddScoped<IAccountsQueries, AccountsQueries>();
         services.AddScoped<ICategoryQueries, CategoryQueries>();
         services.AddScoped<ITransactionQueries, TransactionQueries>();
         services.AddScoped<IReportsQueries, ReportsQueries>();
 
         services.AddSingleton<IExchangeRateServiceAgent, ExchangeRateServiceAgent>();
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         
         return builder;
     }

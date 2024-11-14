@@ -8,7 +8,8 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Queries.Reports;
 
-public class ReportsQueries(IIdentityService identityService, IMapper mapper, FinanceDbContext context) 
+public class ReportsQueries(IIdentityService identityService, IMapper mapper, 
+    IDateTimeProvider dateTimeProvider, FinanceDbContext context) 
     : IReportsQueries
 {
     public async Task<ReportDto?> GetReportForAccountAsync(Guid accountId, ReportFiltersDto? filters)
@@ -52,7 +53,7 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper, Fi
             return null;
         }
 
-        var date = new DateTime();
+        var date = dateTimeProvider.UtcNow;
 
         return new CategoriesReportDto
         {
@@ -68,7 +69,7 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper, Fi
             return null;
         }
 
-        var date = new DateTime();
+        var date = dateTimeProvider.UtcNow;
 
         return new BalanceReportDto
         {
