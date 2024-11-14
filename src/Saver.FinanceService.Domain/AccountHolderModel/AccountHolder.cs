@@ -111,11 +111,6 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         return category;
     }
 
-    public void UpdateBalance(Guid accountId, decimal newBalance)
-    {
-        FindAccountById(accountId).UpdateBalance(newBalance);
-    }
-
     public void CreateRecurringTransaction(Guid accountId, TransactionData transactionData, string cron)
     {
         FindManualBankAccountById(accountId).CreateRecurringTransaction(transactionData, cron);
