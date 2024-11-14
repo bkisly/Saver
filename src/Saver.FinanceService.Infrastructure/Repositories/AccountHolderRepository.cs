@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Saver.Common.DDD;
 using Saver.FinanceService.Domain.AccountHolderModel;
 using Saver.FinanceService.Domain.Repositories;
@@ -11,6 +12,23 @@ public class AccountHolderRepository(FinanceDbContext context) : IAccountHolderR
     public async Task<AccountHolder?> FindByIdAsync(Guid id)
     {
         var accountHolder = await context.AccountHolders.FindAsync(id);
+        if (accountHolder != null)
+        {
+            await context.Entry(accountHolder)
+                .Collection(x => x.Accounts)
+                .LoadAsync();
+
+            await context.Entry(accountHolder)
+                .Collection(x => x.Categories)
+                .LoadAsync();
+        }
+
+        return accountHolder;
+    }
+
+    public async Task<AccountHolder?> FindByUserIdAsync(Guid userId)
+    {
+        var accountHolder = await context.AccountHolders.SingleOrDefaultAsync(x => x.Id == userId);
         if (accountHolder != null)
         {
             await context.Entry(accountHolder)

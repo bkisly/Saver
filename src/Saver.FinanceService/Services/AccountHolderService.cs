@@ -13,6 +13,6 @@ public class AccountHolderService(IIdentityService identityService, IAccountHold
         if (userId == null)
             return null;
 
-        return await Repository.FindByIdAsync(Guid.Parse(userId));
+        return await Repository.FindByUserIdAsync(Guid.Parse(userId));
     }
 }
