@@ -12,16 +12,12 @@ public class AccountHolderAggregateTests
         var accountHolder = new AccountHolder(Guid.NewGuid());
 
         // Act
-        accountHolder.CreateManualAccount("Account1", Currency.USD, 20.5M);
+        var addedAccount = accountHolder.CreateManualAccount("Account1", Currency.USD, 20.5M);
 
         // Assert
         Assert.Single(accountHolder.Accounts);
-
-        var addedAccount = accountHolder.Accounts.Single();
         Assert.IsType<ManualBankAccount>(addedAccount);
-        Assert.Equal("Account1", addedAccount.Name);
-        Assert.Equal(Currency.USD, addedAccount.Currency);
-        Assert.Equal(20.5M, addedAccount.Balance);
+        Assert.Equivalent(addedAccount, accountHolder.Accounts.Single());
     }
 
     [Fact]
@@ -31,10 +27,10 @@ public class AccountHolderAggregateTests
         var accountHolder = new AccountHolder(Guid.NewGuid());
 
         // Act
-        accountHolder.CreateManualAccount("Account1", Currency.USD, 20.5M);
+        var addedAccount = accountHolder.CreateManualAccount("Account1", Currency.USD, 20.5M);
 
         // Assert
-        Assert.Equal(accountHolder.Accounts[^1], accountHolder.DefaultAccount);
+        Assert.Equal(addedAccount, accountHolder.DefaultAccount);
     }
 
     [Fact]
@@ -42,8 +38,7 @@ public class AccountHolderAggregateTests
     {
         // Arrange
         var accountHolder = new AccountHolder(Guid.NewGuid());
-        accountHolder.CreateManualAccount("Account1", Currency.USD, 20.35M);
-        var expectedDefaultAccount = accountHolder.Accounts[^1];
+        var expectedDefaultAccount = accountHolder.CreateManualAccount("Account1", Currency.USD, 20.35M);
 
         // Act
         accountHolder.CreateManualAccount("Account2", Currency.USD, 20.5M);
@@ -71,8 +66,7 @@ public class AccountHolderAggregateTests
         // Arrange
         var accountHolder = new AccountHolder(Guid.NewGuid());
         accountHolder.CreateManualAccount("Account1", Currency.USD, 20.35M);
-        accountHolder.CreateManualAccount("Account2", Currency.USD, 20.35M);
-        var testAccount = accountHolder.Accounts[^1];
+        var testAccount = accountHolder.CreateManualAccount("Account2", Currency.USD, 20.35M);
 
         // Act-Assert
         var exception = Assert.Throws<FinanceDomainException>(() => accountHolder.EditManualAccount(testAccount.Id, "Account1", Currency.EUR, 1.2M));
@@ -85,15 +79,15 @@ public class AccountHolderAggregateTests
     {
         // Arrange
         var accountHolder = new AccountHolder(Guid.NewGuid());
-        accountHolder.CreateManualAccount("Account1", Currency.USD, 20.5M);
-        accountHolder.CreateManualAccount("Account2", Currency.USD, 20.5M);
+        var accountToRemove = accountHolder.CreateManualAccount("Account1", Currency.USD, 20.5M);
+        var testAccount = accountHolder.CreateManualAccount("Account2", Currency.USD, 20.5M);
 
         // Act
-        accountHolder.RemoveAccount(accountHolder.Accounts[0].Id);
+        accountHolder.RemoveAccount(accountToRemove.Id);
 
         // Assert
         Assert.Single(accountHolder.Accounts);
-        Assert.Equal("Account2", accountHolder.Accounts[0].Name);
+        Assert.Equivalent(testAccount, accountHolder.Accounts.Single());
     }
 
     [Fact]
@@ -101,18 +95,19 @@ public class AccountHolderAggregateTests
     {
         // Arrange
         var accountHolder = new AccountHolder(Guid.NewGuid());
-        accountHolder.CreateManualAccount("Account1", Currency.USD, 20.5M);
-        accountHolder.CreateManualAccount("Account2", Currency.USD, 20.5M);
+        var accountToRemove = accountHolder.CreateManualAccount("Account1", Currency.USD, 20.5M);
+        var testAccount = accountHolder.CreateManualAccount("Account2", Currency.USD, 20.5M);
         accountHolder.CreateManualAccount("Account3", Currency.USD, 20.5M);
-        accountHolder.SetDefaultAccount(accountHolder.Accounts[0].Id);
+        accountHolder.SetDefaultAccount(accountToRemove.Id);
 
         // Act
-        accountHolder.RemoveAccount(accountHolder.Accounts[0].Id);
+        accountHolder.RemoveAccount(accountToRemove.Id);
 
         // Assert
         Assert.NotNull(accountHolder.DefaultAccount);
         Assert.NotNull(accountHolder.DefaultAccountId);
-        Assert.Equal("Account2", accountHolder.DefaultAccount.Name);
+        Assert.Equivalent(testAccount, accountHolder.DefaultAccount);
+        Assert.Equal(testAccount.Id, accountHolder.DefaultAccountId);
     }
 
     [Fact]
@@ -137,15 +132,13 @@ public class AccountHolderAggregateTests
         var accountHolder = new AccountHolder(Guid.NewGuid());
 
         // Act
-        accountHolder.CreateCategory("Category1", "Sample description");
-        accountHolder.CreateCategory("Category2", null);
+        var category1 = accountHolder.CreateCategory("Category1", "Sample description");
+        var category2 = accountHolder.CreateCategory("Category2", null);
 
         // Assert
         Assert.Equal(2, accountHolder.Categories.Count);
-        Assert.Equal("Category1", accountHolder.Categories[0].Name);
-        Assert.Equal("Sample description", accountHolder.Categories[0].Description);
-        Assert.Equal("Category2", accountHolder.Categories[1].Name);
-        Assert.Null(accountHolder.Categories[1].Description);
+        Assert.Equivalent(category1, accountHolder.Categories[0]);
+        Assert.Equivalent(category2, accountHolder.Categories[1]);
     }
 
     [Fact]
@@ -165,17 +158,17 @@ public class AccountHolderAggregateTests
     {
         // Arrange
         var accountHolder = new AccountHolder(Guid.NewGuid());
-        accountHolder.CreateCategory("Category1", "Sample description");
-        accountHolder.CreateCategory("Category2", null);
+        var category1 = accountHolder.CreateCategory("Category1", "Sample description");
+        var category2 = accountHolder.CreateCategory("Category2", null);
 
         // Act
         accountHolder.EditCategory(accountHolder.Categories[1].Id, "EditedName", null);
 
         // Assert
-        Assert.Equal("Category1", accountHolder.Categories[0].Name);
-        Assert.Equal("Sample description", accountHolder.Categories[0].Description);
-        Assert.Equal("EditedName", accountHolder.Categories[1].Name);
-        Assert.Null(accountHolder.Categories[1].Description);
+        Assert.Equal("Category1", category1.Name);
+        Assert.Equal("Sample description", category1.Description);
+        Assert.Equal("EditedName",category2.Name);
+        Assert.Null(category2.Description);
     }
 
     [Fact]
