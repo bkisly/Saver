@@ -1,4 +1,5 @@
 using Saver.FinanceService.Domain.AccountHolderModel;
+using Saver.FinanceService.Domain.Events;
 using Saver.FinanceService.Domain.Exceptions;
 
 namespace Saver.FinanceService.Tests.Domain;
@@ -72,6 +73,47 @@ public class AccountHolderAggregateTests
         var exception = Assert.Throws<FinanceDomainException>(() => accountHolder.EditManualAccount(testAccount.Id, "Account1", Currency.EUR, 1.2M));
         Assert.Equal(FinanceDomainErrorCode.NameConflict, exception.ErrorCode);
         Assert.Equal("Account2", testAccount.Name);
+    }
+
+    [Fact]
+    public void ShouldRecalculateBalanceAndPublishEventWhenManualAccountCurrencyWasChanged()
+    {
+        // Arrange
+        var accountHolder = new AccountHolder(Guid.NewGuid());
+        const decimal balance = 20M;
+        const decimal exchangeRate = 1.35M;
+        var testAccount = accountHolder.CreateManualAccount("Account1", Currency.USD, balance);
+
+        // Act
+        accountHolder.EditManualAccount(testAccount.Id, "Account1", Currency.EUR, exchangeRate);
+
+        // Assert
+        var expectedEvent = new AccountCurrencyChangedDomainEvent(testAccount.Id, Currency.EUR, exchangeRate);
+
+        Assert.Equal(balance * exchangeRate, testAccount.Balance);
+        Assert.Single(testAccount.DomainEvents);
+        Assert.Equivalent(expectedEvent, testAccount.DomainEvents.Single());
+    }
+
+    [Fact]
+    public void CannotSetZeroOrNegativeExchangeRateForManualAccount()
+    {
+        // Arrange
+        var accountHolder = new AccountHolder(Guid.NewGuid());
+        var testAccount = accountHolder.CreateManualAccount("Account1", Currency.USD, 20M);
+
+        // Act-Assert
+        var exceptionForZero = Assert.Throws<FinanceDomainException>(() =>
+            accountHolder.EditManualAccount(testAccount.Id, "Account1", Currency.EUR, 0M));
+
+        var exceptionForNegative = Assert.Throws<FinanceDomainException>(() =>
+            accountHolder.EditManualAccount(testAccount.Id, "Account1", Currency.EUR, -1.5M));
+
+        Assert.Equal(FinanceDomainErrorCode.InvalidValue, exceptionForZero.ErrorCode);
+        Assert.Equal(FinanceDomainErrorCode.InvalidValue, exceptionForNegative.ErrorCode);
+        Assert.Equal(Currency.USD, testAccount.Currency);
+        Assert.Equal(20M, testAccount.Balance);
+        Assert.Empty(testAccount.DomainEvents);
     }
 
     [Fact]
