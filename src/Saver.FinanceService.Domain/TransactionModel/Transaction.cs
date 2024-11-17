@@ -10,7 +10,7 @@ public class Transaction : EventPublishingEntity<Guid>, IAggregateRoot
     public TransactionData TransactionData
     {
         get => _data;
-        set => _data = (TransactionData)value.Clone();
+        private set => _data = (TransactionData)value.Clone();
     }
 
     public Guid AccountId { get; }
@@ -25,7 +25,7 @@ public class Transaction : EventPublishingEntity<Guid>, IAggregateRoot
     {
         AccountId = accountId;
         CreationDate = creationDate;
-        TransactionData = (TransactionData)data.Clone();
+        TransactionData = data;
     }
 
     public void EditTransaction(TransactionData newTransactionData, DateTime newCreatedDate)

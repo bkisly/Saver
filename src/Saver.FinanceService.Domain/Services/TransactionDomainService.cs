@@ -9,11 +9,19 @@ public class TransactionDomainService(IAccountHolderRepository accountHolderRepo
 {
     public Transaction CreateTransaction(AccountHolder accountHolder, Guid accountId, TransactionData transactionData, DateTime creationDate)
     {
-        var transaction = new Transaction(accountId, transactionData, creationDate);
-        transactionRepository.Add(transaction);
-
         var account = accountHolder.FindAccountById(accountId);
+
+        if (transactionData.Category is not null && !accountHolder.Categories.Contains(transactionData.Category))
+        {
+            throw new FinanceDomainException(
+                "Cannot create a transaction with a category not belonging to any holder's categories.",
+                FinanceDomainErrorCode.InvalidOperation);
+        }
+
+        var transaction = new Transaction(accountId, transactionData, creationDate);
         account.UpdateBalance(account.Balance + transaction.TransactionData.Value);
+
+        transactionRepository.Add(transaction);
         accountHolderRepository.Update(accountHolder);
 
         return transaction;
@@ -22,15 +30,22 @@ public class TransactionDomainService(IAccountHolderRepository accountHolderRepo
     public IEnumerable<Transaction> CreateTransactions(AccountHolder accountHolder, Guid accountId, IEnumerable<(TransactionData TransactionData, DateTime CreationDate)> transactions)
     {
         var createdTransactions = new List<Transaction>();
+        var account = accountHolder.FindAccountById(accountId);
 
-        foreach (var transactionInfo in transactions)
+        foreach (var (transactionData, creationDate) in transactions)
         {
-            var transaction = new Transaction(accountId, transactionInfo.TransactionData, transactionInfo.CreationDate);
+            if (transactionData.Category is not null && !accountHolder.Categories.Contains(transactionData.Category))
+            {
+                throw new FinanceDomainException(
+                    "Cannot create a transaction with a category not belonging to any holder's categories.",
+                    FinanceDomainErrorCode.InvalidOperation);
+            }
+
+            var transaction = new Transaction(accountId, transactionData, creationDate);
             transactionRepository.Add(transaction);
             createdTransactions.Add(transaction);
         }
 
-        var account = accountHolder.FindAccountById(accountId);
         account.UpdateBalance(account.Balance + createdTransactions.Sum(x => x.TransactionData.Value));
         accountHolderRepository.Update(accountHolder);
 
