@@ -9,7 +9,7 @@ public class TransactionAggregateTests
     public void ShouldCopyTransactionDataWhenInstantiated()
     {
         // Arrange
-        var category = new Category("Sample category", null);
+        var category = new Category("Sample category", null, Guid.NewGuid());
         var transactionData = new TransactionData("Transaction1", null, 20, category);
 
         // Act
@@ -23,7 +23,7 @@ public class TransactionAggregateTests
     public void ShouldCopyTransactionDataWhenEdited()
     {
         // Arrange
-        var category = new Category("Sample category", null);
+        var category = new Category("Sample category", null, Guid.NewGuid());
         var transactionData = new TransactionData("Transaction1", null, 20, category);
         var transaction = new Transaction(Guid.NewGuid(), transactionData, new DateTime(2024, 11, 17));
         var newTransactionData = new TransactionData("Transaction1", "Edited description", 25, category);

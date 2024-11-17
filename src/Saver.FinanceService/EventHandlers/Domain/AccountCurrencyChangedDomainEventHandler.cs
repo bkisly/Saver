@@ -5,7 +5,8 @@ using Saver.FinanceService.Domain.Repositories;
 
 namespace Saver.FinanceService.EventHandlers.Domain;
 
-public class AccountCurrencyChangedDomainEventHandler(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork) : INotificationHandler<AccountCurrencyChangedDomainEvent>
+public class AccountCurrencyChangedDomainEventHandler(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork) 
+    : INotificationHandler<AccountCurrencyChangedDomainEvent>
 {
     public async Task Handle(AccountCurrencyChangedDomainEvent notification, CancellationToken cancellationToken)
     {

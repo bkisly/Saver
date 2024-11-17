@@ -128,6 +128,8 @@ public class AccountHolderAggregateTests
         accountHolder.RemoveAccount(accountToRemove.Id);
 
         // Assert
+        Assert.Single(accountHolder.DomainEvents);
+        Assert.Equivalent(new EntityDeletedDomainEvent(accountToRemove), accountHolder.DomainEvents.Single());
         Assert.Single(accountHolder.Accounts);
         Assert.Equivalent(testAccount, accountHolder.Accounts.Single());
     }
@@ -235,5 +237,23 @@ public class AccountHolderAggregateTests
         // Act-Assert
         var exception = Assert.Throws<FinanceDomainException>(() => accountHolder.EditCategory(Guid.NewGuid(), "Name", null));
         Assert.Equal(FinanceDomainErrorCode.NotFound, exception.ErrorCode);
+    }
+
+    [Fact]
+    public void CanDeleteExistingCategory()
+    {
+        // Arrange
+        var accountHolder = new AccountHolder(Guid.NewGuid());
+        var categoryToDelete = accountHolder.CreateCategory("Category 1", null);
+        var keptCategory = accountHolder.CreateCategory("Category 2", null);
+
+        // Act
+        accountHolder.RemoveCategory(categoryToDelete.Id);
+
+        // Assert
+        Assert.Single(accountHolder.Categories);
+        Assert.Equivalent(keptCategory, accountHolder.Categories.Single());
+        Assert.Single(accountHolder.DomainEvents);
+        Assert.Equivalent(new EntityDeletedDomainEvent(categoryToDelete), accountHolder.DomainEvents.Single());
     }
 }

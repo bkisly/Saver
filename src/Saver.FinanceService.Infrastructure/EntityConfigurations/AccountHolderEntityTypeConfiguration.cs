@@ -15,7 +15,9 @@ internal class AccountHolderEntityTypeConfiguration : IEntityTypeConfiguration<A
         builder.HasKey(x => x.Id);
 
         builder.HasMany(x => x.Categories)
-            .WithOne();
+            .WithOne()
+            .HasForeignKey(x => x.AccountHolderId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(x => x.Accounts)
             .WithOne()

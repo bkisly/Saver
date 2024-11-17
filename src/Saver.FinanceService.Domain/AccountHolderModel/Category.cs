@@ -8,12 +8,15 @@ public class Category : Entity<Guid>
     public string Name { get; internal set; } = null!;
     public string? Description { get; set; }
 
+    public Guid AccountHolderId { get; protected set; }
+
     private Category()
     { }
 
-    public Category(string name, string? description)
+    public Category(string name, string? description, Guid accountHolderId)
     {
         Name = name;
         Description = description;
+        AccountHolderId = accountHolderId;
     }
 }

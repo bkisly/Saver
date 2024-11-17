@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Saver.Common.DDD;
 using Saver.EventBus.IntegrationEventLog;
 using Saver.EventBus.RabbitMQ;
 using Saver.FinanceService.Behaviors;
 using Saver.FinanceService.Domain.Repositories;
+using Saver.FinanceService.Domain.Services;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Infrastructure.Repositories;
 using Saver.FinanceService.Infrastructure.ServiceAgents;
@@ -50,6 +52,7 @@ public static class Extensions
         services.AddScoped<ITransactionRepository, TransactionRepository>();
 
         services.AddTransient<IAccountHolderService, AccountHolderService>();
+        services.AddTransient<ITransactionDomainService, TransactionDomainService>();
         services.AddTransient<IIdentityService, IdentityService>();
         services.AddTransient<IEventBusService, EventBusService>();
         services.AddTransient<ValidationExceptionHandlingMiddleware>();
@@ -61,6 +64,8 @@ public static class Extensions
 
         services.AddSingleton<IExchangeRateServiceAgent, ExchangeRateServiceAgent>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+
+        services.AddTransient<IUnitOfWork>(sp => sp.GetRequiredService<FinanceDbContext>());
         
         return builder;
     }

@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Saver.Common.DDD;
 using Saver.FinanceService.Domain.AccountHolderModel;
 using Saver.FinanceService.Domain.Repositories;
 
@@ -7,8 +6,6 @@ namespace Saver.FinanceService.Infrastructure.Repositories;
 
 public class AccountHolderRepository(FinanceDbContext context) : IAccountHolderRepository
 {
-    public IUnitOfWork UnitOfWork { get; } = context;
-
     public async Task<AccountHolder?> FindByIdAsync(Guid id)
     {
         var accountHolder = await context.AccountHolders.FindAsync(id);

@@ -1,3 +1,4 @@
+using Saver.FinanceService.Domain.Events;
 using Saver.FinanceService.Domain.TransactionModel;
 
 namespace Saver.FinanceService.Domain.AccountHolderModel;
@@ -63,6 +64,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
 
         DefaultAccount = _accounts.FirstOrDefault();
         DefaultAccountId = DefaultAccount?.Id;
+        AddDomainEvent(new EntityDeletedDomainEvent(accountToRemove));
     }
 
     public Category CreateCategory(string name, string? description)
@@ -71,7 +73,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
             throw new FinanceDomainException($"A category with name: {name} already exists.", 
                 FinanceDomainErrorCode.NameConflict);
 
-        var category = new Category(name, description);
+        var category = new Category(name, description, Id);
         _categories.Add(category);
         return category;
     }
@@ -91,6 +93,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     {
         var categoryToRemove = FindCategoryById(categoryId);
         _categories.Remove(categoryToRemove);
+        AddDomainEvent(new EntityDeletedDomainEvent(categoryToRemove));
     }
 
     public BankAccount FindAccountById(Guid accountId)
@@ -130,6 +133,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
             .Single(x => x.Id == recurringTransactionId);
 
         account.DeleteRecurringTransaction(transactionToDelete);
+        AddDomainEvent(new EntityDeletedDomainEvent(transactionToDelete));
     }
 
     private ManualBankAccount FindManualBankAccountById(Guid accountId)

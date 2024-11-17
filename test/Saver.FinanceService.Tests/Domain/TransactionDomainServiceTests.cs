@@ -62,7 +62,7 @@ public class TransactionDomainServiceTests(TransactionDomainServiceFixture fixtu
         var transactionService = new TransactionDomainService(fixture.AccountHolderRepositoryMock.Object,
             fixture.TransactionRepositoryMock.Object);
 
-        var invalidCategory = new Category("Invalid category", null);
+        var invalidCategory = new Category("Invalid category", null, Guid.NewGuid());
         var transactionData = new TransactionData("Sample transaction", null, 20,
             invalidCategory);
 
