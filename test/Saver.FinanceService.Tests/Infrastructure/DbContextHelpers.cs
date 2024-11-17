@@ -10,7 +10,7 @@ internal static class DbContextHelpers
     public static FinanceDbContext CreateInMemoryDbContext()
     {
         var builder = new DbContextOptionsBuilder<FinanceDbContext>();
-        builder.UseInMemoryDatabase("FinanceDB");
+        builder.UseInMemoryDatabase(Guid.NewGuid().ToString());
         return new FinanceDbContext(new Mock<IMediator>().Object, builder.Options);
     }
 }
