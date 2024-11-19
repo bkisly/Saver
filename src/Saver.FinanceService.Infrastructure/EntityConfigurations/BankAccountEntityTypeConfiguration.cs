@@ -14,6 +14,9 @@ internal class BankAccountEntityTypeConfiguration : IEntityTypeConfiguration<Ban
 
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.Id)
+            .ValueGeneratedNever();
+
         builder.HasIndex(x => x.Name)
             .IsUnique();
 

@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Saver.FinanceService.Infrastructure;
 
 namespace Saver.FinanceService.Tests.Infrastructure;

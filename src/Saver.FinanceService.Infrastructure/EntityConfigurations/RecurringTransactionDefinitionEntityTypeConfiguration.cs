@@ -15,6 +15,9 @@ internal class RecurringTransactionDefinitionEntityTypeConfiguration
 
         builder.HasKey(t => t.Id);
 
+        builder.Property(x => x.Id)
+            .ValueGeneratedNever();
+
         var transactionDataBuilder = builder.OwnsOne(x => x.TransactionData);
 
         transactionDataBuilder.Property(x => x.Name)

@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Saver.Common.DDD;
 using Saver.FinanceService.Domain.Repositories;
 using Saver.FinanceService.Domain.TransactionModel;
 
@@ -7,7 +6,6 @@ namespace Saver.FinanceService.Infrastructure.Repositories;
 
 public class TransactionRepository(FinanceDbContext context) : ITransactionRepository
 {
-    public IUnitOfWork UnitOfWork { get; } = context;
     public IQueryable<Transaction> Transactions => context.Transactions;
 
     public async Task<Transaction?> FindByIdAsync(Guid transactionId)

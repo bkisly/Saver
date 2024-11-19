@@ -14,6 +14,9 @@ internal class AccountHolderEntityTypeConfiguration : IEntityTypeConfiguration<A
 
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.Id)
+            .ValueGeneratedNever();
+
         builder.HasMany(x => x.Categories)
             .WithOne()
             .HasForeignKey(x => x.AccountHolderId)

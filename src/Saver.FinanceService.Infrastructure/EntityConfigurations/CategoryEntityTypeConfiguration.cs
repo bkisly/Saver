@@ -12,6 +12,9 @@ internal class CategoryEntityTypeConfiguration : IEntityTypeConfiguration<Catego
 
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.Id)
+            .ValueGeneratedNever();
+
         builder.HasIndex(c => c.Name)
             .IsUnique();
 

@@ -60,6 +60,31 @@ public sealed class AccountHolderRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task CanAddNewObjectsOnUpdate()
+    {
+        // Arrange
+        var repository = new AccountHolderRepository(_context);
+        repository.Add(_accountHolder);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var accountHolder = await repository.FindByIdAsync(_accountHolder.Id);
+
+        if (accountHolder is null)
+            Assert.Fail();
+
+        accountHolder.CreateManualAccount("New account", Currency.PLN, 20);
+        accountHolder.CreateCategory("New category", null);
+        repository.Update(accountHolder);
+        await _context.SaveChangesAsync();
+
+        // Assert
+        Assert.Equal(3, _context.BankAccounts.Count());
+        Assert.Equal(3, _context.ManualBankAccounts.Count());
+        Assert.Equal(3, _context.Categories.Count());
+    }
+
+    [Fact]
     public async Task CanDeleteDependentObjectsOnUpdate()
     {
         // Arrange

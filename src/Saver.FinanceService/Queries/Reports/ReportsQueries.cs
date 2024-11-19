@@ -14,19 +14,16 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper,
 {
     public async Task<ReportDto?> GetReportForAccountAsync(Guid accountId, ReportFiltersDto? filters)
     {
-        if (filters is null)
-        {
-            return null;
-        }
-
         if (await FindBankAccountAssignedToHolderAsync(accountId) is not { } account)
         {
             return null;
         }
 
-        var queryBuilder = new ReportQueryBuilder(context.Transactions.Where(t => t.AccountId == accountId));
+        var queryBuilder = new ReportQueryBuilder(context.Transactions
+            .Where(t => t.AccountId == accountId)
+            .OrderBy(t => t.CreationDate));
 
-        foreach (var filter in filters.Filters)
+        foreach (var filter in filters?.Filters ?? [])
         {
             queryBuilder.AddFilter(filter);
         }
