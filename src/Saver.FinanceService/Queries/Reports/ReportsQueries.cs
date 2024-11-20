@@ -83,9 +83,15 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper,
             return null;
         }
 
+        var accountHolder = context.AccountHolders.SingleOrDefault(x => x.UserId == userId);
+        if (accountHolder is null)
+        {
+            return null;
+        }
+
         return await context.BankAccounts
             .Include(bankAccount => bankAccount.Currency)
-            .SingleOrDefaultAsync(x => x.Id == accountId && x.AccountHolderId == userId);
+            .SingleOrDefaultAsync(x => x.Id == accountId && x.AccountHolderId == accountHolder.Id);
     }
 
     private async Task<List<CategoryReportEntryDto>> GetGroupedTotalsByCategoriesAsync(

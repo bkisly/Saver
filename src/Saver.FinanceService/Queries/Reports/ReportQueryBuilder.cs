@@ -36,6 +36,11 @@ public class ReportQueryBuilder(IQueryable<Transaction> transactions) : IReportQ
 
     public void VisitFilter(IncomeOutcomeReportFilter filter)
     {
-        _transactions = _transactions.Where(x => x.TransactionType == filter.TransactionType);
+        _transactions = filter.TransactionType switch
+        {
+            TransactionType.Income => _transactions.Where(x => x.TransactionData.Value > 0),
+            TransactionType.Outcome => _transactions.Where(x => x.TransactionData.Value < 0),
+            _ => _transactions
+        };
     }
 }

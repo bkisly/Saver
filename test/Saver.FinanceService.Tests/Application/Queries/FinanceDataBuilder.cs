@@ -28,11 +28,11 @@ public class FinanceDataBuilder(FinanceDbContext context)
         }
     }
 
-    public class TransactionsBuilder
+    public class TransactionsBuilder(FinanceDbContext context)
     {
         private readonly List<Transaction> _transactions = [];
 
-        public TransactionsBuilder AddTransaction(string name, decimal value, DateTime date, Guid accountId, Category? category)
+        public TransactionsBuilder AddTransaction(string name, decimal value, DateTime date, Guid accountId, Category? category = null)
         {
             var transactionData = new TransactionData(name, null, value, category);
             var transaction = new Transaction(accountId, transactionData, date);
@@ -42,6 +42,7 @@ public class FinanceDataBuilder(FinanceDbContext context)
 
         public IEnumerable<Transaction> Build()
         {
+            context.AddRange(_transactions);
             return _transactions;
         }
     }
@@ -56,7 +57,7 @@ public class FinanceDataBuilder(FinanceDbContext context)
 
     public TransactionsBuilder AddTransaction(string name, decimal value, DateTime date, Guid accountId, Category? category)
     {
-        var builder = new TransactionsBuilder();
+        var builder = new TransactionsBuilder(context);
         builder.AddTransaction(name, value, date, accountId, category);
         return builder;
     }
