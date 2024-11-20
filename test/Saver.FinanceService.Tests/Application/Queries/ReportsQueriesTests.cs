@@ -176,6 +176,52 @@ public sealed class ReportsQueriesTests(InMemoryDbContextFactory contextFactory,
         Assert.Equivalent(expectedEntries, report.ReportEntries);
     }
 
+    [Fact]
+    public async Task GetCategoriesReportForAccount_ShouldReturnNull_WhenAccountIsInvalid()
+    {
+        // Arrange
+        var builder = new FinanceDataBuilder(_context);
+        var invalidAccountHolder = builder.AddAccountHolder(Guid.Empty)
+            .WithManualAccount("Invalid account")
+            .Build();
+
+        await _context.SaveChangesAsync();
+
+        var queries = CreateQueries();
+
+        // Act
+        var reportForInvalidAccount = await queries.GetCategoriesReportForAccountAsync(Guid.Empty);
+        var reportForInvalidAccountHolder = await queries.GetCategoriesReportForAccountAsync(
+            invalidAccountHolder.Accounts[0].Id);
+
+        // Assert
+        Assert.Null(reportForInvalidAccount);
+        Assert.Null(reportForInvalidAccountHolder);
+    }
+
+    [Fact]
+    public async Task GetBalanceReportForAccount_ShouldReturnNull_WhenAccountIsInvalid()
+    {
+        // Arrange
+        var builder = new FinanceDataBuilder(_context);
+        var invalidAccountHolder = builder.AddAccountHolder(Guid.Empty)
+            .WithManualAccount("Invalid account")
+            .Build();
+
+        await _context.SaveChangesAsync();
+
+        var queries = CreateQueries();
+
+        // Act
+        var reportForInvalidAccount = await queries.GetBalanceReportForAccountAsync(Guid.Empty);
+        var reportForInvalidAccountHolder = await queries.GetBalanceReportForAccountAsync(
+            invalidAccountHolder.Accounts[0].Id);
+
+        // Assert
+        Assert.Null(reportForInvalidAccount);
+        Assert.Null(reportForInvalidAccountHolder);
+    }
+
     public void Dispose()
     {
         contextFactory.Dispose();

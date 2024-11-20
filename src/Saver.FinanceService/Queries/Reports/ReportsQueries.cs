@@ -99,7 +99,7 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper,
     {
         var groupedTotals = await context.Transactions
             .Where(x => x.AccountId == accountId 
-                        && x.TransactionType == TransactionType.Income 
+                        && x.TransactionType == transactionType
                         && x.TransactionData.Category != null 
                         && x.CreationDate <= relativeDate)
             .GroupBy(x => x.TransactionData.Category)
