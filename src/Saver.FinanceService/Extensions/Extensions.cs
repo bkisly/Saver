@@ -7,7 +7,7 @@ using Saver.FinanceService.Domain.Repositories;
 using Saver.FinanceService.Domain.Services;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Infrastructure.Repositories;
-using Saver.FinanceService.Infrastructure.ServiceAgents;
+using Saver.FinanceService.Infrastructure.ServiceAgents.ExchangeRate;
 using Saver.FinanceService.Middleware;
 using Saver.FinanceService.Queries;
 using Saver.FinanceService.Queries.Reports;
@@ -44,6 +44,16 @@ public static class Extensions
         builder.EnrichNpgsqlDbContext<FinanceDbContext>();
 
         services.AddHttpContextAccessor();
+
+        services.AddHttpClient<ExchangeRateServiceAgent>(options =>
+        {
+            var url = builder.Configuration.GetValue<string>("ExchangeRateApiUrl") ??
+                      throw new Exception("ExchangeRateUrl config value is missing");
+
+            options.BaseAddress = new Uri(url);
+        });
+
+        builder.AddRedisDistributedCache(ServicesNames.Redis);
 
         builder.AddRabbitMQEventBus(ServicesNames.RabbitMQ)
             .WithIntegrationEventLogs<FinanceDbContext>();

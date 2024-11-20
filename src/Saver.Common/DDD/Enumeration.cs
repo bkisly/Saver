@@ -46,4 +46,14 @@ public abstract class Enumeration(int id, string name) : IComparable
             .Select(x => x.Name)
             .Contains(name);
     }
+
+    public static bool operator ==(Enumeration left, Enumeration right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Enumeration left, Enumeration right)
+    {
+        return !(left == right);
+    }
 }

@@ -2,7 +2,7 @@
 using Saver.Common.DDD;
 using Saver.FinanceService.Domain.AccountHolderModel;
 using Saver.FinanceService.Domain.Exceptions;
-using Saver.FinanceService.Infrastructure.ServiceAgents;
+using Saver.FinanceService.Infrastructure.ServiceAgents.ExchangeRate;
 using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
@@ -12,7 +12,8 @@ public record EditManualBankAccountCommand(Guid AccountId, string Name, string? 
 public class EditManualBankAccountCommandHandler(
     IAccountHolderService accountHolderService, 
     IExchangeRateServiceAgent exchangeRateServiceAgent, 
-    IUnitOfWork unitOfWork) 
+    IUnitOfWork unitOfWork,
+    ILogger<EditCategoryCommandHandler> logger) 
     : IRequestHandler<EditManualBankAccountCommand, CommandResult>
 {
     public async Task<CommandResult> Handle(EditManualBankAccountCommand request, CancellationToken cancellationToken)
@@ -26,7 +27,19 @@ public class EditManualBankAccountCommandHandler(
         {
             var account = accountHolder.FindAccountById(request.AccountId);
             var newCurrency = Enumeration.FromName<Currency>(request.CurrencyCode);
-            var exchangeRate = await exchangeRateServiceAgent.GetExchangeRateAsync(account.Currency, newCurrency);
+
+            var exchangeRate = 1M;
+            if (newCurrency != account.Currency)
+            {
+                try
+                {
+                    exchangeRate = await exchangeRateServiceAgent.GetExchangeRateAsync(account.Currency, newCurrency);
+                }
+                catch (ExchangeRateServiceException e)
+                {
+                    logger.LogError("{message}", e.Message);
+                }
+            }
 
             accountHolder.EditManualAccount(request.AccountId, request.Name, newCurrency, exchangeRate);
         }

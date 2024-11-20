@@ -1,6 +1,3 @@
-using Saver.FinanceService.Domain.Events;
-using Saver.FinanceService.Domain.TransactionModel;
-
 namespace Saver.FinanceService.Domain.AccountHolderModel;
 
 public abstract class BankAccount : EventPublishingEntity<Guid>

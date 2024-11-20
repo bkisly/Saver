@@ -1,6 +1,6 @@
 ﻿using Saver.FinanceService.Domain.AccountHolderModel;
 
-namespace Saver.FinanceService.Infrastructure.ServiceAgents;
+namespace Saver.FinanceService.Infrastructure.ServiceAgents.ExchangeRate;
 
 /// <summary>
 /// Provides an abstraction over exchange rates external service.
