@@ -1,25 +1,51 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-
-namespace Saver.IdentityService.Api;
+﻿namespace Saver.IdentityService.Api;
 
 public static class IdentityApi
 {
     public static void MapIdentityApiV1(this IEndpointRouteBuilder builder)
     {
         var api = builder.MapGroup("/api/identity");
-        api.MapIdentityApi<IdentityUser>();
-        api.MapPost("logout", LogOutAsync);
+
+        api.MapPost("/register", Register)
+            .AllowAnonymous();
+        api.MapPut("/confirm", ConfirmEmail)
+            .AllowAnonymous();
+        api.MapPut("/edit/email", ChangeEmail);
+        api.MapPut("/edit/password", ChangePassword);
+        api.MapDelete("/", DeleteAccount);
+        api.MapPost("/login", Login)
+            .AllowAnonymous();
+
+        api.RequireAuthorization();
     }
 
-    private static async Task<Results<Ok, UnauthorizedHttpResult>> LogOutAsync(
-        SignInManager<IdentityUser> signInManager, [FromBody] object? empty)
+    private static void Register()
     {
-        if (empty == null) 
-            return TypedResults.Unauthorized();
 
-        await signInManager.SignOutAsync();
-        return TypedResults.Ok();
+    }
+
+    private static void ConfirmEmail()
+    {
+
+    }
+
+    private static void ChangeEmail()
+    {
+
+    }
+
+    private static void ChangePassword()
+    {
+
+    }
+
+    private static void DeleteAccount()
+    {
+
+    }
+
+    private static void Login()
+    {
+
     }
 }
