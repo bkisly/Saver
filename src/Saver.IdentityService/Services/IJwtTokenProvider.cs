@@ -11,5 +11,5 @@ public interface IJwtTokenProvider
     /// Generates a new JWT token.
     /// </summary>
     /// <returns>Encoded JWT token.</returns>
-    string Provide(IdentityUser user);
+    string ProvideToken(IdentityUser user);
 }

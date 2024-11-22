@@ -9,7 +9,7 @@ namespace Saver.IdentityService.Services;
 
 public class JwtTokenProvider(IIdentityConfigurationProvider config) : IJwtTokenProvider
 {
-    public string Provide(IdentityUser user)
+    public string ProvideToken(IdentityUser user)
     {
         var handler = new JwtSecurityTokenHandler();
         var secretKey = Encoding.UTF8.GetBytes(config.SecretKey);
