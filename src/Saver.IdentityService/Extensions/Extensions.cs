@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Saver.IdentityService.Configuration;
 using Saver.IdentityService.Data;
-using Saver.IdentityService.Jwt;
+using Saver.IdentityService.Services;
 using Saver.ServiceDefaults;
 
 namespace Saver.IdentityService.Extensions;
@@ -36,8 +36,8 @@ public static class Extensions
             {
                 ValidateIssuer = false,
                 ValidateAudience = false,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Jwt:SecretKey") 
-                    ?? throw new NullReferenceException("Jwt:SecretKey not set.")))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Identity:SecretKey") 
+                    ?? throw new NullReferenceException("Identity__SecretKey not set.")))
             };
         });
 
@@ -48,8 +48,14 @@ public static class Extensions
             options.SignIn.RequireConfirmedEmail = false;
         });
 
+        services.AddHttpContextAccessor();
+
         services.AddSingleton<IIdentityConfigurationProvider, IdentityConfigurationProvider>();
         services.AddSingleton<IJwtTokenProvider, JwtTokenProvider>();
+        services.AddSingleton<IUserContextProvider, UserContextProvider>();
+
+        services.AddScoped<IAccountService, AccountService<IdentityUser>>();
+        services.AddScoped<ILoginService, LoginService<IdentityUser>>();
 
         return builder;
     }

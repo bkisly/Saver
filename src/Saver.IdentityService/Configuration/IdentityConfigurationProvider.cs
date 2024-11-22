@@ -3,9 +3,9 @@
 public class IdentityConfigurationProvider(IConfiguration configuration, ILogger<IdentityConfigurationProvider> logger) 
     : IIdentityConfigurationProvider
 {
-    public string Issuer => GetRequiredConfigurationValue("Jwt:Issuer", string.Empty);
-    public string SecretKey => GetRequiredConfigurationValue("Jwt:SecretKey", string.Empty);
-    public int ExpirationTimeMinutes => configuration.GetValue("Jwt:ExpirationTimeMinutes", 15);
+    public string Issuer => GetRequiredConfigurationValue("Identity:Issuer", string.Empty);
+    public string SecretKey => GetRequiredConfigurationValue("Identity:SecretKey", string.Empty);
+    public int ExpirationTimeMinutes => configuration.GetValue("Identity:ExpirationTimeMinutes", 15);
 
     private T GetRequiredConfigurationValue<T>(string key, T defaultValue)
     {

@@ -11,7 +11,7 @@ var app = builder.Build();
 
 app.MapDefaultEndpoints();
 app.MapGet("/", () => "Hello World!");
-app.MapIdentityApiV1();
+app.MapIdentityApi();
 
 app.UseDefaultSwagger();
 

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Saver.IdentityService.Configuration;
 
-namespace Saver.IdentityService.Jwt;
+namespace Saver.IdentityService.Services;
 
 public class JwtTokenProvider(IIdentityConfigurationProvider config) : IJwtTokenProvider
 {
@@ -14,7 +14,7 @@ public class JwtTokenProvider(IIdentityConfigurationProvider config) : IJwtToken
         var handler = new JwtSecurityTokenHandler();
         var secretKey = Encoding.UTF8.GetBytes(config.SecretKey);
         var signingCredentials = new SigningCredentials(
-            new SymmetricSecurityKey(secretKey), 
+            new SymmetricSecurityKey(secretKey),
             SecurityAlgorithms.HmacSha256);
 
         var tokenDescriptor = new SecurityTokenDescriptor

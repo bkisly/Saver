@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Saver.IdentityService.Jwt;
+namespace Saver.IdentityService.Services;
 
 /// <summary>
 /// Provides JWT tokens for authorization.
