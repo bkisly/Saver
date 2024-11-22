@@ -1,8 +1,5 @@
-﻿using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Saver.IdentityService.Configuration;
 using Saver.IdentityService.Data;
 using Saver.IdentityService.Services;
@@ -26,22 +23,7 @@ public static class Extensions
         services.AddIdentityCore<IdentityUser>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Identity:SecretKey") 
-                    ?? throw new NullReferenceException("Identity__SecretKey not set.")))
-            };
-        });
-
-        services.AddAuthorization();
+        builder.AddDefaultAuthorization();
 
         services.Configure<IdentityOptions>(options =>
         {

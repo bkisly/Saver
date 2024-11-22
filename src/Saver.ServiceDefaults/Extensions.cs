@@ -1,9 +1,13 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -45,6 +49,47 @@ namespace Microsoft.Extensions.Hosting
         {
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            return builder;
+        }
+
+        public static IHostApplicationBuilder AddDefaultAuthorization(this IHostApplicationBuilder builder)
+        {
+            var identityConfig = builder.Configuration.GetSection("Identity");
+            if (identityConfig.Value is null)
+            {
+                return builder;
+            }
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                var issuer = identityConfig.GetValue<string>("Issuer") ??
+                             throw new InvalidOperationException("Identity:Issuer config value missing");
+
+                var audience = identityConfig.GetValue<string>("Audience") ??
+                               throw new InvalidOperationException("Identity:Audience config value missing");
+
+                var secretKey = identityConfig.GetValue<string>("SecretKey") ??
+                                throw new InvalidOperationException("Identity:SecretKey config value missing");
+
+                options.Authority = issuer;
+                options.Audience = audience;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = false,
+                    ValidIssuer = issuer,
+                    ValidAudience = audience,
+                    ValidateIssuer = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+
+            builder.Services.AddAuthorization();
             return builder;
         }
 
