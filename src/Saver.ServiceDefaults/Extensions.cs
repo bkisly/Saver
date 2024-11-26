@@ -1,9 +1,8 @@
-using System.Text;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
@@ -11,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using Saver.ServiceDefaults;
 
 namespace Microsoft.Extensions.Hosting
 {
@@ -55,10 +55,6 @@ namespace Microsoft.Extensions.Hosting
         public static IHostApplicationBuilder AddDefaultAuthorization(this IHostApplicationBuilder builder)
         {
             var identityConfig = builder.Configuration.GetSection("Identity");
-            if (identityConfig.Value is null)
-            {
-                return builder;
-            }
 
             builder.Services.AddAuthentication(options =>
             {
@@ -66,17 +62,16 @@ namespace Microsoft.Extensions.Hosting
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
-                var issuer = identityConfig.GetValue<string>("Issuer") ??
-                             throw new InvalidOperationException("Identity:Issuer config value missing");
+                var issuer = identityConfig.GetRequiredValue<string>("Issuer");
+                var audience = identityConfig.GetRequiredValue<string>("Audience");
+                var publicKey = identityConfig.GetRequiredValue<string>("PublicKey");
 
-                var audience = identityConfig.GetValue<string>("Audience") ??
-                               throw new InvalidOperationException("Identity:Audience config value missing");
-
-                var secretKey = identityConfig.GetValue<string>("SecretKey") ??
-                                throw new InvalidOperationException("Identity:SecretKey config value missing");
+                var rsa = RSA.Create();
+                rsa.ImportRSAPublicKey(new ReadOnlySpan<byte>(Convert.FromBase64String(publicKey)), out _);
 
                 options.Authority = issuer;
                 options.Audience = audience;
+                options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateAudience = false,
@@ -84,7 +79,7 @@ namespace Microsoft.Extensions.Hosting
                     ValidAudience = audience,
                     ValidateIssuer = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                    IssuerSigningKey = new RsaSecurityKey(rsa),
                     ClockSkew = TimeSpan.Zero
                 };
             });

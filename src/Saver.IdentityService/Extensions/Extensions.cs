@@ -13,6 +13,8 @@ public static class Extensions
     {
         var services = builder.Services;
 
+        builder.AddDefaultAuthorization();
+
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
         {
             options.UseNpgsql(builder.Configuration.GetConnectionString(ServicesNames.IdentityServiceDatabase));
@@ -22,8 +24,6 @@ public static class Extensions
 
         services.AddIdentityCore<IdentityUser>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
-
-        builder.AddDefaultAuthorization();
 
         services.Configure<IdentityOptions>(options =>
         {

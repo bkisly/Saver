@@ -6,6 +6,6 @@
 public interface IIdentityConfigurationProvider
 {
     public string Issuer { get; }
-    public string SecretKey { get; }
+    public string PrivateKey { get; }
     public int ExpirationTimeMinutes { get; }
 }

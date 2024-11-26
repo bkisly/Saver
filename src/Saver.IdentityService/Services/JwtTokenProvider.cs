@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Saver.IdentityService.Configuration;
@@ -12,13 +12,16 @@ public class JwtTokenProvider(IIdentityConfigurationProvider config) : IJwtToken
     public string ProvideToken(IdentityUser user)
     {
         var handler = new JwtSecurityTokenHandler();
-        var secretKey = Encoding.UTF8.GetBytes(config.SecretKey);
+        using var rsa = RSA.Create();
+        rsa.ImportRSAPrivateKey(new ReadOnlySpan<byte>(Convert.FromBase64String(config.PrivateKey)), out _);
+
         var signingCredentials = new SigningCredentials(
-            new SymmetricSecurityKey(secretKey),
-            SecurityAlgorithms.HmacSha256);
+            new RsaSecurityKey(rsa),
+            SecurityAlgorithms.RsaSha256);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
+            Issuer = config.Issuer,
             SigningCredentials = signingCredentials,
             Expires = DateTime.UtcNow.AddMinutes(config.ExpirationTimeMinutes),
             Subject = GenerateClaims(user)
