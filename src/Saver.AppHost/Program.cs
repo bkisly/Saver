@@ -17,8 +17,7 @@ var publicKey = builder.Configuration.GetValue<string>("Identity:PublicKey")
 
 var identityService = builder.AddProject<Projects.Saver_IdentityService>("identityservice")
     .WithReference(identityServiceDb)
-    .WithReference(rabbitMq)
-    .WithEnvironment("Identity__PublicKey", publicKey);
+    .WithReference(rabbitMq);
 
 var identityEndpoint = identityService.GetEndpoint("https");
 
