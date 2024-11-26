@@ -224,8 +224,8 @@ public sealed class ReportsQueriesTests(InMemoryDbContextFactory contextFactory,
 
     public void Dispose()
     {
-        contextFactory.Dispose();
         _context.Dispose();
+        contextFactory.Dispose();
     }
 
     private ReportsQueries CreateQueries()

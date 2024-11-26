@@ -5,16 +5,18 @@ using Saver.FinanceService.Infrastructure.Repositories;
 
 namespace Saver.FinanceService.Tests.Infrastructure;
 
-public sealed class TransactionRepositoryTests : IDisposable
+public sealed class TransactionRepositoryTests : IClassFixture<InMemoryDbContextFactory>, IDisposable
 {
+    private readonly InMemoryDbContextFactory _contextFactory;
     private readonly FinanceDbContext _context;
     private readonly AccountHolder _accountHolder;
     private readonly Transaction _transaction;
     private readonly AccountHolderRepository _accountHolderRepository;
 
-    public TransactionRepositoryTests()
+    public TransactionRepositoryTests(InMemoryDbContextFactory contextFactory)
     {
-        _context = DbContextHelpers.CreateInMemoryDbContext();
+        _contextFactory = contextFactory;
+        _context = _contextFactory.BuildSqliteInMemoryDbContext();
 
         _accountHolder = new AccountHolder(Guid.NewGuid());
         var account = _accountHolder.CreateManualAccount("Sample account", Currency.USD, 20);
@@ -69,7 +71,7 @@ public sealed class TransactionRepositoryTests : IDisposable
 
     public void Dispose()
     {
-        _context.Database.EnsureDeleted();
         _context.Dispose();
+        _contextFactory.Dispose();
     }
 }
