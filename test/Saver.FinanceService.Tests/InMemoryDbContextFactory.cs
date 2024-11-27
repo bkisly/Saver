@@ -18,6 +18,7 @@ public sealed class InMemoryDbContextFactory : IDisposable
 
         var context = new FinanceDbContext(new Mock<IMediator>().Object, options);
         context.Database.EnsureCreated();
+        //context.ChangeTracker.Clear();
         return context;
     }
 

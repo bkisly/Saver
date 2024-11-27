@@ -14,8 +14,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     public IReadOnlyList<Category> Categories => _categories.AsReadOnly();
 
     public Guid UserId { get; }
-    public Guid? DefaultAccountId { get; private set; }
-    public BankAccount? DefaultAccount { get; private set; }
+    public DefaultBankAccount? DefaultAccount { get; private set; }
 
     private AccountHolder()
     { }
@@ -33,7 +32,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
 
         var account = new ManualBankAccount(name, currency, initialBalance, Id);
         _accounts.Add(account);
-        DefaultAccount ??= account;
+        DefaultAccount ??= new DefaultBankAccount(Id, account);
         return account;
     }
 
@@ -50,8 +49,8 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
 
     public void SetDefaultAccount(Guid accountId)
     {
-        DefaultAccount = FindAccountById(accountId);
-        DefaultAccountId = accountId;
+        var bankAccount = FindAccountById(accountId);
+        SetOrCreateDefaultAccount(bankAccount);
     }
 
     public void RemoveAccount(Guid accountId)
@@ -59,19 +58,30 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         var accountToRemove = FindAccountById(accountId);
         _accounts.Remove(accountToRemove);
 
-        if (accountToRemove != DefaultAccount) 
+        if (accountToRemove != DefaultAccount?.BankAccount)
+        {
             return;
+        }
 
-        DefaultAccount = _accounts.FirstOrDefault();
-        DefaultAccountId = DefaultAccount?.Id;
+        if (_accounts.Count > 0)
+        {
+            SetOrCreateDefaultAccount(_accounts.First());
+        }
+        else
+        {
+            DefaultAccount = null;
+        }
+
         AddDomainEvent(new EntityDeletedDomainEvent(accountToRemove));
     }
 
     public Category CreateCategory(string name, string? description)
     {
         if (_categories.Any(x => x.Name == name))
-            throw new FinanceDomainException($"A category with name: {name} already exists.", 
+        {
+            throw new FinanceDomainException($"A category with name: {name} already exists.",
                 FinanceDomainErrorCode.NameConflict);
+        }
 
         var category = new Category(name, description, Id);
         _categories.Add(category);
@@ -81,8 +91,10 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     public void EditCategory(Guid categoryId, string newName, string? newDescription)
     {
         if (_categories.Any(x => x.Name == newName))
+        {
             throw new FinanceDomainException($"A category with name: {newName} already exists.",
                 FinanceDomainErrorCode.NameConflict);
+        }
 
         var category = FindCategoryById(categoryId);
         category.Name = newName;
@@ -139,13 +151,29 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     private ManualBankAccount FindManualBankAccountById(Guid accountId)
     {
         if (FindAccountById(accountId) is not { } account)
+        {
             throw new FinanceDomainException("Could not find requested manual account.",
                 FinanceDomainErrorCode.InvalidOperation);
+        }
 
         if (account is not ManualBankAccount manualAccount)
+        {
             throw new FinanceDomainException("Operation is possible to perform only for manual accounts.",
                 FinanceDomainErrorCode.InvalidOperation);
+        }
 
         return manualAccount;
+    }
+
+    private void SetOrCreateDefaultAccount(BankAccount account)
+    {
+        if (DefaultAccount is null)
+        {
+            DefaultAccount = new DefaultBankAccount(Id, account);
+        }
+        else
+        {
+            DefaultAccount.BankAccount = account;
+        }
     }
 }

@@ -90,7 +90,6 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper,
         }
 
         return await context.BankAccounts
-            .Include(bankAccount => bankAccount.Currency)
             .SingleOrDefaultAsync(x => x.Id == accountId && x.AccountHolderId == accountHolder.Id);
     }
 

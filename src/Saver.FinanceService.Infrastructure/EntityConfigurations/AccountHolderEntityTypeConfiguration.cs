@@ -28,12 +28,8 @@ internal class AccountHolderEntityTypeConfiguration : IEntityTypeConfiguration<A
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(x => x.DefaultAccount)
-            .WithMany()
-            .HasForeignKey(x => x.DefaultAccountId)
+            .WithOne()
             .OnDelete(DeleteBehavior.SetNull);
-
-        builder.HasIndex(x => x.DefaultAccountId)
-            .IsUnique();
 
         builder.HasIndex(x => x.UserId)
             .IsUnique();

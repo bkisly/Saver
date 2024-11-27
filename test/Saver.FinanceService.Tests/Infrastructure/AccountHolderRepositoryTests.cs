@@ -109,8 +109,8 @@ public sealed class AccountHolderRepositoryTests : IClassFixture<InMemoryDbConte
         Assert.NotNull(foundHolder);
         Assert.Single(foundHolder.Accounts);
         Assert.Single(foundHolder.Categories);
-        Assert.Equivalent(keptAccount, foundHolder.DefaultAccount);
-        Assert.Equal(keptAccount.Id, foundHolder.DefaultAccountId);
+        Assert.NotNull(foundHolder.DefaultAccount);
+        Assert.Equivalent(keptAccount, foundHolder.DefaultAccount.BankAccount);
     }
 
     [Fact]
