@@ -16,7 +16,7 @@ public class AccountsQueries(IAccountHolderService accountHolderService)
     public async Task<BankAccountDto?> GetDefaultAccountAsync()
     {
         var accountHolder = await accountHolderService.GetCurrentAccountHolder();
-        return accountHolder?.DefaultAccount == null ? null : MapFromEntity(accountHolder.DefaultAccount, accountHolder);
+        return accountHolder?.DefaultAccount is null ? null : MapFromEntity(accountHolder.DefaultAccount.BankAccount, accountHolder);
     }
 
     public async Task<BankAccountDto?> FindAccountByIdAsync(Guid id)
@@ -35,7 +35,7 @@ public class AccountsQueries(IAccountHolderService accountHolderService)
             Description = null,
             Balance = entity.Balance,
             CurrencyCode = entity.Currency.Name,
-            IsDefault = accountHolder.DefaultAccount?.Id == entity.Id
+            IsDefault = accountHolder.DefaultAccount?.BankAccount.Id == entity.Id
         };
     }
 }

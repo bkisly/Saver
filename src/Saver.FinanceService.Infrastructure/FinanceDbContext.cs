@@ -16,6 +16,7 @@ public class FinanceDbContext(IMediator mediator, DbContextOptions<FinanceDbCont
 {
     public DbSet<AccountHolder> AccountHolders { get; set; }
     public DbSet<BankAccount> BankAccounts { get; set; }
+    public DbSet<DefaultBankAccount> DefaultBankAccounts { get; set; }
     public DbSet<ExternalBankAccount> ExternalBankAccounts { get; set; }
     public DbSet<ManualBankAccount> ManualBankAccounts { get; set; }
     public DbSet<RecurringTransactionDefinition> RecurringTransactionDefinitions { get; set; }
@@ -33,6 +34,7 @@ public class FinanceDbContext(IMediator mediator, DbContextOptions<FinanceDbCont
         modelBuilder.ApplyConfiguration(new CurrencyEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new RecurringTransactionDefinitionEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new BankAccountEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new DefaultBankAccountEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new ManualBankAccountEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new ExternalBankAccountEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new AccountHolderEntityTypeConfiguration());

@@ -40,6 +40,12 @@ public abstract class Enumeration(int id, string name) : IComparable
             .Single(x => x.Name == name);
     }
 
+    public static T FromId<T>(int id) where T : Enumeration
+    {
+        return GetAll<T>()
+            .Single(x => x.Id == id);
+    }
+
     public static bool HasName<T>(string name) where T : Enumeration
     {
         return GetAll<T>()

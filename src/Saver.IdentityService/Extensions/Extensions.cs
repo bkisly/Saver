@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Saver.IdentityService.Configuration;
 using Saver.IdentityService.Data;
+using Saver.IdentityService.Services;
 using Saver.ServiceDefaults;
 
 namespace Saver.IdentityService.Extensions;
@@ -11,6 +13,8 @@ public static class Extensions
     {
         var services = builder.Services;
 
+        builder.AddDefaultAuthorization();
+
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
         {
             options.UseNpgsql(builder.Configuration.GetConnectionString(ServicesNames.IdentityServiceDatabase));
@@ -18,14 +22,22 @@ public static class Extensions
 
         builder.EnrichNpgsqlDbContext<ApplicationDbContext>();
 
-        services.AddIdentityApiEndpoints<IdentityUser>()
+        services.AddIdentityCore<IdentityUser>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
-        services.AddAuthorization();
         services.Configure<IdentityOptions>(options =>
         {
             options.SignIn.RequireConfirmedEmail = false;
         });
+
+        services.AddHttpContextAccessor();
+
+        services.AddSingleton<IIdentityConfigurationProvider, IdentityConfigurationProvider>();
+        services.AddSingleton<IJwtTokenProvider, JwtTokenProvider>();
+        services.AddSingleton<IUserContextProvider, UserContextProvider>();
+
+        services.AddScoped<IAccountService, AccountService<IdentityUser>>();
+        services.AddScoped<ILoginService, LoginService<IdentityUser>>();
 
         return builder;
     }

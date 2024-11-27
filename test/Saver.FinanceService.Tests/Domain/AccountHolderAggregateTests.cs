@@ -31,7 +31,8 @@ public class AccountHolderAggregateTests
         var addedAccount = accountHolder.CreateManualAccount("Account1", Currency.USD, 20.5M);
 
         // Assert
-        Assert.Equal(addedAccount, accountHolder.DefaultAccount);
+        Assert.NotNull(accountHolder.DefaultAccount);
+        Assert.Equal(addedAccount, accountHolder.DefaultAccount.BankAccount);
     }
 
     [Fact]
@@ -45,7 +46,8 @@ public class AccountHolderAggregateTests
         accountHolder.CreateManualAccount("Account2", Currency.USD, 20.5M);
 
         // Assert
-        Assert.Equal(expectedDefaultAccount, accountHolder.DefaultAccount);
+        Assert.NotNull(accountHolder.DefaultAccount);
+        Assert.Equal(expectedDefaultAccount, accountHolder.DefaultAccount.BankAccount);
     }
 
     [Fact]
@@ -149,9 +151,8 @@ public class AccountHolderAggregateTests
 
         // Assert
         Assert.NotNull(accountHolder.DefaultAccount);
-        Assert.NotNull(accountHolder.DefaultAccountId);
-        Assert.Equivalent(testAccount, accountHolder.DefaultAccount);
-        Assert.Equal(testAccount.Id, accountHolder.DefaultAccountId);
+        Assert.Equivalent(testAccount, accountHolder.DefaultAccount.BankAccount);
+        Assert.Equal(accountHolder.Id, accountHolder.DefaultAccount.AccountHolderId);
     }
 
     [Fact]
@@ -166,7 +167,6 @@ public class AccountHolderAggregateTests
 
         // Assert
         Assert.Null(accountHolder.DefaultAccount);
-        Assert.Null(accountHolder.DefaultAccountId);
     }
 
     [Fact]

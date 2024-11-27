@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Saver.Common.DDD;
 using Saver.FinanceService.Domain.AccountHolderModel;
 
 namespace Saver.FinanceService.Infrastructure.EntityConfigurations;
@@ -24,7 +25,8 @@ internal class BankAccountEntityTypeConfiguration : IEntityTypeConfiguration<Ban
             .IsRequired()
             .HasMaxLength(256);
 
-        builder.HasOne(x => x.Currency)
-            .WithMany();
+        builder.Property(x => x.Currency)
+            .HasConversion(x => x.Id, x => Enumeration.FromId<Currency>(x))
+            .HasColumnName("CurrencyId");
     }
 }
