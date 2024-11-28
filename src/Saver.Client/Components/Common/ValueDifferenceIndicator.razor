@@ -1,0 +1,28 @@
+﻿<p class="h5">
+    <span class="@CaretColorClass">
+        <i class="@CaretClass"></i>
+    </span>
+    <span>@Math.Abs(Value).ToString("N2") @CurrencyCode</span>
+</p>
+
+@code {
+    [Parameter, EditorRequired] public decimal Value { get; set; }
+    [Parameter, EditorRequired] public string CurrencyCode { get; set; } = string.Empty;
+    [Parameter] public bool Invert { get; set; }
+
+    private decimal ValueIncludingInversion => Invert ? -Value : Value;
+
+    private string CaretClass => ValueIncludingInversion switch
+    {
+        > 0 => "bi-caret-up-fill",
+        < 0 => "bi-caret-down-fill",
+        _ => "bi-caret-right-fill"
+    };
+
+    private string CaretColorClass => ValueIncludingInversion switch
+    {
+        > 0 => "text-success",
+        < 0 => "text-danger",
+        _ => "text-muted"
+    };
+}
