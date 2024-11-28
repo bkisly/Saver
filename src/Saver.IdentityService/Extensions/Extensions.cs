@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Saver.EventBus.IntegrationEventLog;
+using Saver.EventBus.RabbitMQ;
 using Saver.IdentityService.Configuration;
 using Saver.IdentityService.Data;
+using Saver.IdentityService.IntegrationEvents;
 using Saver.IdentityService.Services;
 using Saver.ServiceDefaults;
 
@@ -29,6 +32,9 @@ public static class Extensions
         {
             options.SignIn.RequireConfirmedEmail = false;
         });
+
+        builder.AddRabbitMQEventBus(ServicesNames.RabbitMQ)
+            .WithIntegrationEventLogs<ApplicationDbContext>(IdentityIntegrationsAssemblyInfo.Assembly);
 
         services.AddHttpContextAccessor();
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Saver.EventBus.IntegrationEventLog.Services;
 
@@ -15,9 +16,15 @@ public static class Extensions
         });
     }
 
-    public static void WithIntegrationEventLogs<TContext>(this EventBusBuilder builder) 
+    public static void WithIntegrationEventLogs<TContext>(this EventBusBuilder builder, Assembly integrationEventsAssembly) 
         where TContext : DbContext
     {
-        builder.Services.AddTransient<IIntegrationEventLogService, IntegrationEventLogService<TContext>>();
+        builder.Services.AddTransient<IIntegrationEventLogService, IntegrationEventLogService<TContext>>(sp =>
+        {
+            var context = sp.GetRequiredService<TContext>();
+            return new IntegrationEventLogService<TContext>(context, integrationEventsAssembly);
+        });
+
+        builder.Services.AddTransient<IIntegrationEventService<TContext>, IntegrationEventService<TContext>>();
     }
 }

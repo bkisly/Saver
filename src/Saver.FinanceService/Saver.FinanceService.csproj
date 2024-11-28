@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Saver.IdentityService.IntegrationEvents\Saver.IdentityService.IntegrationEvents.csproj" />
     <ProjectReference Include="..\Saver.FinanceService.Domain\Saver.FinanceService.Domain.csproj" />
     <ProjectReference Include="..\Saver.FinanceService.Infrastructure\Saver.FinanceService.Infrastructure.csproj" />
     <ProjectReference Include="..\Saver.ServiceDefaults\Saver.ServiceDefaults.csproj" />

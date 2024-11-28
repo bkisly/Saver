@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Saver.Common.DDD;
 using Saver.EventBus.IntegrationEventLog;
 using Saver.EventBus.RabbitMQ;
 using Saver.FinanceService.Behaviors;
 using Saver.FinanceService.Domain.Repositories;
 using Saver.FinanceService.Domain.Services;
+using Saver.FinanceService.EventHandlers.Integration;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Infrastructure.Repositories;
 using Saver.FinanceService.Infrastructure.ServiceAgents.ExchangeRate;
@@ -12,6 +14,7 @@ using Saver.FinanceService.Middleware;
 using Saver.FinanceService.Queries;
 using Saver.FinanceService.Queries.Reports;
 using Saver.FinanceService.Services;
+using Saver.IdentityService.IntegrationEvents;
 using Saver.ServiceDefaults;
 
 namespace Saver.FinanceService.Extensions;
@@ -53,14 +56,15 @@ public static class Extensions
         builder.AddRedisDistributedCache(ServicesNames.Redis);
 
         builder.AddRabbitMQEventBus(ServicesNames.RabbitMQ)
-            .WithIntegrationEventLogs<FinanceDbContext>();
+            .AddSubscription<UserRegisteredIntegrationEvent, UserRegisteredIntegrationEventHandler>()
+            .WithIntegrationEventLogs<FinanceDbContext>(typeof(Program).Assembly);
 
         services.AddScoped<IAccountHolderRepository, AccountHolderRepository>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
 
         services.AddTransient<IAccountHolderService, AccountHolderService>();
         services.AddTransient<ITransactionDomainService, TransactionDomainService>();
-        services.AddTransient<IIdentityService, IdentityService>();
+        services.AddTransient<IIdentityService, Services.IdentityService>();
         services.AddTransient<IEventBusService, EventBusService>();
         services.AddTransient<ValidationExceptionHandlingMiddleware>();
 
