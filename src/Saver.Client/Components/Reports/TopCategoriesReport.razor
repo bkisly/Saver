@@ -1,6 +1,35 @@
-﻿<h3>TopCategoriesReport</h3>
+﻿<div class="bg-light rounded-2 m-0 p-3">
+    <label class="mb-2">@Header</label>
+    
+    <div>
+        @if (Categories.Any())
+        {
+            @foreach (var category in Categories)
+            {
+                <div class="d-flex">
+                    <p class="h4">@category.CategoryName</p>
+                    <div class="ms-auto">
+                        <p class="mb-1 h4">@category.Total.ToCurrencyString(CurrencyCode)</p>
+                        <ValueDifferenceIndicator 
+                            Value="@category.DifferenceToPreviousPeriod" 
+                            CurrencyCode="@CurrencyCode" 
+                            Invert="@ShouldInvertDifference"/>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="justify-content-center text-center text-muted">No categories available.</p>
+        }
+    </div>
+</div>
 
 @code {
     [Parameter] public string Header { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public IEnumerable<CategoryReportViewModel> Categories { get; set; } = [];
+    [Parameter, EditorRequired] public string CurrencyCode { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public TransactionType TransactionType { get; set; }
 
+    private bool ShouldInvertDifference => TransactionType == TransactionType.Outcome;
 }

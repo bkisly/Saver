@@ -5,13 +5,27 @@
         <BalanceReport Balance="2000M" CurrencyCode="USD" ChangeInLast7Days="25.34M" ChangeInLast30Days="-100.1M"/>
     </div>
     <div class="col">
-        <BalanceReport Balance="2000M" CurrencyCode="USD" ChangeInLast7Days="25.34M" ChangeInLast30Days="-100.1M" />
+        <TopCategoriesReport 
+            CurrencyCode="USD" 
+            Categories="_categoryReports" 
+            Header="TOP BENEFITS IN 30 DAYS" 
+            TransactionType="TransactionType.Income"/>
     </div>
     <div class="col">
-        <BalanceReport Balance="2000M" CurrencyCode="USD" ChangeInLast7Days="25.34M" ChangeInLast30Days="-100.1M"/>
+        <TopCategoriesReport 
+            CurrencyCode="USD" 
+            Categories="_categoryReports" 
+            Header="TOP EXPENSES IN 30 DAYS" 
+            TransactionType="TransactionType.Outcome"/>
     </div>
 </div>
 
 @code {
 
+    private readonly List<CategoryReportViewModel> _categoryReports =
+    [
+        new() { CategoryName = "Category 1", DifferenceToPreviousPeriod = 20.15M, Total = 315.45M },
+        new() { CategoryName = "Category 2", DifferenceToPreviousPeriod = -43M, Total = 200.45M },
+        new() { CategoryName = "Category 3", DifferenceToPreviousPeriod = 21.1M, Total = 95.45M }
+    ];
 }
