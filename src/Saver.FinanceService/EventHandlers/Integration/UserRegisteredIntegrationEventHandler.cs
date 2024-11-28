@@ -1,12 +1,21 @@
-﻿using Saver.EventBus;
+﻿using MediatR;
+using Saver.EventBus;
+using Saver.FinanceService.Commands;
 using Saver.IdentityService.IntegrationEvents;
 
 namespace Saver.FinanceService.EventHandlers.Integration;
 
-public class UserRegisteredIntegrationEventHandler : IIntegrationEventHandler<UserRegisteredIntegrationEvent>
+public class UserRegisteredIntegrationEventHandler(IMediator mediator, ILogger<UserRegisteredIntegrationEventHandler> logger) 
+    : IIntegrationEventHandler<UserRegisteredIntegrationEvent>
 {
-    public Task Handle(UserRegisteredIntegrationEvent e)
+    public async Task Handle(UserRegisteredIntegrationEvent e)
     {
-        return Task.CompletedTask;
+        var command = new CreateAccountHolderCommand(e.UserId);
+        var result = await mediator.Send(command);
+
+        if (!result.IsSuccess)
+        {
+            logger.LogError("Failed handling event {eventName}. Error message: {message}", nameof(UserRegisteredIntegrationEvent), result.Message);
+        }
     }
 }

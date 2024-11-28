@@ -18,9 +18,11 @@ public class CreateManualAccountCommandHandler(IAccountHolderService accountHold
         var repository = accountHolderService.Repository;
 
         if (accountHolder is null)
+        {
             return CommandResult.Error(FinanceDomainErrorCode.NotFound);
+        }
 
-        var currency = Enumeration.GetAll<Currency>().Single(c => c.Name == request.CurrencyCode);
+        var currency = Enumeration.FromName<Currency>(request.CurrencyCode);
 
         try
         {

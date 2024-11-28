@@ -25,7 +25,10 @@ public class AccountHolderRepository(FinanceDbContext context) : IAccountHolderR
 
     public async Task<AccountHolder?> FindByUserIdAsync(Guid userId)
     {
-        var accountHolder = await context.AccountHolders.SingleOrDefaultAsync(x => x.Id == userId);
+        var accountHolder = await context.AccountHolders
+            .Include(x => x.DefaultAccount)
+            .SingleOrDefaultAsync(x => x.UserId == userId);
+
         if (accountHolder != null)
         {
             await context.Entry(accountHolder)
