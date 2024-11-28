@@ -83,7 +83,7 @@ public static class IdentityApi
     }
 
     private static async Task<Results<NoContent, ValidationProblem>> DeleteAccountAsync(
-        [FromServices] IdentityServices services)
+        [AsParameters] IdentityServices services)
     {
         var userId = services.UserContextProvider.GetUserId();
         if (userId is null)

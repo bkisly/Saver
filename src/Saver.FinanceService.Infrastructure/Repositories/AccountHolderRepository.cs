@@ -9,16 +9,18 @@ public class AccountHolderRepository(FinanceDbContext context) : IAccountHolderR
     public async Task<AccountHolder?> FindByIdAsync(Guid id)
     {
         var accountHolder = await context.AccountHolders.FindAsync(id);
-        if (accountHolder != null)
+        if (accountHolder is null)
         {
-            await context.Entry(accountHolder)
-                .Collection(x => x.Accounts)
-                .LoadAsync();
-
-            await context.Entry(accountHolder)
-                .Collection(x => x.Categories)
-                .LoadAsync();
+            return accountHolder;
         }
+
+        await context.Entry(accountHolder)
+            .Collection(x => x.Accounts)
+            .LoadAsync();
+
+        await context.Entry(accountHolder)
+            .Collection(x => x.Categories)
+            .LoadAsync();
 
         return accountHolder;
     }
@@ -29,16 +31,18 @@ public class AccountHolderRepository(FinanceDbContext context) : IAccountHolderR
             .Include(x => x.DefaultAccount)
             .SingleOrDefaultAsync(x => x.UserId == userId);
 
-        if (accountHolder != null)
+        if (accountHolder is null)
         {
-            await context.Entry(accountHolder)
-                .Collection(x => x.Accounts)
-                .LoadAsync();
-
-            await context.Entry(accountHolder)
-                .Collection(x => x.Categories)
-                .LoadAsync();
+            return accountHolder;
         }
+
+        await context.Entry(accountHolder)
+            .Collection(x => x.Accounts)
+            .LoadAsync();
+
+        await context.Entry(accountHolder)
+            .Collection(x => x.Categories)
+            .LoadAsync();
 
         return accountHolder;
     }
@@ -53,10 +57,8 @@ public class AccountHolderRepository(FinanceDbContext context) : IAccountHolderR
         context.AccountHolders.Update(accountHolder);
     }
 
-    public void Delete(Guid id)
+    public void Delete(AccountHolder accountHolder)
     {
-        var accountHolderToRemove = context.AccountHolders.SingleOrDefault(x => x.Id == id);
-        if (accountHolderToRemove != null)
-            context.AccountHolders.Remove(accountHolderToRemove);
+        context.AccountHolders.Remove(accountHolder);
     }
 }

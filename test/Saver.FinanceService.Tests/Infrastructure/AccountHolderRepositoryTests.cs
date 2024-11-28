@@ -125,7 +125,7 @@ public sealed class AccountHolderRepositoryTests : IClassFixture<InMemoryDbConte
         _context.SaveChanges();
 
         // Act
-        repository.Delete(_accountHolder.Id);
+        repository.Delete(_accountHolder);
         _context.SaveChanges();
 
         // Assert

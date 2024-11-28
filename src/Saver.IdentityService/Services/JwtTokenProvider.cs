@@ -12,7 +12,7 @@ public class JwtTokenProvider(IIdentityConfigurationProvider config) : IJwtToken
     public string ProvideToken(IdentityUser user)
     {
         var handler = new JwtSecurityTokenHandler();
-        using var rsa = RSA.Create();
+        var rsa = RSA.Create();
         rsa.ImportRSAPrivateKey(new ReadOnlySpan<byte>(Convert.FromBase64String(config.PrivateKey)), out _);
 
         var signingCredentials = new SigningCredentials(

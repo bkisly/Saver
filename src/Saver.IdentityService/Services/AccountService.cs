@@ -70,6 +70,19 @@ public class AccountService<TUser>(
             return new UserNotFoundIdentityResult();
         }
 
-        return await userManager.DeleteAsync(user);
+        var result = new IdentityResult();
+        var transactionId = await ResilientTransaction.New(context).ExecuteAsync(async () =>
+        {
+            result = await userManager.DeleteAsync(user);
+
+            if (result.Succeeded)
+            {
+                await integrationEventService.AddIntegrationEventAsync(
+                    new UserDeletedIntegrationEvent(Guid.Parse(userId)));
+            }
+        });
+
+        await integrationEventService.PublishEventsThroughEventBusAsync(transactionId);
+        return result;
     }
 }

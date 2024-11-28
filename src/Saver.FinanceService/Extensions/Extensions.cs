@@ -57,6 +57,7 @@ public static class Extensions
 
         builder.AddRabbitMQEventBus(ServicesNames.RabbitMQ)
             .AddSubscription<UserRegisteredIntegrationEvent, UserRegisteredIntegrationEventHandler>()
+            .AddSubscription<UserDeletedIntegrationEvent, UserDeletedIntegrationEventHandler>()
             .WithIntegrationEventLogs<FinanceDbContext>(new FinanceServiceIntegrationEventsAssemblyProvider());
 
         services.AddScoped<IAccountHolderRepository, AccountHolderRepository>();
