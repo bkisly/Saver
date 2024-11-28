@@ -26,7 +26,7 @@ public static class Extensions
         builder.Services.AddSingleton<IEventBus, RabbitMQEventBus>();
 
         // Register event bus as IHostedService,
-        // so that events consuming can be started when the application starts.
+        // so that consuming events can be started when the application starts.
         builder.Services.AddSingleton<IHostedService>(sp => (RabbitMQEventBus)sp.GetRequiredService<IEventBus>());
 
         return new EventBusBuilder(builder.Services);

@@ -34,7 +34,7 @@ public static class Extensions
         });
 
         builder.AddRabbitMQEventBus(ServicesNames.RabbitMQ)
-            .WithIntegrationEventLogs<ApplicationDbContext>(IdentityIntegrationsAssemblyInfo.Assembly);
+            .WithIntegrationEventLogs<ApplicationDbContext>(new IdentityIntegrationEventsAssemblyProvider());
 
         services.AddHttpContextAccessor();
 

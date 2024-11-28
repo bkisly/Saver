@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Saver.Common.DDD;
 using Saver.EventBus.IntegrationEventLog;
 using Saver.EventBus.RabbitMQ;
@@ -10,6 +9,7 @@ using Saver.FinanceService.EventHandlers.Integration;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Infrastructure.Repositories;
 using Saver.FinanceService.Infrastructure.ServiceAgents.ExchangeRate;
+using Saver.FinanceService.IntegrationEvents;
 using Saver.FinanceService.Middleware;
 using Saver.FinanceService.Queries;
 using Saver.FinanceService.Queries.Reports;
@@ -57,7 +57,7 @@ public static class Extensions
 
         builder.AddRabbitMQEventBus(ServicesNames.RabbitMQ)
             .AddSubscription<UserRegisteredIntegrationEvent, UserRegisteredIntegrationEventHandler>()
-            .WithIntegrationEventLogs<FinanceDbContext>(typeof(Program).Assembly);
+            .WithIntegrationEventLogs<FinanceDbContext>(new FinanceServiceIntegrationEventsAssemblyProvider());
 
         services.AddScoped<IAccountHolderRepository, AccountHolderRepository>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
@@ -65,7 +65,6 @@ public static class Extensions
         services.AddTransient<IAccountHolderService, AccountHolderService>();
         services.AddTransient<ITransactionDomainService, TransactionDomainService>();
         services.AddTransient<IIdentityService, Services.IdentityService>();
-        services.AddTransient<IEventBusService, EventBusService>();
         services.AddTransient<ValidationExceptionHandlingMiddleware>();
 
         services.AddScoped<IAccountsQueries, AccountsQueries>();
