@@ -258,8 +258,10 @@ public sealed class RabbitMQEventBus(
 
     private static void SetActivityContext(Activity? activity, string routingKey, string operation)
     {
-        if (activity is null) 
+        if (activity is null)
+        {
             return;
+        }
 
         activity.SetTag("messaging.system", "rabbitmq");
         activity.SetTag("messaging.destination_kind", "queue");
