@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Saver.EventBus.IntegrationEventLog.Services;
 
-public sealed class IntegrationEventLogService<TContext>(TContext context) : IIntegrationEventLogService, IDisposable
+public sealed class IntegrationEventLogService<TContext>(TContext context, Assembly integrationEventsAssembly) : IIntegrationEventLogService, IDisposable
     where TContext : DbContext
 {
-    private readonly Type[] _eventTypes = Assembly.Load(Assembly.GetEntryAssembly()?.FullName ?? string.Empty)
+    private readonly Type[] _eventTypes = Assembly.Load(integrationEventsAssembly.FullName ?? string.Empty)
             .GetTypes()
             .Where(t => t.Name.EndsWith(nameof(IntegrationEvent)))
             .ToArray();

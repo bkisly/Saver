@@ -39,12 +39,16 @@ public sealed class RabbitMQEventBus(
         var routingKey = e.GetType().Name;
 
         if (logger.IsEnabled(LogLevel.Trace))
+        {
             logger.LogTrace("Creating RabbitMQ channel to publish event: {EventId} ({EventName})", e.Id, routingKey);
+        }
 
         using var channel = _rabbitMQConnection?.CreateModel() ?? throw new InvalidOperationException("RabbitMQ connection is not open");
 
         if (logger.IsEnabled(LogLevel.Trace))
+        {
             logger.LogTrace("Declaring RabbitMQ exchange to publish event: {EventId}", e.Id);
+        }
 
         channel.ExchangeDeclare(exchange: ExchangeName, type: "direct");
         var body = JsonSerializer.SerializeToUtf8Bytes(e, e.GetType());
@@ -78,7 +82,9 @@ public sealed class RabbitMQEventBus(
             SetActivityContext(activity, routingKey, "publish");
 
             if (logger.IsEnabled(LogLevel.Trace))
+            {
                 logger.LogTrace("Publishing event to RabbitMQ: {EventId}", e.Id);
+            }
 
             try
             {
@@ -109,10 +115,14 @@ public sealed class RabbitMQEventBus(
 
                 _rabbitMQConnection = serviceProvider.GetRequiredService<IConnection>();
                 if (!_rabbitMQConnection.IsOpen)
+                {
                     return;
+                }
 
                 if (logger.IsEnabled(LogLevel.Trace))
+                {
                     logger.LogTrace("Creating RabbitMQ consumer channel");
+                }
 
                 _consumerChannel = _rabbitMQConnection.CreateModel();
                 _consumerChannel.CallbackException += (_, e) =>
@@ -129,7 +139,9 @@ public sealed class RabbitMQEventBus(
                     arguments: null);
 
                 if (logger.IsEnabled(LogLevel.Trace))
+                {
                     logger.LogTrace("Starting RabbitMQ basic consume");
+                }
 
                 var consumer = new AsyncEventingBasicConsumer(_consumerChannel);
                 consumer.Received += OnMessageReceived;
@@ -171,7 +183,9 @@ public sealed class RabbitMQEventBus(
         var parentContext = _textMapPropagator.Extract(default, e.BasicProperties, (props, key) =>
         {
             if (!props.Headers.TryGetValue(key, out var value) || value is not byte[] bytes)
+            {
                 return [];
+            }
 
             return [Encoding.UTF8.GetString(bytes)];
         });
@@ -200,7 +214,9 @@ public sealed class RabbitMQEventBus(
     private async Task ProcessEvent(string eventName, string message)
     {
         if (logger.IsEnabled(LogLevel.Trace))
+        {
             logger.LogTrace("Processing RabbitMQ event: {EventName}", eventName);
+        }
 
         await using var scope = serviceProvider.CreateAsyncScope();
 
@@ -242,8 +258,10 @@ public sealed class RabbitMQEventBus(
 
     private static void SetActivityContext(Activity? activity, string routingKey, string operation)
     {
-        if (activity is null) 
+        if (activity is null)
+        {
             return;
+        }
 
         activity.SetTag("messaging.system", "rabbitmq");
         activity.SetTag("messaging.destination_kind", "queue");
@@ -255,7 +273,9 @@ public sealed class RabbitMQEventBus(
     private static void SetActivityExceptionTags(Activity? activity, Exception ex)
     {
         if (activity is null)
+        {
             return;
+        }
 
         activity.AddTag("exception.message", ex.Message);
         activity.AddTag("exception.stacktrace", ex.ToString());

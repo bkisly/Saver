@@ -1,10 +1,14 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
+using Saver.EventBus;
+using Saver.EventBus.IntegrationEventLog.Utilities;
 using Saver.FinanceService.Infrastructure;
 
 namespace Saver.FinanceService.Behaviors;
 
-public sealed class TransactionBehavior<TRequest, TResult>(FinanceDbContext context) 
+public sealed class TransactionBehavior<TRequest, TResult>(
+    FinanceDbContext context, 
+    IIntegrationEventService<FinanceDbContext> integrationEventService,
+    ILogger<TransactionBehavior<TRequest, TResult>> logger) 
     : IPipelineBehavior<TRequest, TResult> where TRequest : IRequest<TResult>
 {
     public async Task<TResult> Handle(TRequest request, RequestHandlerDelegate<TResult> next, CancellationToken cancellationToken)
@@ -13,23 +17,23 @@ public sealed class TransactionBehavior<TRequest, TResult>(FinanceDbContext cont
 
         try
         {
-            if (context.HasActiveTransaction)
-                return await next();
-
-            var strategy = context.Database.CreateExecutionStrategy();
-            await strategy.ExecuteAsync(async () =>
+            if (context.Database.CurrentTransaction != null)
             {
-                await using var transaction = await context.BeginTransactionAsync();
+                return await next();
+            }
+
+            var transactionId = await ResilientTransaction.New(context).ExecuteAsync(async () =>
+            {
                 response = await next();
-                await context.CommitTransactionAsync(transaction!);
-                // @TODO: publish integration events here
             });
+
+            await integrationEventService.PublishEventsThroughEventBusAsync(transactionId);
 
             return response!;
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.LogError(e, "An exception was thrown during processing of the transaction.");
             throw;
         }
     }

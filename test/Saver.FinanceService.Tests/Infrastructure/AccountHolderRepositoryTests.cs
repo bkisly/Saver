@@ -46,18 +46,21 @@ public sealed class AccountHolderRepositoryTests : IClassFixture<InMemoryDbConte
         var repository = new AccountHolderRepository(_context);
         repository.Add(_accountHolder);
         await _context.SaveChangesAsync();
+        _context.ChangeTracker.Clear();
 
         // Act
-        var foundHolder = await repository.FindByIdAsync(_accountHolder.Id);
+        var foundHolder = await repository.FindByUserIdAsync(_accountHolder.UserId);
 
         // Assert
         Assert.NotNull(foundHolder);
         Assert.NotEmpty(foundHolder.Accounts);
         Assert.NotEmpty(foundHolder.Categories);
+        Assert.NotNull(foundHolder.DefaultAccount);
         Assert.Equal(2, foundHolder.Accounts.Count);
         Assert.Equal(2, foundHolder.Categories.Count);
         Assert.Equivalent(_accountHolder.Accounts, foundHolder.Accounts);
         Assert.Equivalent(_accountHolder.Categories, foundHolder.Categories);
+        Assert.Equivalent(_accountHolder.DefaultAccount, foundHolder.DefaultAccount);
         Assert.Equivalent(_accountHolder, foundHolder);
     }
 
@@ -122,7 +125,7 @@ public sealed class AccountHolderRepositoryTests : IClassFixture<InMemoryDbConte
         _context.SaveChanges();
 
         // Act
-        repository.Delete(_accountHolder.Id);
+        repository.Delete(_accountHolder);
         _context.SaveChanges();
 
         // Assert

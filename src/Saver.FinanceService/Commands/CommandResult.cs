@@ -5,7 +5,7 @@ namespace Saver.FinanceService.Commands;
 
 public record CommandResult
 {
-    public bool IsSuccess => DomainErrorCode != null && Message == null;
+    public bool IsSuccess => DomainErrorCode == null && Message == null;
     public FinanceDomainErrorCode? DomainErrorCode { get; init; }
     public string? Message { get; init; }
 

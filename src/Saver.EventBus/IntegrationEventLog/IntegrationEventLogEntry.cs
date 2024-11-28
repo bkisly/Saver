@@ -24,7 +24,7 @@ public class IntegrationEventLogEntry
     public Guid EventId { get; private set; }
     [Required] public string EventTypeName { get; private set; } = null!;
     [NotMapped] public string EventTypeShortName => EventTypeName.Split('.').Last();
-    [NotMapped] public IntegrationEvent? IntegrationEvent { get; private set; }
+    [NotMapped] public IntegrationEvent IntegrationEvent { get; private set; } = null!;
     public EventState State { get; set; } = EventState.NotPublished;
     public int TimesSent { get; set; } = 0;
     public DateTime CreationTime { get; private set; }
