@@ -1,0 +1,22 @@
+﻿<div class="bg-light rounded-2 m-0 p-3">
+    <label class="mb-2">BALANCE</label>
+    <p class="h3">@Balance.ToCurrencyString(CurrencyCode)</p>
+    
+    <div class="d-flex">
+        <div class="me-3">
+            <label>Last 7 days</label>
+            <ValueDifferenceIndicator Value="@ChangeInLast7Days" CurrencyCode="@CurrencyCode"/>
+        </div>
+        <div>
+            <label>Last 30 days</label>
+            <ValueDifferenceIndicator Value="@ChangeInLast30Days" CurrencyCode="@CurrencyCode"/>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public decimal Balance { get; set; }
+    [Parameter, EditorRequired] public string CurrencyCode { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public decimal ChangeInLast7Days { get; set; }
+    [Parameter, EditorRequired] public decimal ChangeInLast30Days { get; set; }
+}
