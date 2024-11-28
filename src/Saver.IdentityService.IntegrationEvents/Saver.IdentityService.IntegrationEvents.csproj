@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Saver.EventBus\Saver.EventBus.csproj" />
+    <ProjectReference Include="..\Saver.EventBus\Saver.EventBus.csproj" />
   </ItemGroup>
 
 </Project>
