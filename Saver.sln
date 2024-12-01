@@ -49,7 +49,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.FinanceService.Integr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.IdentityService.IntegrationEvents", "src\Saver.IdentityService.IntegrationEvents\Saver.IdentityService.IntegrationEvents.csproj", "{79009759-7112-4EBA-99D8-D814AA9860C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saver.Client.Tests", "test\Saver.Client.Tests\Saver.Client.Tests.csproj", "{262888DC-2320-44FB-82BF-3D5D032F202A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.Client.Tests", "test\Saver.Client.Tests\Saver.Client.Tests.csproj", "{262888DC-2320-44FB-82BF-3D5D032F202A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{3A40DC4B-6DED-495E-8DC5-99BD76E0056F}"
 EndProject

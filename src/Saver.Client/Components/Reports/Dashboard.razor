@@ -8,16 +8,20 @@
         <TopCategoriesReport 
             CurrencyCode="USD" 
             Categories="_categoryReports" 
-            Header="TOP BENEFITS IN 30 DAYS" 
+            Header="TOP BENEFITS IN LAST 30 DAYS" 
             TransactionType="TransactionType.Income"/>
     </div>
     <div class="col">
         <TopCategoriesReport 
             CurrencyCode="USD" 
             Categories="_categoryReports" 
-            Header="TOP EXPENSES IN 30 DAYS" 
+            Header="TOP EXPENSES IN LAST 30 DAYS" 
             TransactionType="TransactionType.Outcome"/>
     </div>
+</div>
+
+<div class="my-3">
+    <BalanceChart Header="BALANCE CHANGES IN LAST 30 DAYS"/>
 </div>
 
 @code {
