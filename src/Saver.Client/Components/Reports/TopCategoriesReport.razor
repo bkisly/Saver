@@ -7,13 +7,16 @@
             @foreach (var category in Categories)
             {
                 <div class="d-flex">
-                    <p class="h4">@category.CategoryName</p>
+                    <p class="fs-5">@category.CategoryName</p>
                     <div class="ms-auto">
-                        <p class="mb-1 h4">@category.Total.ToCurrencyString(CurrencyCode)</p>
-                        <ValueDifferenceIndicator 
-                            Value="@category.DifferenceToPreviousPeriod" 
-                            CurrencyCode="@CurrencyCode" 
-                            Invert="@ShouldInvertDifference"/>
+                        <p class="mb-1 h5">@category.Total.ToCurrencyString(CurrencyCode)</p>
+                        <div class="d-flex justify-content-end">
+                            <ValueDifferenceIndicator
+                                Value="@category.DifferenceToPreviousPeriod" 
+                                CurrencyCode="@CurrencyCode" 
+                                Invert="@ShouldInvertDifference"/>
+                        </div>
+
                     </div>
                 </div>
             }

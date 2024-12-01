@@ -1,8 +1,8 @@
-﻿<div class="bg-light rounded-2 m-0 p-3">
+﻿<div class="bg-light rounded-2 m-0 p-3 flex-fill">
     <label class="mb-2">BALANCE</label>
     <p class="h3">@Balance.ToCurrencyString(CurrencyCode)</p>
     
-    <div class="d-flex">
+    <div class="d-flex align-items-stretch">
         <div class="me-3">
             <label>Last 7 days</label>
             <ValueDifferenceIndicator Value="@ChangeInLast7Days" CurrencyCode="@CurrencyCode"/>
