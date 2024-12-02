@@ -1,8 +1,6 @@
 ﻿@page "/"
 @using Saver.Client.Components.Reports
 
-<PageTitle>Home</PageTitle>
-
 @if (_accounts.Count > 0)
 {
     <Dashboard />
@@ -18,3 +16,4 @@ else
 @code {
     private readonly List<object> _accounts = [new()];
 }
+W
