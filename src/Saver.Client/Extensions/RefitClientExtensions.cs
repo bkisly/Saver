@@ -1,4 +1,5 @@
 ﻿using Refit;
+using Saver.Client.Infrastructure;
 using Saver.FinanceService.Contracts.BankAccounts;
 using Saver.FinanceService.Contracts.Categories;
 using Saver.FinanceService.Contracts.Reports;
@@ -12,26 +13,25 @@ public static class RefitClientExtensions
 {
     public static IServiceCollection AddIdentityServiceClients(this IServiceCollection services)
     {
-        services.AddRefitClient<IIdentityApiClient>()
-            .ConfigureHttpClient(config => config.BaseAddress = new Uri($"https://{ServicesNames.IdentityService}"));
-
+        services.AddApiClient<IIdentityApiClient>(ServicesNames.IdentityService);
         return services;
     }
 
     public static IServiceCollection AddFinanceServiceClients(this IServiceCollection services)
     {
-        services.AddRefitClient<IBankAccountsApiClient>()
-            .ConfigureHttpClient(config => config.BaseAddress = new Uri($"https://{ServicesNames.FinanceService}"));
-
-        services.AddRefitClient<ICategoriesApiClient>()
-            .ConfigureHttpClient(config => config.BaseAddress = new Uri($"https://{ServicesNames.FinanceService}"));
-
-        services.AddRefitClient<ITransactionsApiClient>()
-            .ConfigureHttpClient(config => config.BaseAddress = new Uri($"https://{ServicesNames.FinanceService}"));
-
-        services.AddRefitClient<IReportsApiClient>()
-            .ConfigureHttpClient(config => config.BaseAddress = new Uri($"https://{ServicesNames.FinanceService}"));
+        services.AddApiClient<IBankAccountsApiClient>(ServicesNames.FinanceService);
+        services.AddApiClient<ICategoriesApiClient>(ServicesNames.FinanceService);
+        services.AddApiClient<ITransactionsApiClient>(ServicesNames.FinanceService);
+        services.AddApiClient<IReportsApiClient>(ServicesNames.FinanceService);
 
         return services;
+    }
+
+    private static void AddApiClient<T>(this IServiceCollection services, string serviceName) where T : class
+    {
+        services.AddRefitClient<T>()
+            .ConfigureHttpClient(config => config.BaseAddress = new Uri($"https://{serviceName}"))
+            .AddHttpMessageHandler<AuthorizationHeaderHandler>()
+            .AddStandardResilienceHandler();
     }
 }
