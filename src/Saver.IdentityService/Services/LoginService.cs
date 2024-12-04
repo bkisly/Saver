@@ -20,7 +20,7 @@ public class LoginService<TUser>(UserManager<TUser> userManager, IJwtTokenProvid
             return IdentityResult.Failed();
         }
 
-        var token = tokenProvider.ProvideToken(user);
-        return new LoggedInIdentityResult { Token = token };
+        var token = tokenProvider.ProvideToken(user, out var claims);
+        return new LoggedInIdentityResult { Token = token, Claims = claims };
     }
 }

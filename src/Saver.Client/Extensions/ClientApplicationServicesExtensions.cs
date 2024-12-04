@@ -1,8 +1,9 @@
 ﻿using Saver.Client.Infrastructure;
+using Saver.Client.Services;
 
 namespace Saver.Client.Extensions;
 
-public static class ClientServicesExtensions
+public static class ClientApplicationServicesExtensions
 {
     public static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
     {
@@ -12,6 +13,9 @@ public static class ClientServicesExtensions
 
         services.AddIdentityServiceClients();
         services.AddFinanceServiceClients();
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<IIdentityService, Services.IdentityService>();
 
         return builder;
     }

@@ -45,16 +45,16 @@
         new() { CategoryName = "Category 3", DifferenceToPreviousPeriod = 21.1M, Total = 95.45M }
     ];
 
-    protected override async Task OnInitializedAsync()
-    {
-        _defaultAccountDto = await BankAccountsApiClient.GetDefaultBankAccountAsync();
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     _defaultAccountDto = await BankAccountsApiClient.GetDefaultBankAccountAsync();
 
-        if (_defaultAccountDto is not null)
-        {
-            var balanceReportResponse = await ReportsApiClient.GetBalanceReportForAccountAsync(_defaultAccountDto.Id);
-            _balanceReportDto = balanceReportResponse.Content;
-        }
+    //     if (_defaultAccountDto is not null)
+    //     {
+    //         var balanceReportResponse = await ReportsApiClient.GetBalanceReportForAccountAsync(_defaultAccountDto.Id);
+    //         _balanceReportDto = balanceReportResponse.Content;
+    //     }
 
-        await base.OnInitializedAsync();
-    }
+    //     await base.OnInitializedAsync();
+    // }
 }

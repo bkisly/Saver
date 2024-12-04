@@ -1,0 +1,86 @@
+﻿@page "/login"
+
+@using Microsoft.AspNetCore.Authorization
+@using Saver.Client.Services
+@using Saver.IdentityService.Contracts
+
+@attribute [AllowAnonymous]
+
+@inject IIdentityService IdentityService
+@inject NavigationManager NavigationManager
+@inject IHttpContextAccessor HttpContextAccessor
+
+<div class="bg-light rounded-3 p-3 my-3">
+    <h1 class="h3 text-center">Login</h1>
+    <EditForm EditContext="_editContext" OnValidSubmit="LoginAsync" FormName="LoginForm">
+        <DataAnnotationsValidator/>
+
+        <div class="mt-2">
+            <label class="form-label">E-mail</label>
+            <InputText class="form-control" @bind-Value="LoginViewModel.Email"/>
+            <ValidationMessage For="() => LoginViewModel.Email"/>
+        </div>
+        <div class="mt-2">
+            <label class="form-label">Password</label>
+            <InputText class="form-control" type="password" @bind-Value="LoginViewModel.Password"/>
+            <ValidationMessage For="() => LoginViewModel.Password"/>
+        </div>
+        <div class="my-4">
+            <ValidationMessage class="text-center my-3 text-danger" For="() => LoginViewModel"></ValidationMessage>
+            <button type="submit" class="btn btn-success btn-lg rounded-3 w-100 @(IsLoggingIn ? "disabled" : string.Empty)">
+                @if (IsLoggingIn)
+                {
+                    <span>Please wait...</span>
+                }
+                else
+                {
+                    <span>Log in</span>
+                }
+            </button>
+        </div>
+    </EditForm>
+</div>
+
+
+@code {
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
+
+    [SupplyParameterFromForm(FormName = "LoginForm")]
+    private LoginViewModel LoginViewModel { get; set; } = null!;
+
+    private bool IsLoggingIn { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (HttpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+
+        LoginViewModel = new LoginViewModel();
+        _editContext = new EditContext(LoginViewModel);
+        _editContext.OnValidationRequested += (sender, args) =>
+        {
+            _messageStore?.Clear();
+        };
+        _messageStore = new ValidationMessageStore(_editContext);
+    }
+
+    private async Task LoginAsync()
+    {
+        IsLoggingIn = true;
+
+        if (await IdentityService.SignInAsync(new LoginRequest { Email = LoginViewModel.Email, Password = LoginViewModel.Password }))
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            _messageStore?.Add(() =>  LoginViewModel, "Invalid credentials. Please try again.");
+            LoginViewModel.Password = string.Empty;
+        }
+
+        IsLoggingIn = false;
+    }
+}

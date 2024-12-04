@@ -14,6 +14,11 @@ public static class RefitClientExtensions
     public static IServiceCollection AddIdentityServiceClients(this IServiceCollection services)
     {
         services.AddApiClient<IIdentityApiClient>(ServicesNames.IdentityService);
+
+        services.AddRefitClient<IIdentityApiClient>()
+            .ConfigureHttpClient(config => config.BaseAddress = new Uri($"https://{ServicesNames.IdentityService}"))
+            .AddStandardResilienceHandler();
+
         return services;
     }
 

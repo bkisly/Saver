@@ -55,7 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{3A40DC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.FinanceService.Contracts", "src\Saver.FinanceService.Contracts\Saver.FinanceService.Contracts.csproj", "{B75B96A2-D19C-47ED-827B-0B8334101710}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saver.IdentityService.Contracts", "src\Saver.IdentityService.Contracts\Saver.IdentityService.Contracts.csproj", "{8F170ECA-3EE2-4478-A5D7-DE69DAAFC368}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.IdentityService.Contracts", "src\Saver.IdentityService.Contracts\Saver.IdentityService.Contracts.csproj", "{8F170ECA-3EE2-4478-A5D7-DE69DAAFC368}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -98,12 +98,12 @@ public static class IdentityApi
             : CreateValidationProblem(result);
     }
 
-    private static async Task<Results<Ok<string>, UnauthorizedHttpResult>> LoginAsync(
+    private static async Task<Results<Ok<LoginResponse>, UnauthorizedHttpResult>> LoginAsync(
         LoginRequest request, [FromServices] ILoginService loginService)
     {
         var result = await loginService.LoginAsync(request);
         return result is LoggedInIdentityResult loggedInResult
-            ? TypedResults.Ok(loggedInResult.Token)
+            ? TypedResults.Ok(new LoginResponse { Token = loggedInResult.Token, Claims = loggedInResult.Claims })
             : TypedResults.Unauthorized();
     }
 
