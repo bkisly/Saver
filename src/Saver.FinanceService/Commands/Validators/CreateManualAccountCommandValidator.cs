@@ -4,7 +4,7 @@ using Saver.FinanceService.Domain.AccountHolderModel;
 
 namespace Saver.FinanceService.Commands.Validators;
 
-public class CreateManualAccountCommandValidator : AbstractValidator<CreateManualAccountCommand>
+public class CreateManualAccountCommandValidator : AbstractValidator<CreateManualBankAccountCommand>
 {
 	public CreateManualAccountCommandValidator()
     {

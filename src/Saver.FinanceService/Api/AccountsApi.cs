@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Saver.FinanceService.Commands;
@@ -54,15 +55,17 @@ public static class AccountsApi
     }
 
     private static async Task<Results<Created, ProblemHttpResult>> CreateManualAccountAsync(
-        CreateManualAccountCommand command, [FromServices] IMediator mediator)
+        CreateManualBankAccountRequest request, [FromServices] IMediator mediator, [FromServices] IMapper mapper)
     {
+        var command = mapper.Map<CreateManualBankAccountRequest, CreateManualBankAccountCommand>(request);
         var result = await mediator.Send(command);
         return result.IsSuccess ? TypedResults.Created() : result.ToHttpProblem();
     }
 
     private static async Task<Results<NoContent, ProblemHttpResult>> EditManualAccountAsync(
-        [FromBody] EditManualBankAccountCommand command, [FromServices] IMediator mediator)
+        [FromBody] EditManualBankAccountRequest request, [FromServices] IMediator mediator, [FromServices] IMapper mapper)
     {
+        var command = mapper.Map<EditManualBankAccountRequest, EditManualBankAccountCommand>(request);
         var result = await mediator.Send(command);
         return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
     }

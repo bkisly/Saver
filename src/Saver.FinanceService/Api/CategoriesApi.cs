@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Saver.FinanceService.Commands;
@@ -16,7 +17,7 @@ public static class CategoriesApi
         api.MapGet("/", GetCategoriesAsync);
         api.MapGet("/{id:guid}", GetCategoryByIdAsync);
         api.MapPost("/", CreateCategoryAsync);
-        api.MapPut("/{id:guid}", EditCategoryAsync);
+        api.MapPut("/", EditCategoryAsync);
         api.MapDelete("/{id:guid}", DeleteCategoryAsync);
 
         api.RequireAuthorization();
@@ -38,15 +39,17 @@ public static class CategoriesApi
     }
 
     private static async Task<Results<Created, ProblemHttpResult>> CreateCategoryAsync(
-        CreateCategoryCommand command, [FromServices] IMediator mediator)
+        CreateCategoryRequest request, [FromServices] IMediator mediator, [FromServices] IMapper mapper)
     {
+        var command = mapper.Map<CreateCategoryRequest, CreateCategoryCommand>(request);
         var result = await mediator.Send(command);
         return result.IsSuccess ? TypedResults.Created() : result.ToHttpProblem();
     }
 
     private static async Task<Results<NoContent, ProblemHttpResult>> EditCategoryAsync(
-        Guid id, [FromBody] EditCategoryCommand command, [FromServices] IMediator mediator)
+        [FromBody] EditCategoryRequest request, [FromServices] IMediator mediator, [FromServices] IMapper mapper)
     {
+        var command = mapper.Map<EditCategoryRequest, EditCategoryCommand>(request);
         var result = await mediator.Send(command);
         return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
     }

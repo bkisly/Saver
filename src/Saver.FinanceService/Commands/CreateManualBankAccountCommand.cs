@@ -6,13 +6,13 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record CreateManualAccountCommand(string Name, string? Description, string CurrencyCode, decimal InitialBalance) 
+public record CreateManualBankAccountCommand(string Name, string? Description, string CurrencyCode, decimal InitialBalance) 
     : IRequest<CommandResult>;
 
-public class CreateManualAccountCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork)
-    : IRequestHandler<CreateManualAccountCommand, CommandResult>
+public class CreateManualBankAccountCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork)
+    : IRequestHandler<CreateManualBankAccountCommand, CommandResult>
 {
-    public async Task<CommandResult> Handle(CreateManualAccountCommand request, CancellationToken cancellationToken)
+    public async Task<CommandResult> Handle(CreateManualBankAccountCommand request, CancellationToken cancellationToken)
     {
         var accountHolder = await accountHolderService.GetCurrentAccountHolder();
         var repository = accountHolderService.Repository;
