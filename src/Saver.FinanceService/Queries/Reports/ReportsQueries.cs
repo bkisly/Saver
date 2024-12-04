@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Saver.FinanceService.Contracts.Categories;
+using Saver.FinanceService.Contracts.Reports;
 using Saver.FinanceService.Domain.AccountHolderModel;
 using Saver.FinanceService.Domain.TransactionModel;
-using Saver.FinanceService.Dto;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Services;
 
@@ -23,9 +24,9 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper,
             .Where(t => t.AccountId == accountId)
             .OrderBy(t => t.CreationDate));
 
-        foreach (var filter in filters?.Filters ?? [])
+        if (filters is not null)
         {
-            queryBuilder.AddFilter(filter);
+            RegisterFilters(queryBuilder, filters);
         }
 
         var transactions = queryBuilder.Build();
@@ -151,5 +152,23 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper,
                         && x.CreationDate <= relativeDate
                         && x.CreationDate >= relativeDate - TimeSpan.FromDays(numberOfDays))
             .SumAsync(x => x.TransactionData.Value);
+    }
+
+    private static void RegisterFilters(ReportQueryBuilder builder, ReportFiltersDto filters)
+    {
+        if (filters.FromDate.HasValue || filters.ToDate.HasValue)
+        {
+            builder.AddFilter(new DateRangeReportFilter { FromDate = filters.FromDate, ToDate = filters.ToDate });
+        }
+
+        if (filters.CategoryId.HasValue)
+        {
+            builder.AddFilter(new CategoryReportFilter { CategoryId = filters.CategoryId.Value });
+        }
+
+        if (filters.TransactionType.HasValue)
+        {
+            builder.AddFilter(new IncomeOutcomeReportFilter { TransactionType = (TransactionType)filters.TransactionType.Value });
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Saver.FinanceService.Dto;
+﻿namespace Saver.FinanceService.Contracts.BankAccounts;
 
 public record BankAccountDto
 {

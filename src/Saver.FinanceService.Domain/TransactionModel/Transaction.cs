@@ -1,5 +1,3 @@
-using Saver.FinanceService.Domain.Events;
-
 namespace Saver.FinanceService.Domain.TransactionModel;
 
 public class Transaction : EventPublishingEntity<Guid>, IAggregateRoot
@@ -31,17 +29,23 @@ public class Transaction : EventPublishingEntity<Guid>, IAggregateRoot
     public void EditTransaction(TransactionData newTransactionData, DateTime newCreatedDate)
     {
         if (TransactionData != newTransactionData)
+        {
             TransactionData = newTransactionData;
+        }
 
         if (newCreatedDate != CreationDate)
+        {
             CreationDate = newCreatedDate;
+        }
     }
 
     public void ChangeExchangeRate(decimal exchangeRate)
     {
         if (exchangeRate <= 0)
+        {
             throw new FinanceDomainException("Cannot apply 0 or less exchange rate.",
                 FinanceDomainErrorCode.InvalidValue);
+        }
 
         TransactionData = new TransactionData(TransactionData.Name, TransactionData.Description,
             TransactionData.Value * exchangeRate, TransactionData.Category);

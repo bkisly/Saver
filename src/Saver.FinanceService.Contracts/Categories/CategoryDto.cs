@@ -1,4 +1,4 @@
-﻿namespace Saver.FinanceService.Dto;
+﻿namespace Saver.FinanceService.Contracts.Categories;
 
 public record CategoryDto
 {

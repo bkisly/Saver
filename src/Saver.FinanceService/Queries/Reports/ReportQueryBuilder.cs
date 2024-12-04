@@ -25,7 +25,15 @@ public class ReportQueryBuilder(IQueryable<Transaction> transactions) : IReportQ
 
     public void VisitFilter(DateRangeReportFilter filter)
     {
-        _transactions = _transactions.Where(x => x.CreationDate >= filter.FromDate && x.CreationDate <= filter.ToDate);
+        if (filter.FromDate.HasValue)
+        {
+            _transactions = _transactions.Where(x => x.CreationDate >= filter.FromDate.Value);
+        }
+
+        if (filter.ToDate.HasValue)
+        {
+            _transactions = _transactions.Where(x => x.CreationDate <= filter.ToDate.Value);
+        }
     }
 
     public void VisitFilter(CategoryReportFilter filter)

@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Saver.FinanceService.Contracts.Categories;
+using Saver.FinanceService.Contracts.Transactions;
 using Saver.FinanceService.Domain.AccountHolderModel;
 using Saver.FinanceService.Domain.TransactionModel;
-using Saver.FinanceService.Dto;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Services;
 

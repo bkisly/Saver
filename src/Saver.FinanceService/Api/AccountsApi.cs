@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Saver.FinanceService.Commands;
-using Saver.FinanceService.Dto;
+using Saver.FinanceService.Contracts.BankAccounts;
 using Saver.FinanceService.Queries;
 
 namespace Saver.FinanceService.Api;

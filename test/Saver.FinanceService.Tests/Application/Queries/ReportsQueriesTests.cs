@@ -1,6 +1,5 @@
+using Saver.FinanceService.Contracts.Reports;
 using Saver.FinanceService.Domain.AccountHolderModel;
-using Saver.FinanceService.Domain.TransactionModel;
-using Saver.FinanceService.Dto;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Queries.Reports;
 
@@ -153,12 +152,6 @@ public sealed class ReportsQueriesTests(InMemoryDbContextFactory contextFactory,
         await _context.SaveChangesAsync();
 
         var queries = CreateQueries();
-        var filters = new List<IReportFilter>
-        {
-            new DateRangeReportFilter { FromDate = new DateTime(2024, 11, 2), ToDate = new DateTime(2024, 11, 3) },
-            new IncomeOutcomeReportFilter { TransactionType = TransactionType.Income },
-            new CategoryReportFilter { CategoryId = accountHolder.Categories[0].Id }
-        };
 
         var expectedEntries = new[]
         {
@@ -168,7 +161,13 @@ public sealed class ReportsQueriesTests(InMemoryDbContextFactory contextFactory,
 
         // Act
         var report = await queries.GetReportForAccountAsync(accountHolder.Accounts[0].Id,
-            new ReportFiltersDto { Filters = filters });
+            new ReportFiltersDto
+            {
+                FromDate = new DateTime(2024, 11, 2),
+                ToDate = new DateTime(2024, 11, 3),
+                CategoryId = accountHolder.Categories[0].Id,
+                TransactionType = Contracts.Transactions.TransactionType.Income,
+            });
 
         // Assert
         Assert.NotNull(report);
