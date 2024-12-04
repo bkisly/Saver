@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Saver.IdentityService.Models;
+using Saver.IdentityService.Contracts;
 
-namespace Saver.IdentityService.Services
+namespace Saver.IdentityService.Services;
+
+public interface IAccountService
 {
-    public interface IAccountService
-    {
-        Task<IdentityResult> CreateAccountAsync(RegistrationModel registrationModel);
-        Task<IdentityResult> ChangeEmailAsync(string userId, ChangeEmailModel changeEmailModel);
-        Task<IdentityResult> ChangePasswordAsync(string userId, ChangePasswordModel changePasswordModel);
-        Task<IdentityResult> DeleteAccountAsync(string userId);
-    }
+    Task<IdentityResult> CreateAccountAsync(RegistrationRequest registrationRequest);
+    Task<IdentityResult> ChangeEmailAsync(string userId, ChangeEmailRequest changeEmailRequest);
+    Task<IdentityResult> ChangePasswordAsync(string userId, ChangePasswordRequest changePasswordRequest);
+    Task<IdentityResult> DeleteAccountAsync(string userId);
 }

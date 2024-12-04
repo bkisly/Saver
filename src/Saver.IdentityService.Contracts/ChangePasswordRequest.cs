@@ -1,6 +1,6 @@
-﻿namespace Saver.IdentityService.Models;
+﻿namespace Saver.IdentityService.Contracts;
 
-public record ChangePasswordModel
+public record ChangePasswordRequest
 {
     public required string OldPassword { get; init; }
     public required string NewPassword { get; init; }
