@@ -21,7 +21,7 @@ public static class ReportsApi
     }
 
     private static async Task<Results<Ok<ReportDto>, NotFound>> GetReportForAccountAsync(
-        Guid id, [AsParameters] ReportFiltersDto? filters, [FromServices] IReportsQueries reportsQueries)
+        Guid id, [AsParameters] ReportFiltersDto filters, [FromServices] IReportsQueries reportsQueries)
     {
         var report = await reportsQueries.GetReportForAccountAsync(id, filters);
 

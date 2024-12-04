@@ -1,4 +1,9 @@
 ﻿@page "/dashboard"
+@inject IReportsApiClient ReportsApiClient
+@inject IBankAccountsApiClient BankAccountsApiClient
+
+@using Saver.FinanceService.Contracts.BankAccounts
+@using Saver.FinanceService.Contracts.Reports
 @using Saver.FinanceService.Contracts.Transactions
 
 <PageTitle>Dashboard</PageTitle>
@@ -30,6 +35,8 @@
 </div>
 
 @code {
+    private BankAccountDto? _defaultAccountDto;
+    private BalanceReportDto? _balanceReportDto;
 
     private readonly List<CategoryReportViewModel> _categoryReports =
     [
@@ -37,4 +44,17 @@
         new() { CategoryName = "Category 2", DifferenceToPreviousPeriod = -43M, Total = 200.45M },
         new() { CategoryName = "Category 3", DifferenceToPreviousPeriod = 21.1M, Total = 95.45M }
     ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _defaultAccountDto = await BankAccountsApiClient.GetDefaultBankAccountAsync();
+
+        if (_defaultAccountDto is not null)
+        {
+            var balanceReportResponse = await ReportsApiClient.GetBalanceReportForAccountAsync(_defaultAccountDto.Id);
+            _balanceReportDto = balanceReportResponse.Content;
+        }
+
+        await base.OnInitializedAsync();
+    }
 }
