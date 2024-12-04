@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Saver.FinanceService.Contracts\Saver.FinanceService.Contracts.csproj" />
+    <ProjectReference Include="..\Saver.IdentityService.Contracts\Saver.IdentityService.Contracts.csproj" />
     <ProjectReference Include="..\Saver.ServiceDefaults\Saver.ServiceDefaults.csproj" />
   </ItemGroup>
 

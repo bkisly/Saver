@@ -1,8 +1,10 @@
 using Saver.Client.Components;
+using Saver.Client.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.AddApplicationServices();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
