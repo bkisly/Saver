@@ -13,8 +13,7 @@ public class AuthorizationHeaderHandler(TokenService tokenService) : DelegatingH
         // 3. Append token to authorization headers
         // 4. Last line sends the request
 
-        var token = ""; //await tokenService.GetAccessToken();
-
+        var token = await tokenService.GetAccessToken();
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return await base.SendAsync(request, cancellationToken);
     }
