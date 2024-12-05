@@ -35,7 +35,7 @@ public class JwtAuthenticationStateProvider(TokenService protectedStorage, IConf
 
     public void NotifyAuthenticationStateChanged()
     {
-        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+        //base.NotifyAuthenticationStateChanged;
     }
 
     private IEnumerable<Claim> ParseClaims(string token)
@@ -43,7 +43,7 @@ public class JwtAuthenticationStateProvider(TokenService protectedStorage, IConf
         try
         {
             var handler = new JwtSecurityTokenHandler();
-            using var rsa = RSA.Create();
+            var rsa = RSA.Create();
             var configSection = configuration.GetSection("Identity");
             var publicKey = configSection.GetRequiredValue<string>("PublicKey");
             var issuer = configSection.GetRequiredValue<string>("Issuer");

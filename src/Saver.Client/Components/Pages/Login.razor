@@ -78,7 +78,7 @@
 
         if (await IdentityService.SignInAsync(new LoginRequest { Email = LoginViewModel.Email, Password = LoginViewModel.Password }))
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/", forceLoad: true);
         }
         else
         {

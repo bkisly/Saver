@@ -16,23 +16,12 @@ public class IdentityService(IIdentityApiClient identityApiClient, TokenService 
         }
 
         await tokenService.SetAccessToken(response.Content.Token);
-
-        if (authStateProvider is JwtAuthenticationStateProvider jwtStateProvider)
-        {
-            jwtStateProvider.NotifyAuthenticationStateChanged();
-        }
-
         return response is { IsSuccessStatusCode: true, Content: not null };
     }
 
     public async Task<bool> SignOutAsync()
     {
         await tokenService.SetAccessToken("");
-        if (authStateProvider is JwtAuthenticationStateProvider jwtStateProvider)
-        {
-            jwtStateProvider.NotifyAuthenticationStateChanged();
-        }
-
         return true;
     }
 }

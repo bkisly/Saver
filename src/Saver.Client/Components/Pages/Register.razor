@@ -1,10 +1,8 @@
 ﻿@page "/register"
-@using Microsoft.AspNetCore.Authorization
 @using Saver.IdentityService.Contracts
 
 @implements IDisposable
 
-@inject IHttpContextAccessor HttpContextAccessor
 @inject IIdentityApiClient IdentityApiClient
 @inject NavigationManager NavigationManager
 
@@ -54,15 +52,16 @@
     private EditContext? _editContext;
     private ValidationMessageStore? _messageStore;
 
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
     private bool IsRegistering { get; set; }
 
     [SupplyParameterFromForm(FormName = "RegistrationForm")]
     private RegistrationViewModel RegistrationViewModel { get; set; } = null!;
 
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        if (HttpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true)
+        if ((await AuthenticationState).User.Identity?.IsAuthenticated == true)
         {
             NavigationManager.NavigateTo("/");
         }
