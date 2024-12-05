@@ -17,6 +17,7 @@ public static class ClientApplicationServicesExtensions
         });
         services.AddAuthorization();
         services.AddCascadingAuthenticationState();
+        services.AddTransient<TokenService>();
         services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 
         services.AddTransient<AuthorizationHeaderHandler>();
