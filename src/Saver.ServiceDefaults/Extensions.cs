@@ -53,7 +53,7 @@ namespace Microsoft.Extensions.Hosting
             return builder;
         }
 
-        public static IHostApplicationBuilder AddDefaultAuthorization(this IHostApplicationBuilder builder)
+        public static IHostApplicationBuilder AddJwtAuthorization(this IHostApplicationBuilder builder, Action<JwtBearerOptions>? additionalOptions = null)
         {
             var identityConfig = builder.Configuration.GetSection("Identity");
 
@@ -83,6 +83,8 @@ namespace Microsoft.Extensions.Hosting
                     IssuerSigningKey = new RsaSecurityKey(rsa),
                     ClockSkew = TimeSpan.Zero
                 };
+
+                additionalOptions?.Invoke(options);
             });
 
             builder.Services.AddAuthorization();

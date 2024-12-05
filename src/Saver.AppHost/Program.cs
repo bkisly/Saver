@@ -44,7 +44,8 @@ builder.AddProject<Projects.Saver_Client>("client")
     .WithReference(budgetService)
     .WithReference(financeService)
     .WithReference(predictionsService)
-    .WithExternalHttpEndpoints();
+    .WithExternalHttpEndpoints()
+    .WithIdentityEnvironment(identityEndpoint, publicKey);
 
 builder.Build().Run();
   

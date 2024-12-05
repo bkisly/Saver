@@ -20,14 +20,14 @@ public class JwtTokenProvider(IIdentityConfigurationProvider config) : IJwtToken
             SecurityAlgorithms.RsaSha256);
 
         var claimIdentity = GenerateClaims(user);
-        claims = claimIdentity.Claims.ToArray();
+        claims = [];
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Issuer = config.Issuer,
             SigningCredentials = signingCredentials,
             Expires = DateTime.UtcNow.AddMinutes(config.ExpirationTimeMinutes),
-            Subject = GenerateClaims(user)
+            Subject = claimIdentity
         };
 
         var token = handler.CreateToken(tokenDescriptor);

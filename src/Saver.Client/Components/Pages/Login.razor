@@ -1,6 +1,5 @@
 ﻿@page "/login"
 
-@using Microsoft.AspNetCore.Authorization
 @using Saver.Client.Services
 @using Saver.IdentityService.Contracts
 
@@ -8,7 +7,6 @@
 
 @inject IIdentityService IdentityService
 @inject NavigationManager NavigationManager
-@inject IHttpContextAccessor HttpContextAccessor
 
 <div class="bg-light rounded-3 p-3 my-3">
     <h1 class="h3 text-center">Login</h1>
@@ -48,6 +46,8 @@
 
 
 @code {
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
+
     private EditContext? _editContext;
     private ValidationMessageStore? _messageStore;
 
@@ -56,9 +56,9 @@
 
     private bool IsLoggingIn { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        if (HttpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true)
+        if ((await AuthenticationState).User.Identity?.IsAuthenticated == true)
         {
             NavigationManager.NavigateTo("/");
         }

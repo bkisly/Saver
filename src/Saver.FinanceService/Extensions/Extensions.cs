@@ -25,7 +25,7 @@ public static class Extensions
     {
         var services = builder.Services;
 
-        builder.AddDefaultAuthorization();
+        builder.AddJwtAuthorization();
 
         services.AddMediatR(configuration =>
         {

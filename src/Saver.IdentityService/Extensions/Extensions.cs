@@ -16,7 +16,7 @@ public static class Extensions
     {
         var services = builder.Services;
 
-        builder.AddDefaultAuthorization();
+        builder.AddJwtAuthorization();
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
         {
