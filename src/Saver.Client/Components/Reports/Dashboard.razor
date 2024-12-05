@@ -1,4 +1,9 @@
 ﻿@page "/dashboard"
+
+@attribute [Authorize]
+
+@rendermode InteractiveServer
+
 @inject IReportsApiClient ReportsApiClient
 @inject IBankAccountsApiClient BankAccountsApiClient
 
@@ -12,7 +17,7 @@
 
 <div class="row row-gap-4 row-cols-1 row-cols-md-2 row-cols-lg-3 mt-4">
     <div class="col d-flex align-items-stretch">
-        <BalanceReport Balance="2000M" CurrencyCode="USD" ChangeInLast7Days="25.34M" ChangeInLast30Days="-100.1M"/>
+        <BalanceReport CurrencyCode="@_defaultAccountDto?.CurrencyCode" BalanceReportDto="_balanceReportDto"/>
     </div>
     <div class="col">
         <TopCategoriesReport 
@@ -37,6 +42,7 @@
 @code {
     private BankAccountDto? _defaultAccountDto;
     private BalanceReportDto? _balanceReportDto;
+    private CategoriesReportDto? _categoriesReportDto;
 
     private readonly List<CategoryReportViewModel> _categoryReports =
     [
@@ -45,16 +51,14 @@
         new() { CategoryName = "Category 3", DifferenceToPreviousPeriod = 21.1M, Total = 95.45M }
     ];
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     _defaultAccountDto = await BankAccountsApiClient.GetDefaultBankAccountAsync();
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+         _defaultAccountDto = await BankAccountsApiClient.GetDefaultBankAccountAsync();
 
-    //     if (_defaultAccountDto is not null)
-    //     {
-    //         var balanceReportResponse = await ReportsApiClient.GetBalanceReportForAccountAsync(_defaultAccountDto.Id);
-    //         _balanceReportDto = balanceReportResponse.Content;
-    //     }
+        if (_defaultAccountDto is null)
+            return;
 
-    //     await base.OnInitializedAsync();
-    // }
+        _balanceReportDto = (await ReportsApiClient.GetBalanceReportForAccountAsync(_defaultAccountDto.Id)).Content;
+    }
+
 }

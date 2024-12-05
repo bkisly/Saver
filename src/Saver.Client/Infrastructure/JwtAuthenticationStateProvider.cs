@@ -59,7 +59,9 @@ public class JwtAuthenticationStateProvider(TokenService protectedStorage, IConf
             }, out _);
 
             var readToken = handler.ReadJwtToken(token);
-            return readToken.Claims;
+            var claims = readToken.Claims.ToList();
+            claims.Add(new Claim("jwt", token));
+            return claims;
         }
         catch
         {

@@ -20,12 +20,12 @@ public static class ClientApplicationServicesExtensions
         services.AddTransient<TokenService>();
         services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 
+        services.AddHttpContextAccessor();
         services.AddTransient<AuthorizationHeaderHandler>();
 
         services.AddIdentityServiceClients();
         services.AddFinanceServiceClients();
 
-        services.AddHttpContextAccessor();
         services.AddScoped<IIdentityService, Services.IdentityService>();
 
         return builder;
