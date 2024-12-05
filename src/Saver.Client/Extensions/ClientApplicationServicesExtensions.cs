@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Saver.Client.Infrastructure;
-using Saver.Client.Services;
 
 namespace Saver.Client.Extensions;
 
@@ -11,22 +9,31 @@ public static class ClientApplicationServicesExtensions
     {
         var services = builder.Services;
 
-        services.AddAuthentication().AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+        builder.AddJwtAuthorization(options =>
         {
-            options.LoginPath = "/login";
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    context.Request.Cookies.TryGetValue(SecurityTokenCookieNames.AccessToken, out var token);
+
+                    if (token != null)
+                    {
+                        context.Token = token;
+                    }
+
+                    return Task.CompletedTask;
+                }
+            };
         });
-        services.AddAuthorization();
+
         services.AddCascadingAuthenticationState();
-        services.AddTransient<TokenService>();
-        services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 
         services.AddHttpContextAccessor();
         services.AddTransient<AuthorizationHeaderHandler>();
 
         services.AddIdentityServiceClients();
         services.AddFinanceServiceClients();
-
-        services.AddScoped<IIdentityService, Services.IdentityService>();
 
         return builder;
     }

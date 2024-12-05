@@ -53,12 +53,11 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-         _defaultAccountDto = await BankAccountsApiClient.GetDefaultBankAccountAsync();
+        //  _defaultAccountDto = await BankAccountsApiClient.GetDefaultBankAccountAsync();
 
-        if (_defaultAccountDto is null)
-            return;
+        // if (_defaultAccountDto is null)
+        //     return;
 
-        _balanceReportDto = (await ReportsApiClient.GetBalanceReportForAccountAsync(_defaultAccountDto.Id)).Content;
+        // _balanceReportDto = (await ReportsApiClient.GetBalanceReportForAccountAsync(_defaultAccountDto.Id)).Content;
     }
-
 }

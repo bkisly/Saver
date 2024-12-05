@@ -1,7 +1,4 @@
-﻿@using Saver.Client.Services
-@inherits LayoutComponentBase
-@inject IIdentityService IdentityService
-@inject NavigationManager NavigationManager
+﻿@inherits LayoutComponentBase
 
 <nav class="navbar navbar-expand-lg bg-light py-4">
     <div class="container-xl">
@@ -43,7 +40,9 @@
                                     <hr class="dropdown-divider"/>
                                 </li>
                                 <li>
-                                    <button @onclick="SignOutAsync" class="dropdown-item">Log out</button>
+                                    <form method="post" action="/logout">
+                                        <button type="submit" class="dropdown-item">Log out</button>
+                                    </form>
                                 </li>
                             </ul>
                         </li>
@@ -85,19 +84,5 @@
 </footer>
 
 @code {
-    [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
-    //private ClaimsPrincipal? User { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        //User = (await AuthenticationState).User;
-    }
-
-    private async Task SignOutAsync()
-    {
-        await IdentityService.SignOutAsync();
-        // User = (await AuthenticationState).User;
-        // StateHasChanged();
-        NavigationManager.NavigateTo("/", forceLoad: true);
-    }
 }
