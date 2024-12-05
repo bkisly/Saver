@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Authorization;
 using Saver.Client.Infrastructure;
 using Saver.Client.Services;
 
@@ -10,8 +11,13 @@ public static class ClientApplicationServicesExtensions
     {
         var services = builder.Services;
 
+        services.AddAuthentication().AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+        {
+            options.LoginPath = "/login";
+        });
         services.AddAuthorization();
         services.AddCascadingAuthenticationState();
+        services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 
         services.AddTransient<AuthorizationHeaderHandler>();
 
