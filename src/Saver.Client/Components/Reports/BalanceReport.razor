@@ -1,29 +1,51 @@
-﻿@using Saver.FinanceService.Contracts.Reports
+﻿@using Saver.FinanceService.Contracts.BankAccounts
+@using Saver.FinanceService.Contracts.Reports
+
+@inject IReportsApiClient ReportsApiClient
+
 <div class="bg-light rounded-2 m-0 p-3 flex-fill">
     <label class="mb-2">BALANCE</label>
-    @if (BalanceReportDto is null)
+    @if (BankAccount is null)
     {
         <p>Loading...</p>
     }
     else
     {
-        <p class="h3">@BalanceReportDto.Balance</p>
+        @if (_balanceReport is null)
+        {
+            <p>Could not fetch balance report data. Please try again later.</p>
+        }
+        else
+        {
+            <p class="h3">@BankAccount.Balance</p>
     
-        <div class="d-flex align-items-stretch">
-            <div class="me-3">
-                <label>Last 7 days</label>
-                <ValueDifferenceIndicator Value="@BalanceReportDto.ChangeInLast7Days" CurrencyCode="@CurrencyCode"/>
+            <div class="d-flex align-items-stretch">
+                <div class="me-3">
+                    <label>Last 7 days</label>
+                    <ValueDifferenceIndicator Value="@_balanceReport.ChangeInLast7Days" CurrencyCode="@BankAccount.CurrencyCode"/>
+                </div>
+                <div>
+                    <label>Last 30 days</label>
+                    <ValueDifferenceIndicator Value="@_balanceReport.ChangeInLast30Days" CurrencyCode="@BankAccount.CurrencyCode"/>
+                </div>
             </div>
-            <div>
-                <label>Last 30 days</label>
-                <ValueDifferenceIndicator Value="@BalanceReportDto.ChangeInLast30Days" CurrencyCode="@CurrencyCode"/>
-            </div>
-        </div>
+        }
     }
 
 </div>
 
 @code {
-    [Parameter, EditorRequired] public string CurrencyCode { get; set; } = string.Empty;
-    [Parameter, EditorRequired] public BalanceReportDto? BalanceReportDto { get; set; }
+    [Parameter, EditorRequired] public BankAccountDto? BankAccount { get; set; }
+
+    private BalanceReportDto? _balanceReport;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (BankAccount is null)
+        {
+            return;
+        }
+
+        _balanceReport = (await ReportsApiClient.GetBalanceReportForAccountAsync(BankAccount.Id)).Content;
+    }
 }

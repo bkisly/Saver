@@ -7,7 +7,7 @@ public interface ITransactionsApiClient
     [Get("/api/finance/transactions/account/{accountId}")]
     Task<ApiResponse<IEnumerable<TransactionDto>>> GetTransactionsForAccountAsync(Guid accountId);
 
-    [Get("api/finance/transactions/{id}")]
+    [Get("/api/finance/transactions/{id}")]
     Task<ApiResponse<TransactionDto>> GetTransactionByIdAsync(Guid id);
 
     [Post("/api/finance/transactions")]
@@ -22,7 +22,7 @@ public interface ITransactionsApiClient
     [Get("/api/finance/transactions/recurring/account/{accountId}")]
     Task<ApiResponse<IEnumerable<RecurringTransactionDefinitionDto>>> GetRecurringTransactionsByAccountAsync(Guid accountId);
 
-    [Get("api/finance/transactions/recurring/{id}")]
+    [Get("/api/finance/transactions/recurring/{id}")]
     Task<ApiResponse<RecurringTransactionDefinitionDto>> GetRecurringTransactionByIdAsync(Guid id);
 
     [Post("/api/finance/transactions/recurring")]

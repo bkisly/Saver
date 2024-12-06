@@ -3,17 +3,7 @@
 
 <AuthorizeView>
     <Authorized>
-        @if (_accounts.Count > 0)
-        {
-            <Dashboard />
-        }
-        else 
-        {
-            <div class="text-center justify-content-center align-items-center">
-                <p class="h3">Start by creating your first bank account.</p>
-                <p>Go to the "Accounts" tab and create one!</p>
-            </div>
-        }
+        <Dashboard/>
     </Authorized>
     <NotAuthorized>
         <p class="text-center">Welcome to Saver!</p>
@@ -22,5 +12,5 @@
 
 
 @code {
-    private readonly List<object> _accounts = [new()];
+
 }

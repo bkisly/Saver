@@ -31,7 +31,7 @@
                             </a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">sample@example.com</a>
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">@UserName</a>
                             <ul class="dropdown-menu">
                                 <li>
                                     <a class="dropdown-item" href="#">Edit account</a>
@@ -85,5 +85,11 @@
 </footer>
 
 @code {
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
+    private string UserName { get; set; } = string.Empty;
 
+    protected override async Task OnInitializedAsync()
+    {
+        UserName = (await AuthenticationState).User.Identity?.Name ?? string.Empty;
+    }
 }

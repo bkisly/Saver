@@ -13,35 +13,43 @@
 
 <PageTitle>Dashboard</PageTitle>
 
-<h1 class="h3">Here are key details about your main account: Sample account.</h1>
+@if (DefaultBankAccount is not null)
+{
+    <h1 class="h3">Here are key details about your main account: Sample account.</h1>
 
-<div class="row row-gap-4 row-cols-1 row-cols-md-2 row-cols-lg-3 mt-4">
-    <div class="col d-flex align-items-stretch">
-        <BalanceReport CurrencyCode="@_defaultAccountDto?.CurrencyCode" BalanceReportDto="_balanceReportDto"/>
+    <div class="row row-gap-4 row-cols-1 row-cols-md-2 row-cols-lg-3 mt-4">
+        <div class="col d-flex align-items-stretch">
+            <BalanceReport BankAccount="DefaultBankAccount"/>
+        </div>
+        <div class="col">
+            <TopCategoriesReport 
+                CurrencyCode="USD" 
+                Categories="_categoryReports" 
+                Header="TOP BENEFITS IN LAST 30 DAYS" 
+                TransactionType="TransactionType.Income"/>
+        </div>
+        <div class="col">
+            <TopCategoriesReport 
+                CurrencyCode="USD" 
+                Categories="_categoryReports" 
+                Header="TOP EXPENSES IN LAST 30 DAYS" 
+                TransactionType="TransactionType.Outcome"/>
+        </div>
     </div>
-    <div class="col">
-        <TopCategoriesReport 
-            CurrencyCode="USD" 
-            Categories="_categoryReports" 
-            Header="TOP BENEFITS IN LAST 30 DAYS" 
-            TransactionType="TransactionType.Income"/>
-    </div>
-    <div class="col">
-        <TopCategoriesReport 
-            CurrencyCode="USD" 
-            Categories="_categoryReports" 
-            Header="TOP EXPENSES IN LAST 30 DAYS" 
-            TransactionType="TransactionType.Outcome"/>
-    </div>
-</div>
 
-<div class="my-4">
-    <BalanceChart Header="BALANCE CHANGES IN LAST 30 DAYS"/>
-</div>
+    <div class="my-4">
+        <BalanceChart Header="BALANCE CHANGES IN LAST 30 DAYS"/>
+    </div>
+}
+else
+{
+    <p>You don't have any bank accounts, go and create one!</p>
+}
+
 
 @code {
-    private BankAccountDto? _defaultAccountDto;
-    private BalanceReportDto? _balanceReportDto;
+    private BankAccountDto? DefaultBankAccount { get; set; }
+
     private CategoriesReportDto? _categoriesReportDto;
 
     private readonly List<CategoryReportViewModel> _categoryReports =
@@ -51,13 +59,13 @@
         new() { CategoryName = "Category 3", DifferenceToPreviousPeriod = 21.1M, Total = 95.45M }
     ];
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        //  _defaultAccountDto = await BankAccountsApiClient.GetDefaultBankAccountAsync();
+        DefaultBankAccount = (await BankAccountsApiClient.GetDefaultBankAccountAsync()).Content;
 
-        // if (_defaultAccountDto is null)
-        //     return;
-
-        // _balanceReportDto = (await ReportsApiClient.GetBalanceReportForAccountAsync(_defaultAccountDto.Id)).Content;
+        if (DefaultBankAccount is null)
+        {
+            return;
+        }
     }
 }
