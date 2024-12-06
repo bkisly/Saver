@@ -5,7 +5,7 @@ namespace Saver.FinanceService.Contracts.Categories;
 public interface ICategoriesApiClient
 {
     [Get("/api/finance/categories")]
-    Task<IEnumerable<CategoryDto>> GetCategoriesAsync();
+    Task<ApiResponse<IEnumerable<CategoryDto>>> GetCategoriesAsync();
 
     [Get("/api/finance/categories/{id}")]
     Task<ApiResponse<CategoryDto>> GetCategoryByIdAsync(Guid id);

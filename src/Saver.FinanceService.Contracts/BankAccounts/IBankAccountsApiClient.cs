@@ -5,10 +5,10 @@ namespace Saver.FinanceService.Contracts.BankAccounts;
 public interface IBankAccountsApiClient
 {
     [Get("/api/finance/accounts")] 
-    Task<IEnumerable<BankAccountDto>> GetBankAccountsAsync();
+    Task<ApiResponse<IEnumerable<BankAccountDto>>> GetBankAccountsAsync();
 
     [Get("/api/finance/accounts/default")]
-    Task<BankAccountDto?> GetDefaultBankAccountAsync();
+    Task<ApiResponse<BankAccountDto?>> GetDefaultBankAccountAsync();
 
     [Get("/api/finance/accounts/{id}")]
     Task<ApiResponse<BankAccountDto>> GetBankAccountByIdAsync(Guid id);
