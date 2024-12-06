@@ -13,11 +13,11 @@
     {
         @if (_balanceReport is null)
         {
-            <p>Could not fetch balance report data. Please try again later.</p>
+            <p>Loading...</p>
         }
         else
         {
-            <p class="h3">@BankAccount.Balance</p>
+            <p class="h3">@_balanceReport.Balance.ToCurrencyString(BankAccount.CurrencyCode)</p>
     
             <div class="d-flex align-items-stretch">
                 <div class="me-3">

@@ -75,7 +75,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         AddDomainEvent(new EntityDeletedDomainEvent(accountToRemove));
     }
 
-    public Category CreateCategory(string name, string? description)
+    public Category CreateCategory(string name, string? description = null)
     {
         if (_categories.Any(x => x.Name == name))
         {

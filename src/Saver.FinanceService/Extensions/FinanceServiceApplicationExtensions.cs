@@ -19,7 +19,7 @@ using Saver.ServiceDefaults;
 
 namespace Saver.FinanceService.Extensions;
 
-public static class Extensions
+public static class FinanceServiceApplicationExtensions
 {
     public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
     {
@@ -86,6 +86,13 @@ public static class Extensions
         using var scope = app.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<FinanceDbContext>();
         context.Database.Migrate();
+        return app;
+    }
+
+    public static async Task<WebApplication> SeedSampleDataAsync(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        await DataSeeder.SeedAccountHolderDataAsync(scope.ServiceProvider);
         return app;
     }
 }

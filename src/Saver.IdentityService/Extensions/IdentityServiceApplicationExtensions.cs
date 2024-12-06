@@ -10,7 +10,7 @@ using Saver.ServiceDefaults;
 
 namespace Saver.IdentityService.Extensions;
 
-public static class Extensions
+public static class IdentityServiceApplicationExtensions
 {
     public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
     {
@@ -53,6 +53,13 @@ public static class Extensions
         using var scope = app.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         context.Database.Migrate();
+        return app;
+    }
+
+    public static async Task<WebApplication> SeedSampleDataAsync(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        await DataSeeder.CreateTestUserAsync<IdentityUser>(scope.ServiceProvider);
         return app;
     }
 }
