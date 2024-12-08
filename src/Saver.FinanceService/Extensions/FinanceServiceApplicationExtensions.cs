@@ -92,7 +92,7 @@ public static class FinanceServiceApplicationExtensions
     public static async Task<WebApplication> SeedSampleDataAsync(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
-        await DataSeeder.SeedAccountHolderDataAsync(scope.ServiceProvider);
+        await DataSeeder.SeedFinanceDataAsync(scope.ServiceProvider);
         return app;
     }
 }
