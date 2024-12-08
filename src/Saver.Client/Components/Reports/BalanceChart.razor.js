@@ -1,13 +1,12 @@
-﻿function createChart() {
+﻿function createChart(datesList, valuesList) {
     const ctx = document.getElementById('balance-chart');
 
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: datesList,
             datasets: [{
-                label: '# of Votes',
-                data: [12, 19, -3, 5, 2, 3],
+                data: valuesList,
                 borderWidth: 3
             }]
         },

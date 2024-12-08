@@ -97,11 +97,14 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper,
     private async Task<List<CategoryReportEntryDto>> GetGroupedTotalsByCategoriesAsync(
         TransactionType transactionType, DateTime relativeDate, Guid accountId)
     {
-        var groupedTotals = await context.Transactions
-            .Where(x => x.AccountId == accountId 
-                        && x.TransactionType == transactionType
-                        && x.TransactionData.Category != null 
-                        && x.CreationDate <= relativeDate)
+        var transactions = context.Transactions
+            .Where(x => x.AccountId == accountId
+                        && x.TransactionData.Category != null
+                        && x.CreationDate <= relativeDate);
+
+        transactions = FilterTransactionsByTransactionType(transactions, transactionType);
+
+        var groupedTotals = await transactions
             .GroupBy(x => x.TransactionData.Category)
             .Select(x => new
             {
@@ -112,36 +115,45 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper,
             .Take(10)
             .ToListAsync();
 
-        return [.. await Task.WhenAll(groupedTotals
-            .Select(async x => new CategoryReportEntryDto
+        var reportEntries = new List<CategoryReportEntryDto>();
+
+        foreach (var groupedTotal in groupedTotals)
+        {
+            reportEntries.Add(new CategoryReportEntryDto
             {
-                Category = mapper.Map<Category, CategoryDto>(x.Category!),
-                Value = x.Total,
+                Category = mapper.Map<Category, CategoryDto>(groupedTotal.Category!),
+                Value = groupedTotal.Total,
                 ChangeInLast7Days = await GetTotalDifferenceInDaysAsync(
                     7,
-                    x.Total,
+                    groupedTotal.Total,
                     relativeDate,
                     transactionType,
-                    x.Category!,
+                    groupedTotal.Category,
                     accountId),
                 ChangeInLast30Days = await GetTotalDifferenceInDaysAsync(
                     30,
-                    x.Total,
+                    groupedTotal.Total,
                     relativeDate,
                     transactionType,
-                    x.Category!,
+                    groupedTotal.Category,
                     accountId),
-            }))];
+            });
+        }
+
+        return reportEntries;
     }
 
     private async Task<decimal> GetTotalDifferenceInDaysAsync(int numberOfDays, decimal currentSum, DateTime relativeDate, 
-        TransactionType transactionType, Category category, Guid accountId)
+        TransactionType transactionType, Category? category, Guid accountId)
     {
-        return currentSum - await context.Transactions
+        var transactions = context.Transactions
             .Where(x => x.AccountId == accountId
                         && x.CreationDate <= relativeDate - TimeSpan.FromDays(numberOfDays)
-                        && x.TransactionType == transactionType
-                        && x.TransactionData.Category == category)
+                        && x.TransactionData.Category == category);
+
+        transactions = FilterTransactionsByTransactionType(transactions, transactionType);
+
+        return currentSum - await transactions
             .SumAsync(x => x.TransactionData.Value);
     }
 
@@ -170,5 +182,16 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper,
         {
             builder.AddFilter(new IncomeOutcomeReportFilter { TransactionType = (TransactionType)filters.TransactionType.Value });
         }
+    }
+
+    private static IQueryable<Transaction> FilterTransactionsByTransactionType(IQueryable<Transaction> transactions,
+        TransactionType transactionType)
+    {
+        return transactionType switch
+        {
+            TransactionType.Income => transactions.Where(x => x.TransactionData.Value > 0),
+            TransactionType.Outcome => transactions.Where(x => x.TransactionData.Value < 0),
+            _ => transactions
+        };
     }
 }

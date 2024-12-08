@@ -21,24 +21,24 @@
         <div class="col d-flex align-items-stretch">
             <BalanceReport BankAccount="DefaultBankAccount"/>
         </div>
-        <div class="col">
+        <div class="col d-flex">
             <TopCategoriesReport 
                 CurrencyCode="USD" 
-                Categories="_categoryReports" 
+                CategoriesReport="CategoriesReport?.IncomeCategories"
                 Header="TOP BENEFITS IN LAST 30 DAYS" 
                 TransactionType="TransactionType.Income"/>
         </div>
-        <div class="col">
+        <div class="col d-flex">
             <TopCategoriesReport 
                 CurrencyCode="USD" 
-                Categories="_categoryReports" 
+                CategoriesReport="CategoriesReport?.OutcomeCategories" 
                 Header="TOP EXPENSES IN LAST 30 DAYS" 
                 TransactionType="TransactionType.Outcome"/>
         </div>
     </div>
 
     <div class="my-4">
-        <BalanceChart Header="BALANCE CHANGES IN LAST 30 DAYS"/>
+        <BalanceChart TransactionsReport="TransactionsReport" Header="BALANCE CHANGES IN LAST 30 DAYS"/>
     </div>
 }
 else
@@ -49,15 +49,8 @@ else
 
 @code {
     private BankAccountDto? DefaultBankAccount { get; set; }
-
-    private CategoriesReportDto? _categoriesReportDto;
-
-    private readonly List<CategoryReportViewModel> _categoryReports =
-    [
-        new() { CategoryName = "Category 1", DifferenceToPreviousPeriod = 20.15M, Total = 315.45M },
-        new() { CategoryName = "Category 2", DifferenceToPreviousPeriod = -43M, Total = 200.45M },
-        new() { CategoryName = "Category 3", DifferenceToPreviousPeriod = 21.1M, Total = 95.45M }
-    ];
+    private CategoriesReportDto? CategoriesReport { get; set; }
+    private ReportDto? TransactionsReport { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -67,5 +60,18 @@ else
         {
             return;
         }
+
+        StateHasChanged();
+
+        CategoriesReport = (await ReportsApiClient.GetCategoriesReportForAccountAsync(DefaultBankAccount.Id)).Content;
+        StateHasChanged();
+
+        TransactionsReport = (await ReportsApiClient.GetReportForAccountAsync(DefaultBankAccount.Id, new ReportFiltersDto
+        {
+            FromDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(30)),
+            ToDate = DateTime.UtcNow
+        })).Content;
+
+        StateHasChanged();
     }
 }

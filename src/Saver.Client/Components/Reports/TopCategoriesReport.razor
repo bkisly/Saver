@@ -1,38 +1,45 @@
-﻿@using Saver.FinanceService.Contracts.Transactions
+﻿@using Saver.FinanceService.Contracts.Reports
+@using Saver.FinanceService.Contracts.Transactions
 
-<div class="bg-light rounded-2 m-0 p-3">
+<div class="bg-light flex-fill rounded-2 m-0 p-3">
     <label class="mb-2">@Header</label>
     
     <div>
-        @if (Categories.Any())
+        @if (CategoriesReport != null)
         {
-            @foreach (var category in Categories)
+            @if (CategoriesReport.Count > 0)
             {
-                <div class="d-flex">
-                    <p class="fs-5">@category.CategoryName</p>
-                    <div class="ms-auto">
-                        <p class="mb-1 h5">@category.Total.ToCurrencyString(CurrencyCode)</p>
-                        <div class="d-flex justify-content-end">
-                            <ValueDifferenceIndicator
-                                Value="@category.DifferenceToPreviousPeriod" 
-                                CurrencyCode="@CurrencyCode" 
-                                Invert="@ShouldInvertDifference"/>
+                @foreach (var category in CategoriesReport)
+                {
+                    <div class="d-flex">
+                        <p class="fs-5">@category.Category.Name</p>
+                        <div class="ms-auto">
+                            <p class="mb-1 h5">@category.Value.ToCurrencyString(CurrencyCode)</p>
+                            <div class="d-flex justify-content-end">
+                                <ValueDifferenceIndicator
+                                    Value="@category.ChangeInLast30Days" 
+                                    CurrencyCode="@CurrencyCode" 
+                                    Invert="@ShouldInvertDifference"/>
+                            </div>
                         </div>
-
                     </div>
-                </div>
+                }
+            }
+            else
+            {
+                <p>No categories available.</p>
             }
         }
         else
         {
-            <p class="justify-content-center text-center text-muted">No categories available.</p>
+            <p>Loading...</p>
         }
     </div>
 </div>
 
 @code {
     [Parameter] public string Header { get; set; } = string.Empty;
-    [Parameter, EditorRequired] public IEnumerable<CategoryReportViewModel> Categories { get; set; } = [];
+    [Parameter, EditorRequired] public List<CategoryReportEntryDto>? CategoriesReport { get; set; }
     [Parameter, EditorRequired] public string CurrencyCode { get; set; } = string.Empty;
     [Parameter, EditorRequired] public TransactionType TransactionType { get; set; }
 
