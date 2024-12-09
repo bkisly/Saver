@@ -5,7 +5,10 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record DeleteRecurringTransactionCommand(Guid RecurringTransactionId) : IRequest<CommandResult>;
+public class DeleteRecurringTransactionCommand(Guid recurringTransactionId) : IRequest<CommandResult>
+{
+    public Guid RecurringTransactionId => recurringTransactionId;
+}
 
 public class DeleteRecurringTransactionCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork): IRequestHandler<DeleteRecurringTransactionCommand, CommandResult>
 {

@@ -23,14 +23,14 @@
         </div>
         <div class="col d-flex">
             <TopCategoriesReport 
-                CurrencyCode="USD" 
+                CurrencyCode="@DefaultBankAccount.CurrencyCode" 
                 CategoriesReport="CategoriesReport?.IncomeCategories"
                 Header="TOP BENEFITS IN LAST 30 DAYS" 
                 TransactionType="TransactionType.Income"/>
         </div>
         <div class="col d-flex">
             <TopCategoriesReport 
-                CurrencyCode="USD" 
+                CurrencyCode="@DefaultBankAccount.CurrencyCode" 
                 CategoriesReport="CategoriesReport?.OutcomeCategories" 
                 Header="TOP EXPENSES IN LAST 30 DAYS" 
                 TransactionType="TransactionType.Outcome"/>

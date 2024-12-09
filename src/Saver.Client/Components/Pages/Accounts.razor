@@ -1,12 +1,16 @@
 ﻿@page "/accounts"
+@using Saver.FinanceService.Contracts.BankAccounts
+@using Saver.Client.Components.Forms
 
 @attribute [Authorize]
+
+@inject IBankAccountsApiClient BankAccountsApiClient
 
 <PageTitle>Accounts</PageTitle>
 
 <h1 class="h3">Manage and create your bank accounts here.</h1>
 
-<button type="button" class="btn btn-secondary rounded-3 my-3" data-bs-toggle="modal" data-bs-target="#account-form">
+<button type="button" class="btn btn-secondary rounded-3 my-3" data-bs-toggle="modal" data-bs-target="#@NewBankAccountFormName">
     <span>
         <i class="bi-plus-lg"></i>
     </span>
@@ -14,81 +18,42 @@
 </button>
 
 <div class="mx-2">
-    <div class="row p-2 my-2 bg-light rounded-3">
-        <div class="col-auto my-auto">
-            <i class="bi-bank fs-3"></i>
-        </div>
-        <div class="col my-auto">
-            <p class="fs-5 fw-medium m-0">Some account</p>
-            <span class="my-1">Balance: 250,000.00 USD</span>
-        </div>
-        <div class="col-auto my-auto justify-content-end text-end">
-            <a class="my-auto mx-2 text-black" href="#">
-                <i class="fs-5 bi-star"></i>
-            </a>
-            <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#account-form">
-                <i class="fs-5 bi-pen"></i>
-            </button>
-            <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#delete-modal">
-                <i class="fs-5 bi-trash"></i>
-            </button>
-        </div>
-    </div>
-    <div class="row p-2 my-2 bg-light rounded-3">
-        <div class="col-auto my-auto">
-            <i class="bi-bank fs-3"></i>
-        </div>
-        <div class="col my-auto">
-            <p class="fs-5 fw-medium m-0">Another account</p>
-            <span class="my-1">Balance: 250,000.00 USD</span>
-        </div>
-        <div class="col my-auto justify-content-end text-end">
-            <a class="my-auto mx-2 text-black" href="#">
-                <i class="fs-5 bi-star"></i>
-            </a>
-            <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#account-form">
-                <i class="fs-5 bi-pen"></i>
-            </button>
-            <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#delete-modal">
-                <i class="fs-5 bi-trash"></i>
-            </button>
-        </div>
-    </div>
+    @if (!BankAccounts.Any())
+    {
+        <p>No bank accounts</p>
+    }
+    else
+    {
+        @foreach (var account in BankAccounts.OrderByDescending(x => x.IsDefault))
+        {
+            <div class="row p-2 my-2 bg-light rounded-3">
+                <div class="col-auto my-auto">
+                    <i class="bi-bank fs-3"></i>
+                </div>
+                <div class="col my-auto">
+                    <p class="fs-5 fw-medium m-0">@account.Name</p>
+                    <span class="my-1">Balance: @account.Balance.ToCurrencyString(account.CurrencyCode)</span>
+                </div>
+                <div class="col-auto my-auto justify-content-end text-end">
+                    <button class="border-0 bg-transparent my-auto mx-2 text-black" @onclick="() => MarkAccountAsDefaultAsync(account.Id)">
+                        <i class="fs-5 @(account.IsDefault ? "bi-star-fill" : "bi-star")"></i>
+                    </button>
+                    <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#account-form" @onclick="() => SelectAccount(account.Id)">
+                        <i class="fs-5 bi-pen"></i>
+                    </button>
+                    <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#delete-modal" @onclick="() => SelectAccount(account.Id)">
+                        <i class="fs-5 bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        }
+    }
 </div>
 
-<!-- Modal form -->
-<div class="modal fade" id="account-form" tabindex="-1" aria-labelledby="account-form-title" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="account-form-title">New bank account</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="account-name" class="form-label">Name</label>
-                    <input maxlength="256" class="form-control" id="account-name" placeholder="Your bank account name"/>
-                </div>
-                <div class="mb-3">
-                    <label for="account-initial-balance" class="form-label">Initial balance</label>
-                    <input type="number" step="0.01" id="account-initial-balance" class="form-control" value="0.00"/>
-                </div>
-                <div class="mb-3">
-                    <label for="account-currency" class="form-label">Currency</label>
-                    <select id="account-currency" class="form-select">
-                        <option selected>USD</option>
-                        <option>EUR</option>
-                        <option>PLN</option>
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success rounded-3">Create account</button>
-            </div>
-        </div>
-    </div>
-</div>
+<NewBankAccountForm 
+    FormName="@NewBankAccountFormName" 
+    SupportedCurrencyCodes="_supportedCurrencyCodes" 
+    OnSave="CreateBankAccountAsync"/>
 
 <!-- Delete confirmation modal -->
 <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-confirmation-title" aria-hidden="true">
@@ -106,12 +71,65 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger rounded-3">I understand, delete.</button>
+                <button type="button" class="btn btn-danger rounded-3" data-bs-dismiss="modal" @onclick="DeleteAccountAsync">I understand, delete.</button>
             </div>
         </div>
     </div>
 </div>
 
 @code {
+    private IEnumerable<BankAccountDto> BankAccounts { get; set; } = [];
+    private BankAccountDto? SelectedBankAccount { get; set; }
+    private readonly List<string> _supportedCurrencyCodes = ["EUR", "USD", "PLN"];
 
+    private const string NewBankAccountFormName = "new-bank-account-form";
+    private const string EditBankAccountFormName = "edit-bank-account-form";
+
+    protected override async Task OnInitializedAsync()
+    {
+        BankAccounts = (await BankAccountsApiClient.GetBankAccountsAsync()).Content ?? [];
+    }
+
+    private void SelectAccount(Guid accountId)
+    {
+        SelectedBankAccount = BankAccounts.SingleOrDefault(x => x.Id == accountId);
+    }
+
+    private async Task MarkAccountAsDefaultAsync(Guid accountId)
+    {
+        await BankAccountsApiClient.SetAccountAsDefaultAsync(accountId);
+        await RefreshAccountsAsync();
+    }
+
+    private async Task DeleteAccountAsync()
+    {
+        if (SelectedBankAccount is null)
+        {
+            return;
+        }
+
+        await BankAccountsApiClient.DeleteBankAccountAsync(SelectedBankAccount.Id);
+        await RefreshAccountsAsync();
+    }
+
+    private async Task RefreshAccountsAsync()
+    {
+        BankAccounts = [];
+        StateHasChanged();
+        BankAccounts = (await BankAccountsApiClient.GetBankAccountsAsync()).Content ?? [];
+        StateHasChanged();
+    }
+
+    private async Task CreateBankAccountAsync(NewBankAccountViewModel bankAccountViewModel)
+    {
+        var request = new CreateManualBankAccountRequest
+        {
+            Name = bankAccountViewModel.Name,
+            InitialBalance = bankAccountViewModel.InitialBalance,
+            CurrencyCode = bankAccountViewModel.CurrencyCode
+        };
+
+        await BankAccountsApiClient.CreateManualBankAccountAsync(request);
+        await RefreshAccountsAsync();
+    }
 }

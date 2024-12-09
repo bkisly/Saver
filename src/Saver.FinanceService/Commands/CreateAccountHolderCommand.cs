@@ -5,7 +5,10 @@ using Saver.FinanceService.Domain.Repositories;
 
 namespace Saver.FinanceService.Commands;
 
-public record CreateAccountHolderCommand(Guid UserId) : IRequest<CommandResult>;
+public class CreateAccountHolderCommand(Guid userId) : IRequest<CommandResult>
+{
+    public Guid UserId => userId;
+}
 
 public class CreateAccountHolderCommandHandler(IAccountHolderRepository accountHolderRepository, IUnitOfWork unitOfWork)
     : IRequestHandler<CreateAccountHolderCommand, CommandResult>

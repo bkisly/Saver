@@ -7,8 +7,21 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record CreateTransactionCommand(Guid AccountId, string Name, string? Description, decimal Value, DateTime CreatedTime, Guid? CategoryId)
-    : IRequest<CommandResult>;
+public class CreateTransactionCommand(
+    Guid accountId,
+    string name,
+    string? description,
+    decimal value,
+    DateTime createdDate,
+    Guid? categoryId) : IRequest<CommandResult>
+{
+    public Guid AccountId => accountId;
+    public string Name => name;
+    public string? Description => description;
+    public decimal Value => value;
+    public Guid? CategoryId => categoryId;
+    public DateTime CreatedDate => createdDate;
+}
 
 public class CreateTransactionCommandHandler(
     IAccountHolderService accountHolderService, 
@@ -32,7 +45,7 @@ public class CreateTransactionCommandHandler(
 
             var transactionData = new TransactionData(request.Name, request.Description, request.Value, category);
             transactionService.CreateTransaction(accountHolder, request.AccountId, 
-                transactionData, request.CreatedTime);
+                transactionData, request.CreatedDate);
         }
         catch (FinanceDomainException ex)
         {

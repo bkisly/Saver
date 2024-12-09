@@ -5,7 +5,10 @@ using Saver.FinanceService.Domain.Repositories;
 
 namespace Saver.FinanceService.Commands;
 
-public record DeleteAccountHolderCommand(Guid UserId) : IRequest<CommandResult>;
+public class DeleteAccountHolderCommand(Guid userId) : IRequest<CommandResult>
+{
+    public Guid UserId => userId;
+}
 
 public class DeleteAccountHolderCommandHandler(IAccountHolderRepository repository, IUnitOfWork unitOfWork) 
     : IRequestHandler<DeleteAccountHolderCommand, CommandResult>

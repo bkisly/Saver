@@ -7,7 +7,17 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record EditManualBankAccountCommand(Guid AccountId, string Name, string? Description, string CurrencyCode) : IRequest<CommandResult>;
+public class EditManualBankAccountCommand(
+    Guid accountId,
+    string name,
+    string? description,
+    string currencyCode) : IRequest<CommandResult>
+{
+    public Guid AccountId => accountId;
+    public string Name => name;
+    public string? Description => description;
+    public string CurrencyCode => currencyCode;
+}
 
 public class EditManualBankAccountCommandHandler(
     IAccountHolderService accountHolderService, 

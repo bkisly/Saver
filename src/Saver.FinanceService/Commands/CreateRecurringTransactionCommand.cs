@@ -7,8 +7,21 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record CreateRecurringTransactionCommand(string Name, string? Description, decimal Value, Guid? CategoryId, Guid AccountId, string Cron)
-    : IRequest<CommandResult>;
+public class CreateRecurringTransactionCommand(
+    string name,
+    string? description,
+    decimal value,
+    Guid? categoryId,
+    Guid accountId,
+    string cron) : IRequest<CommandResult>
+{
+    public string Name => name;
+    public string? Description => description;
+    public decimal Value => value;
+    public Guid? CategoryId => categoryId;
+    public Guid AccountId => accountId;
+    public string Cron => cron;
+}
 
 public class CreateRecurringTransactionCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork)
     : IRequestHandler<CreateRecurringTransactionCommand, CommandResult>

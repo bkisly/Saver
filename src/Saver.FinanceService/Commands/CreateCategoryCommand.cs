@@ -5,7 +5,11 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record CreateCategoryCommand(string Name, string? Description) : IRequest<CommandResult>;
+public class CreateCategoryCommand(string name, string? description) : IRequest<CommandResult>
+{
+    public string Name => name;
+    public string? Description => description;
+}
 
 public class CreateCategoryCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork) : IRequestHandler<CreateCategoryCommand, CommandResult>
 {

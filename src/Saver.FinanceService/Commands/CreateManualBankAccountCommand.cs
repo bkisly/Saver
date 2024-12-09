@@ -6,8 +6,15 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record CreateManualBankAccountCommand(string Name, string? Description, string CurrencyCode, decimal InitialBalance) 
-    : IRequest<CommandResult>;
+public class CreateManualBankAccountCommand(
+    string name,
+    string currencyCode,
+    decimal initialBalance) : IRequest<CommandResult>
+{
+    public string Name => name;
+    public string CurrencyCode => currencyCode;
+    public decimal InitialBalance => initialBalance;
+}
 
 public class CreateManualBankAccountCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork)
     : IRequestHandler<CreateManualBankAccountCommand, CommandResult>

@@ -6,7 +6,10 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record DeleteTransactionCommand(Guid TransactionId) : IRequest<CommandResult>;
+public class DeleteTransactionCommand(Guid transactionId) : IRequest<CommandResult>
+{
+    public Guid TransactionId => transactionId;
+}
 
 public class DeleteTransactionCommandHandler(
     IAccountHolderService accountHolderService, 

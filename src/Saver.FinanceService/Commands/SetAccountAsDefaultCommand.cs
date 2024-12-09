@@ -5,7 +5,10 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record SetAccountAsDefaultCommand(Guid AccountId) : IRequest<CommandResult>;
+public class SetAccountAsDefaultCommand(Guid accountId) : IRequest<CommandResult>
+{
+    public Guid AccountId => accountId;
+}
 
 public class SetAccountAsDefaultCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork) 
     : IRequestHandler<SetAccountAsDefaultCommand, CommandResult>

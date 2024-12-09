@@ -7,8 +7,24 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record EditTransactionCommand(Guid TransactionId, Guid AccountId, string Name, string? Description, decimal Value, DateTime CreatedTime, Guid? CategoryId)
-    : IRequest<CommandResult>;
+public class EditTransactionCommand(
+    Guid transactionId,
+    Guid accountId,
+    string name,
+    string? description,
+    decimal value,
+    DateTime createdTime,
+    Guid? categoryId)
+    : IRequest<CommandResult>
+{
+    public Guid TransactionId => transactionId;
+    public Guid AccountId => accountId;
+    public string Name => name;
+    public string? Description => description;
+    public decimal Value => value;
+    public DateTime CreatedTime => createdTime;
+    public Guid? CategoryId => categoryId;
+}
 
 public class EditTransactionCommandHandler(
     IAccountHolderService accountHolderService, 
