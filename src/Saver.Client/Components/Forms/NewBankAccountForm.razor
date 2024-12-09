@@ -5,7 +5,7 @@
                 <h1 class="modal-title fs-5" id="account-form-title">New bank account</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <EditForm FormName="@FormName" EditContext="_editContext" OnValidSubmit="SaveAsync">
+            <EditForm FormName="@FormName" EditContext="_editContext">
                 <div class="modal-body">
                     <DataAnnotationsValidator/>
                     <div class="mb-3">
@@ -31,7 +31,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-success rounded-3" data-bs-dismiss="modal">Create account</button>
+                    <button type="submit" class="btn btn-success rounded-3" data-bs-dismiss="modal" @onclick="SaveAsync">Create account</button>
                 </div>
             </EditForm>
         </div>

@@ -1,9 +1,12 @@
 ﻿@page "/transactions"
 @using Saver.FinanceService.Contracts.BankAccounts
 @using Saver.FinanceService.Contracts.Transactions
+@using Saver.Client.Components.Forms
+@using Saver.FinanceService.Contracts.Categories
 
 @inject IBankAccountsApiClient BankAccountsApiClient
 @inject ITransactionsApiClient TransactionsApiClient
+@inject ICategoriesApiClient CategoriesApiClient
 
 @attribute [Authorize]
 
@@ -14,7 +17,7 @@
 @if (_availableAccounts.Count > 0)
 {
     <div class="d-flex my-3">
-        <button type="button" class="btn btn-secondary rounded-3 me-2" data-bs-toggle="modal" data-bs-target="#transaction-form">
+        <button type="button" class="btn btn-secondary rounded-3 me-2" data-bs-toggle="modal" data-bs-target="#@TransactionForm.FormName" @onclick="ClearTransactionForm">
             <span>
                 <i class="bi-plus-lg"></i>
             </span>
@@ -28,7 +31,7 @@
         </a>
     </div>
 
-    <InputSelect class="form-select" @bind-Value="SelectedBankAccountId">
+    <InputSelect class="form-select" Value="SelectedBankAccountId" ValueChanged="(Guid id) => OnSelectedAccountChanged(id)" ValueExpression="() => SelectedBankAccountId">
         @foreach (var account in _availableAccounts.OrderByDescending(x => x.IsDefault))
         {
             <option value="@account.Id">@account.Name</option>
@@ -36,45 +39,48 @@
     </InputSelect>
 
     <div class="mt-3">
-        @foreach (var transaction in _transactionsForSelectedAccount)
+        @foreach (var transaction in _transactionsForSelectedAccount.OrderByDescending(x => x.CreatedDate))
         {
+            <div class="row p-2 my-2 bg-light rounded-3">
+                <div class="col-auto my-auto">
+                    <i class="bi-cash-coin fs-3"></i>
+                </div>
+                <div class="col my-auto">
+                    <p class="fs-5 fw-medium m-0">@transaction.Name</p>
+                    <div class="my-1 d-flex text-muted">
+                        <span>@transaction.CreatedDate</span>
+                        
+                        @if (transaction.Description is not null)
+                        {
+                            <span class="vr mx-2"></span>
+                            <span>@transaction.Description</span>
+                        }
 
+                        @if (transaction.Category is not null)
+                        {
+                            <span class="vr mx-2"></span>
+                            <span>@transaction.Category.Name</span>
+                        }
+
+                    </div>
+                </div>
+                <div class="col-auto my-auto d-flex justify-content-end text-end">
+                    <p class="h5 my-auto me-3 @(transaction.Value > 0 ? "text-black" : "text-danger")">@transaction.Value.ToCurrencyString(SelectedBankAccount.CurrencyCode)</p>
+                    <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#@(TransactionForm.FormName)" @onclick="() => SelectTransactionToEdit(transaction.Id)">
+                        <i class="fs-5 bi-pen"></i>
+                    </button>
+                    <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#delete-modal" @onclick="() => SelectTransactionToDelete(transaction.Id)">
+                        <i class="fs-5 bi-trash"></i>
+                    </button>
+                </div>
+            </div>
         }
     </div>
 
-    <!-- Modal form -->
-    <div class="modal fade" id="transaction-form" tabindex="-1" aria-labelledby="transaction-form-title" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="transaction-form-title">New bank account</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="account-name" class="form-label">Name</label>
-                        <input maxlength="256" class="form-control" id="account-name" placeholder="Your bank account name" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="account-initial-balance" class="form-label">Initial balance</label>
-                        <input type="number" step="0.01" id="account-initial-balance" class="form-control" value="0.00" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="account-currency" class="form-label">Currency</label>
-                        <select id="account-currency" class="form-select">
-                            <option selected>USD</option>
-                            <option>EUR</option>
-                            <option>PLN</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success rounded-3">Create account</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <TransactionForm 
+        @ref="_transactionForm" 
+        Categories="_availableCategories" 
+        OnSave="HandleTransactionSaved" />
 
     <!-- Delete confirmation modal -->
     <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-confirmation-title" aria-hidden="true">
@@ -86,13 +92,12 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        <span>Are you sure you want to delete this account? This will delete all data related to this account.</span>
-                        <strong>This operation is irreversible.</strong>
+                        <span>Are you sure you want to delete this transaction</span>
                     </p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger rounded-3">I understand, delete.</button>
+                    <button type="button" class="btn btn-danger rounded-3" data-bs-dismiss="modal" @onclick="DeleteTransactionAsync">I understand, delete.</button>
                 </div>
             </div>
         </div>
@@ -105,16 +110,100 @@ else
 
 @code {
     private Guid SelectedBankAccountId { get; set; }
+    private BankAccountDto SelectedBankAccount { get; set; } = null!;
     private List<BankAccountDto> _availableAccounts = [];
     private List<TransactionDto> _transactionsForSelectedAccount = [];
+    private List<CategoryDto> _availableCategories = [];
+    private TransactionForm _transactionForm = null!;
+
+    private Guid _selectedTransactionId;
 
     protected override async Task OnInitializedAsync()
     {
         _availableAccounts = (await BankAccountsApiClient.GetBankAccountsAsync()).Content?.ToList() ?? [];
+        _availableCategories = (await CategoriesApiClient.GetCategoriesAsync()).Content?.ToList() ?? [];
+
+        if (_availableAccounts.Count > 0)
+        {
+            SelectedBankAccountId = _availableAccounts.First().Id;
+            SelectedBankAccount = _availableAccounts.Single(x => x.Id == SelectedBankAccountId);
+            _transactionsForSelectedAccount = (await TransactionsApiClient.GetTransactionsForAccountAsync(SelectedBankAccountId)).Content?.ToList() ?? [];
+        }
     }
 
-    private async Task OnSelectedAccountChanged()
+    private async Task OnSelectedAccountChanged(Guid accountId)
     {
-        _transactionsForSelectedAccount = (await TransactionsApiClient.GetTransactionsForAccountAsync(SelectedBankAccountId)).Content?.ToList() ?? [];
+        SelectedBankAccountId = accountId;
+        SelectedBankAccount = _availableAccounts.Single(x => x.Id == accountId);
+        _transactionsForSelectedAccount = (await TransactionsApiClient.GetTransactionsForAccountAsync(accountId)).Content?.ToList() ?? [];
     }
+
+    private async Task HandleTransactionSaved(TransactionViewModel obj)
+    {
+        if (_transactionForm.TransactionId != default)
+        {
+            var request = new EditTransactionRequest
+            {
+                AccountId = SelectedBankAccountId,
+                CategoryId = obj.CategoryId,
+                Description = obj.Description,
+                CreatedDate = obj.CreatedDate,
+                Name = obj.Name,
+                TransactionId = _transactionForm.TransactionId,
+                Value = obj.Value
+            };
+
+            await TransactionsApiClient.EditTransactionAsync(request);
+        }
+        else
+        {
+            var request = new CreateTransactionRequest
+            {
+                AccountId = SelectedBankAccountId,
+                CategoryId = obj.CategoryId,
+                Description = obj.Description,
+                CreatedDate = obj.CreatedDate,
+                Name = obj.Name,
+                Value = obj.Value
+            };
+
+            await TransactionsApiClient.CreateTransactionAsync(request);
+        }
+
+        _transactionsForSelectedAccount = (await TransactionsApiClient.GetTransactionsForAccountAsync(SelectedBankAccountId)).Content?.ToList() ?? [];
+        StateHasChanged();
+    }
+
+    private void SelectTransactionToEdit(Guid transactionId)
+    {
+        _transactionForm.TransactionId = transactionId;
+        var transaction = _transactionsForSelectedAccount.Single(x => x.Id == transactionId);
+        _transactionForm.TransactionViewModel = new TransactionViewModel
+        {
+            CategoryId = transaction.Category?.Id,
+            CreatedDate = transaction.CreatedDate,
+            Description = transaction.Description,
+            Name = transaction.Name,
+            Value = transaction.Value
+        };
+    }
+
+    private void SelectTransactionToDelete(Guid transactionId)
+    {
+        _selectedTransactionId = transactionId;
+    }
+
+    private async Task DeleteTransactionAsync()
+    {
+        await TransactionsApiClient.DeleteTransactionAsync(_selectedTransactionId);
+        _transactionsForSelectedAccount = (await TransactionsApiClient.GetTransactionsForAccountAsync(SelectedBankAccountId)).Content?.ToList() ?? [];
+        StateHasChanged();
+    }
+
+    private void ClearTransactionForm()
+    {
+        _transactionForm.TransactionViewModel = new TransactionViewModel();
+        _transactionForm.TransactionId = default;
+    }
+
 }

@@ -45,7 +45,7 @@ public class CreateTransactionCommandHandler(
 
             var transactionData = new TransactionData(request.Name, request.Description, request.Value, category);
             transactionService.CreateTransaction(accountHolder, request.AccountId, 
-                transactionData, request.CreatedDate);
+                transactionData, request.CreatedDate.ToUniversalTime());
         }
         catch (FinanceDomainException ex)
         {

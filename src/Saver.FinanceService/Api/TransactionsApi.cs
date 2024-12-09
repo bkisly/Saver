@@ -17,7 +17,7 @@ public static class TransactionsApi
         api.MapGet("/account/{id:guid}", GetTransactionsForAccountAsync);
         api.MapGet("/{id:guid}", GetTransactionByIdAsync);
         api.MapPost("/", CreateTransactionAsync);
-        api.MapPut("/{id:guid}", EditTransactionAsync);
+        api.MapPut("/", EditTransactionAsync);
         api.MapDelete("/{id:guid}", DeleteTransaction);
 
         api.MapGet("/recurring/account/{id:guid}", GetRecurringTransactionsForAccountAsync);

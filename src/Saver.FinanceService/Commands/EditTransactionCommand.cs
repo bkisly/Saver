@@ -11,9 +11,9 @@ public class EditTransactionCommand(
     Guid transactionId,
     Guid accountId,
     string name,
-    string? description,
     decimal value,
     DateTime createdTime,
+    string? description,
     Guid? categoryId)
     : IRequest<CommandResult>
 {
@@ -44,7 +44,7 @@ public class EditTransactionCommandHandler(
             var category = request.CategoryId.HasValue ? accountHolder.FindCategoryById(request.CategoryId.Value) : null;
             var newData = new TransactionData(request.Name, request.Description, request.Value, category);
             await transactionService.EditTransactionAsync(accountHolder, request.TransactionId, 
-                newData, request.CreatedTime);
+                newData, request.CreatedTime.ToUniversalTime());
         }
         catch (FinanceDomainException ex)
         {

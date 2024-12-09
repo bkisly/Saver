@@ -1,0 +1,78 @@
+﻿@using Saver.FinanceService.Contracts.Categories
+<div class="modal fade" id="@FormName" tabindex="-1" aria-labelledby="account-form-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="account-form-title">@(EditOrNewSelector("New", "Edit")) transaction</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <EditForm FormName="@FormName" EditContext="_editContext">
+                <div class="modal-body">
+                    <DataAnnotationsValidator />
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <InputText class="form-control" @bind-Value="TransactionViewModel.Name" placeholder="The name of your transaction" />
+                        <ValidationMessage For="() => TransactionViewModel.Name" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <InputText class="form-control" @bind-Value="TransactionViewModel.Description" placeholder="Some description of your transaction" />
+                        <ValidationMessage For="() => TransactionViewModel.Description" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date</label>
+                        <InputDate class="form-control" Type="InputDateType.Date" @bind-Value="TransactionViewModel.CreatedDate"/>
+                        <ValidationMessage For="() => TransactionViewModel.CreatedDate" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Value</label>
+                        <InputNumber TValue="decimal" class="form-control" @bind-Value="TransactionViewModel.Value"/>
+                        <ValidationMessage For="() => TransactionViewModel.Value" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <InputSelect @bind-Value="TransactionViewModel.CategoryId" class="form-select">
+                            <option selected>Uncategorized</option>
+                            @foreach (var category in Categories)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => TransactionViewModel.CategoryId"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success rounded-3" data-bs-dismiss="modal" @onclick="SaveAsync">@(EditOrNewSelector("Create", "Edit")) transaction</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    public Guid TransactionId { get; set; } = default;
+    [Parameter, EditorRequired] public List<CategoryDto> Categories { get; set; } = [];
+    [Parameter] public EventCallback<TransactionViewModel> OnSave { get; set; }
+
+    public TransactionViewModel TransactionViewModel { get; set; } = new();
+
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
+    public const string FormName = "transaction-form";
+
+    public Func<string, string, string> EditOrNewSelector = null!;
+
+    protected override void OnInitialized()
+    {
+        EditOrNewSelector = (ifNew, ifEdit) => TransactionId == default ? ifNew : ifEdit;
+        _editContext = new EditContext(TransactionViewModel);
+        _editContext.OnValidationRequested += (_, _) => _messageStore?.Clear();
+        _messageStore = new ValidationMessageStore(_editContext);
+    }
+
+    private async Task SaveAsync()
+    {
+        await OnSave.InvokeAsync(TransactionViewModel);
+    }
+}

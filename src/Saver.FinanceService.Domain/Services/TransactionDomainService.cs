@@ -96,7 +96,7 @@ public class TransactionDomainService(IAccountHolderRepository accountHolderRepo
                 FinanceDomainErrorCode.InvalidOperation);
         }
 
-        var account = accountHolder.FindAccountById(transactionId);
+        var account = accountHolder.FindAccountById(transaction.AccountId);
 
         if (account is not ManualBankAccount manualAccount)
         {
