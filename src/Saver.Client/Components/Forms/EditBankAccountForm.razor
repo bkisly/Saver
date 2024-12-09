@@ -1,5 +1,97 @@
-﻿<h3>EditBankAccountForm</h3>
+﻿@using System.Net.Http.Headers
+@using Saver.FinanceService.Contracts.Currency
+
+@inject ICurrencyApiClient CurrencyApiClient
+
+<div class="modal fade" id="@FormName" tabindex="-1" aria-labelledby="account-form-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="account-form-title">New bank account</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <EditForm FormName="@FormName" EditContext="_editContext" OnValidSubmit="SaveAsync">
+                <div class="modal-body">
+                    <DataAnnotationsValidator />
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <InputText class="form-control" @bind-Value="BankAccountViewModel.Name" placeholder="Your bank account name" />
+                        <ValidationMessage For="() => BankAccountViewModel.Name" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Currency</label>
+                        <InputSelect Value="BankAccountViewModel.CurrencyCode" ValueExpression="() => BankAccountViewModel.CurrencyCode" ValueChanged="(string s) => CurrencyCodeChanged(s)" class="form-select">
+                            @foreach (var supportedCurrency in SupportedCurrencyCodes)
+                            {
+                                <option value="@supportedCurrency">@supportedCurrency</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => BankAccountViewModel.CurrencyCode" />
+                    </div>
+                    @if (CurrencyHasChanged && AccountCurrencyChangeInfo != null)
+                    {
+                        <div class="mb-3">
+                            <p>The exchange rate for currency change is: @AccountCurrencyChangeInfo.ExchangeRate</p>
+                            <p>Your transactions will be recalculated. Balance after change will be: @AccountCurrencyChangeInfo.BalanceAfterChange.ToCurrencyString(BankAccountViewModel.CurrencyCode)</p>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success rounded-3" data-bs-dismiss="modal" @onclick="SaveAsync">Edit account</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
 
 @code {
+    private EditBankAccountViewModel _bankAccountViewModel = new();
+    public EditBankAccountViewModel BankAccountViewModel
+    {
+        get => _bankAccountViewModel;
+        set
+        {
+            _bankAccountViewModel = value;
+            _originalCurrencyCode = _bankAccountViewModel.CurrencyCode;
+        }
+    }
 
+    public Guid BankAccountId { get; set; }
+
+    private string _originalCurrencyCode = string.Empty;
+    private AccountCurrencyChangeInfo? AccountCurrencyChangeInfo { get; set; }
+
+    public bool CurrencyHasChanged => _bankAccountViewModel.CurrencyCode != _originalCurrencyCode;
+
+    [Parameter, EditorRequired] public List<string> SupportedCurrencyCodes { get; set; } = [];
+    [Parameter] public string FormName { get; set; } = "edit-bank-account-form";
+    [Parameter] public EventCallback<EditBankAccountViewModel> OnSave { get; set; }
+
+    private EditContext? _editContext;
+    private ValidationMessageStore? _validationMessageStore;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(BankAccountViewModel);
+        _editContext.OnValidationRequested += (_, _) => _validationMessageStore?.Clear();
+        _validationMessageStore = new ValidationMessageStore(_editContext);
+    }
+
+    private async Task SaveAsync()
+    {
+        await OnSave.InvokeAsync(BankAccountViewModel);
+    }
+
+    private async Task CurrencyCodeChanged(string? newCurrencyCode)
+    {
+        BankAccountViewModel.CurrencyCode = newCurrencyCode ?? string.Empty;
+        if (!CurrencyHasChanged)
+        {
+            return;
+        }
+
+        AccountCurrencyChangeInfo = (await CurrencyApiClient.GetAccountCurrencyChangeInfoAsync(BankAccountId, BankAccountViewModel.CurrencyCode)).Content;
+        StateHasChanged();
+    }
 }

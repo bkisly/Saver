@@ -14,7 +14,7 @@ public static class CurrencyApi
         var api = builder.MapGroup("/api/finance/currency");
 
         api.MapGet("/supported", GetSupportedCurrenciesAsync);
-        api.MapGet("/account-diff/{accountId:guid}/{targetCurrency}", GetCurrencyDiffInfoForAccount);
+        api.MapGet("/account-diff/{accountId:guid}/{targetCurrency}", GetAccountCurrencyChangeInfoAsync);
 
         api.RequireAuthorization();
 
@@ -26,7 +26,7 @@ public static class CurrencyApi
         return TypedResults.Ok(await currencyQueries.GetSupportedCurrenciesAsync());
     }
 
-    private static async Task<Results<Ok<AccountCurrencyChangeInfo>, NotFound, BadRequest<string>>> GetCurrencyDiffInfoForAccount(
+    private static async Task<Results<Ok<AccountCurrencyChangeInfo>, NotFound, BadRequest<string>>> GetAccountCurrencyChangeInfoAsync(
         Guid accountId, string targetCurrency, [FromServices] ICurrencyQueries currencyQueries)
     {
         if (!Enumeration.HasName<Currency>(targetCurrency))
