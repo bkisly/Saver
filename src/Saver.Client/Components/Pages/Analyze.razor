@@ -1,0 +1,114 @@
+﻿@page "/analyze"
+@using System.Reflection.Metadata
+@using Saver.Client.Components.Reports
+@using Saver.FinanceService.Contracts.BankAccounts
+@using Saver.FinanceService.Contracts.Categories
+@using Saver.FinanceService.Contracts.Reports
+@using Saver.FinanceService.Contracts.Transactions
+
+@attribute [Authorize]
+
+@inject IReportsApiClient ReportsApiClient
+@inject ICategoriesApiClient CategoriesApiClient
+@inject IBankAccountsApiClient BankAccountsApiClient
+
+<h3>Here you can analyze your finances in more detail.</h3>
+
+@if (AvailableBankAccounts is null)
+{
+    <p>Loading bank accounts...</p>
+}
+else
+{
+    <div class="row my-3">
+        <div class="col-auto my-auto">
+            <label class="form-label me-2 my-auto">Select the account:</label>
+        </div>
+        <div class="col">
+            <InputSelect class="form-select" @bind-Value="AccountId" @bind-Value:after="HandleFiltersChangedAsync">
+                @foreach (var account in AvailableBankAccounts)
+                {
+                    <option value="@account.Id">@account.Name</option>
+                }
+            </InputSelect>
+        </div>
+    </div>
+
+    @if (AvailableBankAccounts.Any())
+    {
+        <div class="my-3 bg-light p-2 rounded-3 d-flex">
+            <div class="d-flex me-3">
+                <label class="form-label me-2 my-auto">From:</label>
+                <InputDate class="form-control" @bind-Value="FromDate" @bind-Value:after="HandleFiltersChangedAsync" Type="InputDateType.Date"></InputDate>
+            </div>
+            <div class="d-flex me-3">
+                <label class="form-label me-2 my-auto">To:</label>
+                <InputDate class="form-control" @bind-Value="ToDate" @bind-Value:after="HandleFiltersChangedAsync" Type="InputDateType.Date"></InputDate>
+            </div>
+            <div class="d-flex me-3">
+                <label class="form-label me-2 my-auto">Category:</label>
+                <InputSelect class="form-select" @bind-Value="CategoryId" @bind-Value:after="HandleFiltersChangedAsync">
+                    <option>Select a category...</option>
+                    @foreach (var category in AvailableCategories)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="d-flex me-3">
+                <label class="form-label me-2 my-auto">Display:</label>
+                <InputSelect class="form-select" @bind-Value="TransactionType" @bind-Value:after="HandleFiltersChangedAsync">
+                    <option>Balance</option>
+                    @foreach (var transactionType in Enum.GetValues<TransactionType>())
+                    {
+                        <option value="@transactionType">@transactionType.ToString()</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+
+        <BalanceChart @ref="_chart" TransactionsReport="Report"/>
+    }
+    else
+    {
+        <p>No bank accounts available. Go and create one!</p>
+    }
+}
+
+
+@code {
+    private DateTime FromDate { get; set; } = DateTime.Now.Subtract(TimeSpan.FromDays(30));
+    private DateTime ToDate { get; set; } = DateTime.Now;
+    private Guid? CategoryId { get; set; }
+    private Guid AccountId { get; set; }
+    private TransactionType? TransactionType { get; set; }
+
+    private IEnumerable<CategoryDto> AvailableCategories { get; set; } = [];
+    private IEnumerable<BankAccountDto>? AvailableBankAccounts { get; set; }
+
+    private ReportDto? Report { get; set; }
+
+    private BalanceChart? _chart;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AvailableCategories = (await CategoriesApiClient.GetCategoriesAsync()).Content ?? [];
+        AvailableBankAccounts = (await BankAccountsApiClient.GetBankAccountsAsync()).Content?.OrderByDescending(x => x.IsDefault);
+        AccountId = AvailableBankAccounts?.FirstOrDefault()?.Id ?? default;
+        await HandleFiltersChangedAsync();
+    }
+
+    private async Task HandleFiltersChangedAsync()
+    {
+        var filters = new ReportFiltersDto
+        {
+            FromDate = FromDate,
+            ToDate = ToDate,
+            CategoryId = CategoryId,
+            TransactionType = TransactionType
+        };
+
+        Report = (await ReportsApiClient.GetReportForAccountAsync(AccountId, filters)).Content;
+        _chart?.Refresh();
+    }
+}

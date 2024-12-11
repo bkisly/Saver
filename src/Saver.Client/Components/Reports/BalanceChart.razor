@@ -32,4 +32,10 @@
             await JsRuntime.InvokeVoidAsync("createChart", TransactionsReport.ReportEntries.Select(x => x.Date).ToList(), TransactionsReport.ReportEntries.Select(x => x.Value).ToList());
         }
     }
+
+    public void Refresh()
+    {
+        _reportLoaded = false;
+        StateHasChanged();
+    }
 }
