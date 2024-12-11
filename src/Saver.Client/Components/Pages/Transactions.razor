@@ -17,7 +17,7 @@
 @if (_availableAccounts.Count > 0)
 {
     <div class="d-flex my-3">
-        <button type="button" class="btn btn-secondary rounded-3 me-2" data-bs-toggle="modal" data-bs-target="#@TransactionForm.FormName" @onclick="ClearTransactionForm">
+        <button type="button" class="btn btn-secondary rounded-3 me-2" data-bs-toggle="modal" data-bs-target="#@TransactionForm.FormName" @onclick="SetFormToNewTransaction">
             <span>
                 <i class="bi-plus-lg"></i>
             </span>
@@ -80,6 +80,7 @@
     <TransactionForm 
         @ref="_transactionForm" 
         Categories="_availableCategories" 
+        AccountId="SelectedBankAccountId"
         OnSave="HandleTransactionSaved" />
 
     <!-- Delete confirmation modal -->
@@ -116,7 +117,7 @@ else
     private List<CategoryDto> _availableCategories = [];
     private TransactionForm _transactionForm = null!;
 
-    private Guid _selectedTransactionId;
+    private Guid _transactionIdToDelete;
 
     protected override async Task OnInitializedAsync()
     {
@@ -140,70 +141,30 @@ else
 
     private async Task HandleTransactionSaved(TransactionViewModel obj)
     {
-        if (_transactionForm.TransactionId != default)
-        {
-            var request = new EditTransactionRequest
-            {
-                AccountId = SelectedBankAccountId,
-                CategoryId = obj.CategoryId,
-                Description = obj.Description,
-                CreatedDate = obj.CreatedDate,
-                Name = obj.Name,
-                TransactionId = _transactionForm.TransactionId,
-                Value = obj.Value
-            };
-
-            await TransactionsApiClient.EditTransactionAsync(request);
-        }
-        else
-        {
-            var request = new CreateTransactionRequest
-            {
-                AccountId = SelectedBankAccountId,
-                CategoryId = obj.CategoryId,
-                Description = obj.Description,
-                CreatedDate = obj.CreatedDate,
-                Name = obj.Name,
-                Value = obj.Value
-            };
-
-            await TransactionsApiClient.CreateTransactionAsync(request);
-        }
-
         _transactionsForSelectedAccount = (await TransactionsApiClient.GetTransactionsForAccountAsync(SelectedBankAccountId)).Content?.ToList() ?? [];
         StateHasChanged();
     }
 
     private void SelectTransactionToEdit(Guid transactionId)
     {
-        _transactionForm.TransactionId = transactionId;
-        var transaction = _transactionsForSelectedAccount.Single(x => x.Id == transactionId);
-        _transactionForm.TransactionViewModel = new TransactionViewModel
-        {
-            CategoryId = transaction.Category?.Id,
-            CreatedDate = transaction.CreatedDate,
-            Description = transaction.Description,
-            Name = transaction.Name,
-            Value = transaction.Value
-        };
+        _transactionForm.LoadTransactionFromDto(_transactionsForSelectedAccount.Single(x => x.Id == transactionId));
     }
 
     private void SelectTransactionToDelete(Guid transactionId)
     {
-        _selectedTransactionId = transactionId;
+        _transactionIdToDelete = transactionId;
     }
 
     private async Task DeleteTransactionAsync()
     {
-        await TransactionsApiClient.DeleteTransactionAsync(_selectedTransactionId);
+        await TransactionsApiClient.DeleteTransactionAsync(_transactionIdToDelete);
         _transactionsForSelectedAccount = (await TransactionsApiClient.GetTransactionsForAccountAsync(SelectedBankAccountId)).Content?.ToList() ?? [];
         StateHasChanged();
     }
 
-    private void ClearTransactionForm()
+    private void SetFormToNewTransaction()
     {
-        _transactionForm.TransactionViewModel = new TransactionViewModel();
-        _transactionForm.TransactionId = default;
+        _transactionForm.ClearForm();
     }
 
 }

@@ -7,6 +7,6 @@ public class TransactionViewModel
     [Required, MaxLength(256)] public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     [Required] public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-    [Required, DeniedValues(0)] public decimal Value { get; set; }
+    [Required] public decimal Value { get; set; }
     public Guid? CategoryId { get; set; }
 }

@@ -1,4 +1,8 @@
 ﻿@using Saver.FinanceService.Contracts.Categories
+@using Saver.FinanceService.Contracts.Transactions
+@inherits ModalFormComponentBase
+@inject ITransactionsApiClient TransactionsApiClient
+
 <div class="modal fade" id="@FormName" tabindex="-1" aria-labelledby="account-form-title" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
@@ -6,7 +10,7 @@
                 <h1 class="modal-title fs-5" id="account-form-title">@(EditOrNewSelector("New", "Edit")) transaction</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <EditForm FormName="@FormName" EditContext="_editContext">
+            <EditForm FormName="@FormName" EditContext="_editContext" OnValidSubmit="SaveAsync">
                 <div class="modal-body">
                     <DataAnnotationsValidator />
                     <div class="mb-3">
@@ -26,8 +30,8 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Value</label>
-                        <InputNumber TValue="decimal" class="form-control" @bind-Value="TransactionViewModel.Value"/>
-                        <ValidationMessage For="() => TransactionViewModel.Value" />
+                        <InputNumber TValue="decimal" class="form-control" @bind-Value="TransactionViewModel.Value" @bind-Value:format="N2"/>
+                        <ValidationMessage For="@(() => TransactionViewModel.Value)" />
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Category</label>
@@ -43,7 +47,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-success rounded-3" data-bs-dismiss="modal" @onclick="SaveAsync">@(EditOrNewSelector("Create", "Edit")) transaction</button>
+                    <button type="submit" class="btn btn-success rounded-3">@(EditOrNewSelector("Create", "Edit")) transaction</button>
                 </div>
             </EditForm>
         </div>
@@ -53,6 +57,7 @@
 @code {
     public Guid TransactionId { get; set; } = default;
     [Parameter, EditorRequired] public List<CategoryDto> Categories { get; set; } = [];
+    [Parameter, EditorRequired] public Guid AccountId { get; set; }
     [Parameter] public EventCallback<TransactionViewModel> OnSave { get; set; }
 
     public TransactionViewModel TransactionViewModel { get; set; } = new();
@@ -63,16 +68,82 @@
 
     public Func<string, string, string> EditOrNewSelector = null!;
 
+    public void LoadTransactionFromDto(TransactionDto transactionDto)
+    {
+        TransactionId = transactionDto.Id;
+        TransactionViewModel = new TransactionViewModel
+        {
+            Name = transactionDto.Name,
+            Description = transactionDto.Description,
+            Value = transactionDto.Value,
+            CreatedDate = transactionDto.CreatedDate,
+            CategoryId = transactionDto.Category?.Id
+        };
+
+        _editContext = ResetEditContext();
+    }
+
+    public void ClearForm()
+    {
+        TransactionId = default;
+        TransactionViewModel = new TransactionViewModel();
+        _editContext = ResetEditContext();
+    }
+
     protected override void OnInitialized()
     {
         EditOrNewSelector = (ifNew, ifEdit) => TransactionId == default ? ifNew : ifEdit;
-        _editContext = new EditContext(TransactionViewModel);
-        _editContext.OnValidationRequested += (_, _) => _messageStore?.Clear();
+        ResetEditContext();
+        _editContext = ResetEditContext();
         _messageStore = new ValidationMessageStore(_editContext);
     }
 
     private async Task SaveAsync()
     {
+        HttpResponseMessage response;
+        if (TransactionId != default)
+        {
+            var request = new EditTransactionRequest
+            {
+                AccountId = AccountId,
+                CategoryId = TransactionViewModel.CategoryId,
+                Description = TransactionViewModel.Description,
+                CreatedDate = TransactionViewModel.CreatedDate,
+                Name = TransactionViewModel.Name,
+                TransactionId = TransactionId,
+                Value = TransactionViewModel.Value
+            };
+
+            response = await TransactionsApiClient.EditTransactionAsync(request);
+        }
+        else
+        {
+            var request = new CreateTransactionRequest
+            {
+                AccountId = AccountId,
+                CategoryId = TransactionViewModel.CategoryId,
+                Description = TransactionViewModel.Description,
+                CreatedDate = TransactionViewModel.CreatedDate,
+                Name = TransactionViewModel.Name,
+                Value = TransactionViewModel.Value
+            };
+
+            response = await TransactionsApiClient.CreateTransactionAsync(request);
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return;
+        }
+
+        await HideModalAsync(FormName);
         await OnSave.InvokeAsync(TransactionViewModel);
+    }
+
+    private EditContext ResetEditContext()
+    {
+        var context = new EditContext(TransactionViewModel);
+        context.OnValidationRequested += (_, _) => _messageStore?.Clear();
+        return context;
     }
 }
