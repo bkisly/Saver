@@ -12,7 +12,7 @@
 
 <h1 class="h3">Manage and create your bank accounts here.</h1>
 
-<button type="button" class="btn btn-secondary rounded-3 my-3" data-bs-toggle="modal" data-bs-target="#@NewBankAccountFormName">
+<button type="button" class="btn btn-secondary rounded-3 my-3" data-bs-toggle="modal" data-bs-target="#@NewBankAccountForm.FormName">
     <span>
         <i class="bi-plus-lg"></i>
     </span>
@@ -40,7 +40,7 @@
                     <button class="border-0 bg-transparent my-auto mx-2 text-black" @onclick="() => MarkAccountAsDefaultAsync(account.Id)">
                         <i class="fs-5 @(account.IsDefault ? "bi-star-fill" : "bi-star")"></i>
                     </button>
-                    <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#@EditBankAccountFormName" @onclick="() => SelectAccountForEdit(account.Id)">
+                    <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#@EditBankAccountForm.FormName" @onclick="() => SelectAccountForEdit(account.Id)">
                         <i class="fs-5 bi-pen"></i>
                     </button>
                     <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#delete-modal" @onclick="() => SelectAccount(account.Id)">
@@ -53,15 +53,13 @@
 </div>
 
 <NewBankAccountForm 
-    FormName="@NewBankAccountFormName" 
     SupportedCurrencyCodes="_supportedCurrencyCodes" 
-    OnSave="CreateBankAccountAsync"/>
+    OnSave="HandleBankAccountCreatedAsync"/>
 
 <EditBankAccountForm
     @ref="_editForm"
-    FormName="@EditBankAccountFormName"
     SupportedCurrencyCodes="_supportedCurrencyCodes"
-    OnSave="EditBankAccountAsync"/>
+    OnSave="HandleBankAccountEditedAsync"/>
 
 <!-- Delete confirmation modal -->
 <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-confirmation-title" aria-hidden="true">
@@ -90,9 +88,6 @@
     private BankAccountDto? SelectedBankAccount { get; set; }
     private List<string> _supportedCurrencyCodes = [];
 
-    private const string NewBankAccountFormName = "new-bank-account-form";
-    private const string EditBankAccountFormName = "edit-bank-account-form";
-
     private EditBankAccountForm _editForm = null!;
 
     protected override async Task OnInitializedAsync()
@@ -109,12 +104,11 @@
     private void SelectAccountForEdit(Guid accountId)
     {
         SelectAccount(accountId);
-        _editForm.BankAccountViewModel = new EditBankAccountViewModel
+
+        if (SelectedBankAccount is not null)
         {
-            Name = SelectedBankAccount?.Name ?? string.Empty,
-            CurrencyCode = SelectedBankAccount?.CurrencyCode ?? string.Empty
-        };
-        _editForm.BankAccountId = accountId;
+            _editForm.LoadBankAccountFromDto(SelectedBankAccount);
+        }
     }
 
     private async Task MarkAccountAsDefaultAsync(Guid accountId)
@@ -142,29 +136,13 @@
         StateHasChanged();
     }
 
-    private async Task CreateBankAccountAsync(NewBankAccountViewModel bankAccountViewModel)
+    private async Task HandleBankAccountCreatedAsync(NewBankAccountViewModel bankAccountViewModel)
     {
-        var request = new CreateManualBankAccountRequest
-        {
-            Name = bankAccountViewModel.Name,
-            InitialBalance = bankAccountViewModel.InitialBalance,
-            CurrencyCode = bankAccountViewModel.CurrencyCode
-        };
-
-        await BankAccountsApiClient.CreateManualBankAccountAsync(request);
         await RefreshAccountsAsync();
     }
 
-    private async Task EditBankAccountAsync(EditBankAccountViewModel bankAccountViewModel)
+    private async Task HandleBankAccountEditedAsync(EditBankAccountViewModel bankAccountViewModel)
     {
-        var request = new EditManualBankAccountRequest
-        {
-            Name = bankAccountViewModel.Name,
-            AccountId = _editForm.BankAccountId,
-            CurrencyCode = bankAccountViewModel.CurrencyCode
-        };
-
-        await BankAccountsApiClient.EditManualBankAccountAsync(request);
         await RefreshAccountsAsync();
     }
 }

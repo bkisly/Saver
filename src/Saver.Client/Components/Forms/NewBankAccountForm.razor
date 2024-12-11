@@ -1,11 +1,15 @@
-﻿<div class="modal fade" id="@FormName" tabindex="-1" aria-labelledby="account-form-title" aria-hidden="true">
+﻿@using Saver.FinanceService.Contracts.BankAccounts
+@inherits ModalFormComponentBase
+@inject IBankAccountsApiClient BankAccountsApiClient
+
+<div class="modal fade" id="@FormName" tabindex="-1" aria-labelledby="account-form-title" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="account-form-title">New bank account</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <EditForm FormName="@FormName" EditContext="_editContext">
+            <EditForm FormName="@FormName" EditContext="_editContext" OnValidSubmit="SaveAsync">
                 <div class="modal-body">
                     <DataAnnotationsValidator/>
                     <div class="mb-3">
@@ -31,7 +35,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-success rounded-3" data-bs-dismiss="modal" @onclick="SaveAsync">Create account</button>
+                    <button type="submit" class="btn btn-success rounded-3">Create account</button>
                 </div>
             </EditForm>
         </div>
@@ -39,7 +43,8 @@
 </div>
 
 @code {
-    [Parameter] public string FormName { get; set; } = "new-account-form";
+    public const string FormName = "new-bank-account-form";
+
     [Parameter, EditorRequired] public IEnumerable<string> SupportedCurrencyCodes { get; set; } = [];
     [Parameter] public EventCallback<NewBankAccountViewModel> OnSave { get; set; }
 
@@ -55,7 +60,22 @@
     }
 
     private async Task SaveAsync()
-    {
+    {        
+        var request = new CreateManualBankAccountRequest
+        {
+            Name = BankAccountViewModel.Name,
+            InitialBalance = BankAccountViewModel.InitialBalance,
+            CurrencyCode = BankAccountViewModel.CurrencyCode
+        };
+
+        var response = await BankAccountsApiClient.CreateManualBankAccountAsync(request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return;
+        }
+
+        await HideModalAsync(FormName);
         await OnSave.InvokeAsync(BankAccountViewModel);
     }
 }
