@@ -29,13 +29,22 @@
         if (TransactionsReport != null)
         {
             _reportLoaded = true;
-            await JsRuntime.InvokeVoidAsync("createChart", TransactionsReport.ReportEntries.Select(x => x.Date).ToList(), TransactionsReport.ReportEntries.Select(x => x.Value).ToList());
+            await JsRuntime.InvokeVoidAsync("createChart", 
+                TransactionsReport.ReportEntries.Select(x => x.Date).ToList(), 
+                TransactionsReport.ReportEntries.Select(x => x.Value).ToList());
         }
     }
 
-    public void Refresh()
+    public async Task RefreshAsync()
     {
-        _reportLoaded = false;
-        StateHasChanged();
+        if (TransactionsReport != null)
+        {
+            await JsRuntime.InvokeVoidAsync("updateChart", 
+                TransactionsReport.ReportEntries.Select(x => x.Date).ToList(), 
+                TransactionsReport.ReportEntries.Select(x => x.Value).ToList());
+
+            StateHasChanged();
+        }
+        
     }
 }

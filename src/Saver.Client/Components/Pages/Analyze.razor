@@ -1,5 +1,5 @@
 ﻿@page "/analyze"
-@using System.Reflection.Metadata
+
 @using Saver.Client.Components.Reports
 @using Saver.FinanceService.Contracts.BankAccounts
 @using Saver.FinanceService.Contracts.Categories
@@ -109,6 +109,10 @@ else
         };
 
         Report = (await ReportsApiClient.GetReportForAccountAsync(AccountId, filters)).Content;
-        _chart?.Refresh();
+
+        if (_chart != null)
+        {
+            await _chart.RefreshAsync();
+        }
     }
 }
