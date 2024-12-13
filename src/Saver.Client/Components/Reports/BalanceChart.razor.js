@@ -21,11 +21,8 @@
 }
 
 function updateChart(datesList, valuesList) {
-    console.log("updagin chart...");
     const chart = document.getElementById('balance-chart').chartInstance;
-    console.log(chart);
     chart.data.labels = datesList;
     chart.data.datasets[0].data = valuesList;
     chart.update();
-    console.log("updated");
 }
