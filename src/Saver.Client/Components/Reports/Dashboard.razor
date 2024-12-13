@@ -31,7 +31,7 @@
         <div class="col d-flex">
             <TopCategoriesReport 
                 CurrencyCode="@DefaultBankAccount.CurrencyCode" 
-                CategoriesReport="CategoriesReport?.OutcomeCategories" 
+                CategoriesReport="CategoriesReport?.OutcomeCategories.OrderBy(x => x.Value).ToList()" 
                 Header="TOP EXPENSES IN LAST 30 DAYS" 
                 TransactionType="TransactionType.Outcome"/>
         </div>

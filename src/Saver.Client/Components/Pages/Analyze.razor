@@ -68,6 +68,15 @@ else
         </div>
 
         <BalanceChart @ref="_chart" TransactionsReport="Report"/>
+
+        <div class="row my-4">
+            <div class="col">
+                <CategoriesChart ChartId="income-categories-chart" CategoriesReport="CategoriesReport?.IncomeCategories" Header="TOP BENEFIT CATEGORIES"/>
+            </div>
+            <div class="col">
+                <CategoriesChart ChartId="outcome-categories-chart" CategoriesReport="CategoriesReport?.OutcomeCategories" Header="TOP EXPENSE CATEGORIES"/>
+            </div>
+        </div>
     }
     else
     {
@@ -87,6 +96,7 @@ else
     private IEnumerable<BankAccountDto>? AvailableBankAccounts { get; set; }
 
     private ReportDto? Report { get; set; }
+    private CategoriesReportDto? CategoriesReport { get; set; }
 
     private BalanceChart? _chart;
 
@@ -109,6 +119,7 @@ else
         };
 
         Report = (await ReportsApiClient.GetReportForAccountAsync(AccountId, filters)).Content;
+        CategoriesReport = (await ReportsApiClient.GetCategoriesReportForAccountAsync(AccountId)).Content;
 
         if (_chart != null)
         {

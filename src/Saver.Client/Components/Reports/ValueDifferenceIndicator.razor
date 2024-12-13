@@ -2,7 +2,7 @@
     <span class="@CaretColorClass">
         <i class="@CaretClass"></i>
     </span>
-    <span>@Value.ToCurrencyString(CurrencyCode)</span>
+    <span>@Math.Abs(Value).ToCurrencyString(CurrencyCode)</span>
 </div>
 
 @code {

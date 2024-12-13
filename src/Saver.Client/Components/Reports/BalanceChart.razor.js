@@ -12,8 +12,22 @@
         },
         options: {
             scales: {
+                x: {
+                    ticks: {
+                        callback: function (value, index, ticks) {
+                            // Custom formatting
+                            const date = new Date(this.getLabelForValue(value));
+                            return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+                        }
+                    },
+                },
                 y: {
                     beginAtZero: false
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
                 }
             }
         }
