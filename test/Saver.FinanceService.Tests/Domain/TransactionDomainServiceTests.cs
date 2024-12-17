@@ -17,7 +17,7 @@ public class TransactionDomainServiceTests(TransactionDomainServiceFixture fixtu
         var transactionService = new TransactionDomainService(fixture.AccountHolderRepositoryMock.Object,
             fixture.TransactionRepositoryMock.Object);
 
-        var transactionDate = new DateTime(2024, 11, 17);
+        var transactionDate = new DateTime(2024, 11, 17, 0, 0, 0, DateTimeKind.Utc);
         var transactionData = new TransactionData("Sample transaction", null, 20,
             fixture.AccountHolder.Categories.Single());
 

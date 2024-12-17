@@ -22,7 +22,7 @@ public class Transaction : EventPublishingEntity<Guid>, IAggregateRoot
     public Transaction(Guid accountId, TransactionData data, DateTime creationDate)
     {
         AccountId = accountId;
-        CreationDate = creationDate;
+        CreationDate = creationDate.ToUniversalTime();
         TransactionData = data;
     }
 
@@ -35,7 +35,7 @@ public class Transaction : EventPublishingEntity<Guid>, IAggregateRoot
 
         if (newCreatedDate != CreationDate)
         {
-            CreationDate = newCreatedDate;
+            CreationDate = newCreatedDate.ToUniversalTime();
         }
     }
 

@@ -27,12 +27,12 @@ public class ReportQueryBuilder(IQueryable<Transaction> transactions) : IReportQ
     {
         if (filter.FromDate.HasValue)
         {
-            _transactions = _transactions.Where(x => x.CreationDate >= filter.FromDate.Value.ToUniversalTime());
+            _transactions = _transactions.Where(x => x.CreationDate.Date >= filter.FromDate.Value.Date.ToUniversalTime());
         }
 
         if (filter.ToDate.HasValue)
         {
-            _transactions = _transactions.Where(x => x.CreationDate <= filter.ToDate.Value.ToUniversalTime());
+            _transactions = _transactions.Where(x => x.CreationDate.Date <= filter.ToDate.Value.Date.ToUniversalTime());
         }
     }
 

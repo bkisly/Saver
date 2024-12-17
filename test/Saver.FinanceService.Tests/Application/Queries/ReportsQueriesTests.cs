@@ -114,37 +114,37 @@ public sealed class ReportsQueriesTests(InMemoryDbContextFactory contextFactory,
             .AddTransaction(
                 "Transaction 1",
                 10M,
-                new DateTime(2024, 11, 3),
+                new DateTime(2024, 11, 3, 0, 0, 0, DateTimeKind.Utc),
                 accountHolder.Accounts[0].Id,
                 accountHolder.Categories[0])
             .AddTransaction(
                 "Transaction 2",
                 5M,
-                new DateTime(2024, 11, 2),
+                new DateTime(2024, 11, 2, 0, 0, 0, DateTimeKind.Utc),
                 accountHolder.Accounts[0].Id,
                 accountHolder.Categories[0])
             .AddTransaction(
                 "Transaction 3",
                 -20M,
-                new DateTime(2024, 11, 1),
+                new DateTime(2024, 11, 1, 0, 0, 0, DateTimeKind.Utc),
                 accountHolder.Accounts[0].Id,
                 accountHolder.Categories[1])
             .AddTransaction(
                 "Transaction 4",
                 15M,
-                new DateTime(2024, 11, 1),
+                new DateTime(2024, 11, 1, 0, 0, 0, DateTimeKind.Utc),
                 accountHolder.Accounts[1].Id,
                 accountHolder.Categories[1])
             .AddTransaction(
                 "Transaction 5",
                 300M,
-                new DateTime(2024, 11, 3),
+                new DateTime(2024, 11, 3, 0, 0, 0, DateTimeKind.Utc),
                 accountHolder.Accounts[1].Id,
                 accountHolder.Categories[1])
             .AddTransaction(
                 "Transaction 6",
                 -10M,
-                new DateTime(2024, 11, 3),
+                new DateTime(2024, 11, 3, 0, 0, 0, DateTimeKind.Utc),
                 accountHolder.Accounts[1].Id,
                 accountHolder.Categories[1])
             .Build();
@@ -155,16 +155,16 @@ public sealed class ReportsQueriesTests(InMemoryDbContextFactory contextFactory,
 
         var expectedEntries = new[]
         {
-            new ReportEntryDto { Date = new DateTime(2024, 11, 2), Value = 5M },
-            new ReportEntryDto { Date = new DateTime(2024, 11, 3), Value = 10M }
+            new ReportEntryDto { Date = new DateTime(2024, 11, 2, 0, 0, 0, DateTimeKind.Utc), Value = 5M },
+            new ReportEntryDto { Date = new DateTime(2024, 11, 3, 0, 0, 0, DateTimeKind.Utc), Value = 10M }
         };
 
         // Act
         var report = await queries.GetReportForAccountAsync(accountHolder.Accounts[0].Id,
             new ReportFiltersDto
             {
-                FromDate = new DateTime(2024, 11, 2),
-                ToDate = new DateTime(2024, 11, 3),
+                FromDate = new DateTime(2024, 11, 2, 0, 0, 0, DateTimeKind.Utc),
+                ToDate = new DateTime(2024, 11, 3, 0, 0, 0, DateTimeKind.Utc),
                 CategoryId = accountHolder.Categories[0].Id,
                 TransactionType = Contracts.Transactions.TransactionType.Income,
             });

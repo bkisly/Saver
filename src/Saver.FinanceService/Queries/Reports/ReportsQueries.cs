@@ -29,16 +29,17 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper,
             RegisterFilters(queryBuilder, filters);
         }
 
-        var balanceBeforeFilters = filters?.FromDate != null
-            ? account.Balance + await context.Transactions.Where(x => x.AccountId == accountId && x.CreationDate < filters.FromDate.Value.ToUniversalTime())
-                .SumAsync(x => x.TransactionData.Value)
-            : account.Balance;
+        //var balanceBeforeFilters = filters?.FromDate != null
+        //    ? account.Balance + await context.Transactions.Where(x => x.AccountId == accountId && x.CreationDate < filters.FromDate.Value.ToUniversalTime())
+        //        .SumAsync(x => x.TransactionData.Value)
+        //    : account.Balance;
+        // @TODO: fix balance changes report and find a way to test
 
         var transactions = queryBuilder.Build();
         var reportEntries = transactions.Select(transaction => new ReportEntryDto
         {
             Date = transaction.CreationDate, 
-            Value = transaction.TransactionData.Value + balanceBeforeFilters
+            Value = transaction.TransactionData.Value   // + balanceBeforeFilters
         }).ToList();
 
         return new ReportDto
