@@ -17,11 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Saver.AccountIntegrationService\Saver.AccountIntegrationService.csproj" />
     <ProjectReference Include="..\Saver.BudgetService\Saver.BudgetService.csproj" />
     <ProjectReference Include="..\Saver.Client\Saver.Client.csproj" />
     <ProjectReference Include="..\Saver.FinanceService\Saver.FinanceService.csproj" />
     <ProjectReference Include="..\Saver.IdentityService\Saver.IdentityService.csproj" />
-    <ProjectReference Include="..\Saver.PredictionsService\Saver.PredictionsService.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-namespace Saver.PredictionsService.Tests
+namespace Saver.AccountIntegrationService.Tests
 {
     public class UnitTest1
     {
