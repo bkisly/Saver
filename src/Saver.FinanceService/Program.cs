@@ -16,7 +16,8 @@ app.MapGet("/", () => "Hello World!");
 app.MapAccountsApi()
     .MapTransactionsApi()
     .MapCategoriesApi()
-    .MapReportsApi();
+    .MapReportsApi()
+    .MapCurrencyApi();
 
 app.UseDefaultSwagger();
 app.UseMiddleware<ValidationExceptionHandlingMiddleware>();
@@ -24,6 +25,7 @@ app.UseMiddleware<ValidationExceptionHandlingMiddleware>();
 if (app.Environment.IsDevelopment())
 {
     app.ApplyMigrations();
+    await app.SeedSampleDataAsync();
 }
 
 app.Run();

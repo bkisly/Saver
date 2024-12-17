@@ -4,7 +4,7 @@ using Saver.FinanceService.Domain.AccountHolderModel;
 
 namespace Saver.FinanceService.Infrastructure.ServiceAgents.ExchangeRate;
 
-public class ExchangeRateServiceAgent(IDistributedCache cache, HttpClient httpClient)
+public class ExchangeRateServiceAgent(IDistributedCache cache, IHttpClientFactory httpClientFactory)
     : IExchangeRateServiceAgent
 {
     private const string PairExchangeRatePrefix = "PairExchangeRate";
@@ -24,7 +24,8 @@ public class ExchangeRateServiceAgent(IDistributedCache cache, HttpClient httpCl
                    throw new ExchangeRateServiceException("Error while reading exchange rate data from cache.");
         }
 
-        var exchangeRateResponse = await httpClient.GetAsync($"/pair/{sourceCurrency.Name}/{targetCurrency.Name}");
+        var httpClient = httpClientFactory.CreateClient("ExchangeRateApiClient");
+        var exchangeRateResponse = await httpClient.GetAsync($"pair/{sourceCurrency.Name}/{targetCurrency.Name}");
         if (!exchangeRateResponse.IsSuccessStatusCode)
         {
             throw new ExchangeRateServiceException("Error while fetching exchange rate data from API.");

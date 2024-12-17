@@ -1,0 +1,116 @@
+﻿@using Saver.FinanceService.Contracts.Categories
+@inherits ModalFormComponentBase
+
+@inject ICategoriesApiClient CategoriesApiClient
+
+<div class="modal fade" id="@FormName" tabindex="-1" aria-labelledby="category-form-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="category-form-title">@(NewOrEditSelector("New", "Edit")) category</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <EditForm FormName="@FormName" EditContext="_editContext" OnValidSubmit="SaveAsync">
+                <div class="modal-body">
+                    <DataAnnotationsValidator />
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <InputText class="form-control" @bind-Value="CategoryViewModel.Name" placeholder="The name of your category" />
+                        <ValidationMessage For="() => CategoryViewModel.Name" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <InputText class="form-control" @bind-Value="CategoryViewModel.Description" placeholder="Some description of your category" />
+                        <ValidationMessage For="() => CategoryViewModel.Description" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success rounded-3">@(NewOrEditSelector("Create", "Edit")) category</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    public const string FormName = "category-form";
+
+    [Parameter] public EventCallback<CategoryViewModel> OnSave { get; set; }
+
+    private Guid _categoryId;
+    private CategoryViewModel CategoryViewModel { get; set; } = new();
+
+    private EditContext? _editContext;
+    private ValidationMessageStore? _validationMessageStore;
+
+    public Func<string, string, string> NewOrEditSelector = null!;
+
+    public void LoadCategoryFromDto(CategoryDto categoryDto)
+    {
+        _categoryId = categoryDto.Id;
+        CategoryViewModel = new CategoryViewModel
+        {
+            Name = categoryDto.Name,
+            Description = categoryDto.Description
+        };
+
+        _editContext = ResetEditContext();
+    }
+
+    public void ClearForm()
+    {
+        _categoryId = default;
+        CategoryViewModel = new CategoryViewModel();
+        _editContext = ResetEditContext();
+    }
+
+    protected override void OnInitialized()
+    {
+        NewOrEditSelector = (ifNew, ifEdit) => _categoryId == default ? ifNew : ifEdit;
+        _editContext = ResetEditContext();
+        _validationMessageStore = new ValidationMessageStore(_editContext);
+    }
+
+    private EditContext ResetEditContext()
+    {
+        var editContext = new EditContext(CategoryViewModel);
+        editContext.OnValidationRequested += (_, _) => _validationMessageStore?.Clear();
+        return editContext;
+    }
+
+    private async Task SaveAsync()
+    {
+        HttpResponseMessage response;
+        if (_categoryId == default)
+        {
+            var request = new CreateCategoryRequest
+                {
+                    Name = CategoryViewModel.Name,
+                    Description = CategoryViewModel.Description
+                };
+
+            response = await CategoriesApiClient.CreateCategoryAsync(request);
+        }
+        else
+        {
+            var request = new EditCategoryRequest
+                {
+                    CategoryId = _categoryId,
+                    Description = CategoryViewModel.Description,
+                    Name = CategoryViewModel.Name
+                };
+
+            response = await CategoriesApiClient.EditCategoryAsync(request);
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return;
+        }
+
+        await HideModalAsync(FormName);
+        await OnSave.InvokeAsync(CategoryViewModel);
+    }
+}

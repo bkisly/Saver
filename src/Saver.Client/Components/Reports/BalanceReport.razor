@@ -1,0 +1,51 @@
+﻿@using Saver.FinanceService.Contracts.BankAccounts
+@using Saver.FinanceService.Contracts.Reports
+
+@inject IReportsApiClient ReportsApiClient
+
+<div class="bg-light rounded-2 m-0 p-3 flex-fill">
+    <label class="mb-2">BALANCE</label>
+    @if (BankAccount is null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        @if (_balanceReport is null)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            <p class="h3">@_balanceReport.Balance.ToCurrencyString(BankAccount.CurrencyCode)</p>
+    
+            <div class="d-flex align-items-stretch">
+                <div class="me-3">
+                    <label>Last 7 days</label>
+                    <ValueDifferenceIndicator Value="@_balanceReport.ChangeInLast7Days" CurrencyCode="@BankAccount.CurrencyCode"/>
+                </div>
+                <div>
+                    <label>Last 30 days</label>
+                    <ValueDifferenceIndicator Value="@_balanceReport.ChangeInLast30Days" CurrencyCode="@BankAccount.CurrencyCode"/>
+                </div>
+            </div>
+        }
+    }
+
+</div>
+
+@code {
+    [Parameter, EditorRequired] public BankAccountDto? BankAccount { get; set; }
+
+    private BalanceReportDto? _balanceReport;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (BankAccount is null)
+        {
+            return;
+        }
+
+        _balanceReport = (await ReportsApiClient.GetBalanceReportForAccountAsync(BankAccount.Id)).Content;
+    }
+}

@@ -7,8 +7,24 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record EditTransactionCommand(Guid TransactionId, Guid AccountId, string Name, string? Description, decimal Value, DateTime CreatedTime, Guid? CategoryId)
-    : IRequest<CommandResult>;
+public class EditTransactionCommand(
+    Guid transactionId,
+    Guid accountId,
+    string name,
+    decimal value,
+    DateTime createdDate,
+    string? description,
+    Guid? categoryId)
+    : IRequest<CommandResult>
+{
+    public Guid TransactionId => transactionId;
+    public Guid AccountId => accountId;
+    public string Name => name;
+    public string? Description => description;
+    public decimal Value => value;
+    public DateTime CreatedDate => createdDate;
+    public Guid? CategoryId => categoryId;
+}
 
 public class EditTransactionCommandHandler(
     IAccountHolderService accountHolderService, 
@@ -28,7 +44,7 @@ public class EditTransactionCommandHandler(
             var category = request.CategoryId.HasValue ? accountHolder.FindCategoryById(request.CategoryId.Value) : null;
             var newData = new TransactionData(request.Name, request.Description, request.Value, category);
             await transactionService.EditTransactionAsync(accountHolder, request.TransactionId, 
-                newData, request.CreatedTime);
+                newData, request.CreatedDate.ToUniversalTime());
         }
         catch (FinanceDomainException ex)
         {

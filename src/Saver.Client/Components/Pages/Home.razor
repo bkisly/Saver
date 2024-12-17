@@ -1,7 +1,16 @@
 ﻿@page "/"
+@using Saver.Client.Components.Reports
 
-<PageTitle>Home</PageTitle>
+<AuthorizeView>
+    <Authorized>
+        <Dashboard/>
+    </Authorized>
+    <NotAuthorized>
+        <p class="text-center">Welcome to Saver!</p>
+    </NotAuthorized>
+</AuthorizeView>
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+@code {
+
+}

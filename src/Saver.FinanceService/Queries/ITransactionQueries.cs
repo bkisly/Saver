@@ -1,4 +1,4 @@
-﻿using Saver.FinanceService.Dto;
+﻿using Saver.FinanceService.Contracts.Transactions;
 
 namespace Saver.FinanceService.Queries;
 

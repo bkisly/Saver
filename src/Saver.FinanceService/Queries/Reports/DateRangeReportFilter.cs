@@ -2,8 +2,8 @@
 
 public class DateRangeReportFilter : IReportFilter
 {
-    public required DateTime FromDate { get; init; }
-    public required DateTime ToDate { get; init; }
+    public DateTime? FromDate { get; init; }
+    public DateTime? ToDate { get; init; }
 
     public void AcceptBuilder(IReportQueryBuilder builder)
     {

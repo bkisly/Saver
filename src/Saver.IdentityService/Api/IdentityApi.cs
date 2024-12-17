@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Saver.IdentityService.Models;
+using Saver.IdentityService.Contracts;
+using Saver.IdentityService.IdentityResults;
 using Saver.IdentityService.Services;
 
 namespace Saver.IdentityService.Api;
@@ -31,14 +32,14 @@ public static class IdentityApi
     }
 
     private static async Task<Results<Created, ValidationProblem>> RegisterAsync(
-        RegistrationModel model, [AsParameters] IdentityServices services)
+        RegistrationRequest request, [AsParameters] IdentityServices services)
     {
-        if (!EmailAttribute.IsValid(model.Email))
+        if (!EmailAttribute.IsValid(request.Email))
         {
-            return CreateValidationProblem("InvalidEmail", $"Value {model.Email} is invalid for an e-mail.");
+            return CreateValidationProblem("InvalidEmail", $"Value {request.Email} is invalid for an e-mail.");
         }
 
-        var result = await services.AccountService.CreateAccountAsync(model);
+        var result = await services.AccountService.CreateAccountAsync(request);
         return result.Succeeded ? TypedResults.Created() : CreateValidationProblem(result);
     }
 
@@ -48,11 +49,11 @@ public static class IdentityApi
     }
 
     private static async Task<Results<NoContent, ValidationProblem>> ChangeEmailAsync(
-        [FromBody] ChangeEmailModel model, [AsParameters] IdentityServices services)
+        [FromBody] ChangeEmailRequest request, [AsParameters] IdentityServices services)
     {
-        if (!EmailAttribute.IsValid(model.NewEmail))
+        if (!EmailAttribute.IsValid(request.NewEmail))
         {
-            return CreateValidationProblem("InvalidEmail", $"Value {model.NewEmail} is invalid for an e-mail.");
+            return CreateValidationProblem("InvalidEmail", $"Value {request.NewEmail} is invalid for an e-mail.");
         }
 
         var userId = services.UserContextProvider.GetUserId();
@@ -61,14 +62,14 @@ public static class IdentityApi
             return TypedResults.NoContent();
         }
 
-        var result = await services.AccountService.ChangeEmailAsync(userId, model);
+        var result = await services.AccountService.ChangeEmailAsync(userId, request);
         return result is UserNotFoundIdentityResult or { Succeeded: true }
             ? TypedResults.NoContent()
             : CreateValidationProblem(result);
     }
 
     private static async Task<Results<NoContent, ValidationProblem>> ChangePasswordAsync(
-        [FromBody] ChangePasswordModel model, [AsParameters] IdentityServices services)
+        [FromBody] ChangePasswordRequest request, [AsParameters] IdentityServices services)
     {
         var userId = services.UserContextProvider.GetUserId();
         if (userId is null)
@@ -76,7 +77,7 @@ public static class IdentityApi
             return TypedResults.NoContent();
         }
 
-        var result = await services.AccountService.ChangePasswordAsync(userId, model);
+        var result = await services.AccountService.ChangePasswordAsync(userId, request);
         return result is UserNotFoundIdentityResult or { Succeeded: true }
             ? TypedResults.NoContent()
             : CreateValidationProblem(result);
@@ -97,13 +98,17 @@ public static class IdentityApi
             : CreateValidationProblem(result);
     }
 
-    private static async Task<Results<Ok<string>, UnauthorizedHttpResult>> LoginAsync(
-        LoginModel model, [FromServices] ILoginService loginService)
+    private static async Task<Results<Ok<LoginResponse>, UnauthorizedHttpResult>> LoginAsync(
+        LoginRequest request, HttpContext httpContext, [FromServices] ILoginService loginService)
     {
-        var result = await loginService.LoginAsync(model);
-        return result is LoggedInIdentityResult loggedInResult
-            ? TypedResults.Ok(loggedInResult.Token)
-            : TypedResults.Unauthorized();
+        var result = await loginService.LoginAsync(request);
+
+        if (result is not LoggedInIdentityResult loggedInResult)
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        return TypedResults.Ok(new LoginResponse { Token = loggedInResult.Token, Claims = loggedInResult.Claims });
     }
 
     private static ValidationProblem CreateValidationProblem(string errorCode, string errorDescription)

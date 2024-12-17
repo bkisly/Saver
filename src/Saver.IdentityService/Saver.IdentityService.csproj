@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Saver.EventBus\Saver.EventBus.csproj" />
+    <ProjectReference Include="..\Saver.IdentityService.Contracts\Saver.IdentityService.Contracts.csproj" />
     <ProjectReference Include="..\Saver.IdentityService.IntegrationEvents\Saver.IdentityService.IntegrationEvents.csproj" />
     <ProjectReference Include="..\Saver.ServiceDefaults\Saver.ServiceDefaults.csproj" />
   </ItemGroup>

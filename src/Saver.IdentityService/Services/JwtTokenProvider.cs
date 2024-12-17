@@ -9,7 +9,7 @@ namespace Saver.IdentityService.Services;
 
 public class JwtTokenProvider(IIdentityConfigurationProvider config) : IJwtTokenProvider
 {
-    public string ProvideToken(IdentityUser user)
+    public string ProvideToken(IdentityUser user, out Claim[] claims)
     {
         var handler = new JwtSecurityTokenHandler();
         var rsa = RSA.Create();
@@ -19,12 +19,15 @@ public class JwtTokenProvider(IIdentityConfigurationProvider config) : IJwtToken
             new RsaSecurityKey(rsa),
             SecurityAlgorithms.RsaSha256);
 
+        var claimIdentity = GenerateClaims(user);
+        claims = [];
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Issuer = config.Issuer,
             SigningCredentials = signingCredentials,
             Expires = DateTime.UtcNow.AddMinutes(config.ExpirationTimeMinutes),
-            Subject = GenerateClaims(user)
+            Subject = claimIdentity
         };
 
         var token = handler.CreateToken(tokenDescriptor);

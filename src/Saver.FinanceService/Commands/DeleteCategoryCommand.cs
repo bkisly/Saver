@@ -5,7 +5,10 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record DeleteCategoryCommand(Guid CategoryId) : IRequest<CommandResult>;
+public class DeleteCategoryCommand(Guid categoryId) : IRequest<CommandResult>
+{
+    public Guid CategoryId => categoryId;
+}
 
 public class DeleteCategoryCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork) 
     : IRequestHandler<DeleteCategoryCommand, CommandResult>

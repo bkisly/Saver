@@ -25,8 +25,7 @@ internal class TransactionEntityTypeConfiguration : IEntityTypeConfiguration<Tra
             .HasMaxLength(256);
 
         transactionDataBuilder.Property(x => x.Value)
-            .IsRequired()
-            .HasPrecision(2);
+            .IsRequired();
 
         transactionDataBuilder.HasOne(x => x.Category)
             .WithMany()

@@ -5,7 +5,12 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record EditCategoryCommand(Guid CategoryId, string Name, string? Description) : IRequest<CommandResult>;
+public class EditCategoryCommand(Guid categoryId, string name, string? description) : IRequest<CommandResult>
+{
+    public Guid CategoryId => categoryId;
+    public string Name => name;
+    public string? Description => description;
+}
 
 public class EditCategoryCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork)
     : IRequestHandler<EditCategoryCommand, CommandResult>

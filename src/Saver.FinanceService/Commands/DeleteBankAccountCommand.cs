@@ -5,7 +5,10 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record DeleteBankAccountCommand(Guid AccountId) : IRequest<CommandResult>;
+public class DeleteBankAccountCommand(Guid accountId) : IRequest<CommandResult>
+{
+    public Guid AccountId => accountId;
+}
 
 public class DeleteBankAccountCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork) 
     : IRequestHandler<DeleteBankAccountCommand, CommandResult>

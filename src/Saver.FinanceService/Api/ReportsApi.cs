@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Saver.FinanceService.Dto;
+using Saver.FinanceService.Contracts.Reports;
 using Saver.FinanceService.Queries.Reports;
 
 namespace Saver.FinanceService.Api;
@@ -11,7 +11,7 @@ public static class ReportsApi
     {
         var api = builder.MapGroup("/api/finance/reports");
 
-        api.MapGet("/{id:guid}/{filters?}", GetReportForAccountAsync);
+        api.MapGet("/{id:guid}", GetReportForAccountAsync);
         api.MapGet("/categories/{id:guid}", GetCategoriesReportAsync);
         api.MapGet("/balance/{id:guid}", GetBalanceReportAsync);
 
@@ -21,7 +21,7 @@ public static class ReportsApi
     }
 
     private static async Task<Results<Ok<ReportDto>, NotFound>> GetReportForAccountAsync(
-        Guid id, ReportFiltersDto? filters, [FromServices] IReportsQueries reportsQueries)
+        Guid id, [AsParameters] ReportFiltersDto filters, [FromServices] IReportsQueries reportsQueries)
     {
         var report = await reportsQueries.GetReportForAccountAsync(id, filters);
 

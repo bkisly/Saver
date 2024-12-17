@@ -1,13 +1,27 @@
 ﻿using MediatR;
 using Saver.Common.DDD;
+using Saver.FinanceService.Domain.AccountHolderModel;
 using Saver.FinanceService.Domain.Exceptions;
 using Saver.FinanceService.Domain.TransactionModel;
 using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public record CreateRecurringTransactionCommand(string Name, string? Description, decimal Value, Guid CategoryId, Guid AccountId, string Cron)
-    : IRequest<CommandResult>;
+public class CreateRecurringTransactionCommand(
+    string name,
+    string? description,
+    decimal value,
+    Guid? categoryId,
+    Guid accountId,
+    string cron) : IRequest<CommandResult>
+{
+    public string Name => name;
+    public string? Description => description;
+    public decimal Value => value;
+    public Guid? CategoryId => categoryId;
+    public Guid AccountId => accountId;
+    public string Cron => cron;
+}
 
 public class CreateRecurringTransactionCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork)
     : IRequestHandler<CreateRecurringTransactionCommand, CommandResult>
@@ -19,7 +33,12 @@ public class CreateRecurringTransactionCommandHandler(IAccountHolderService acco
 
         try
         {
-            var category = accountHolder.FindCategoryById(request.CategoryId);
+            Category? category = null;
+            if (request.CategoryId.HasValue)
+            {
+                category = accountHolder.FindCategoryById(request.CategoryId.Value);
+            }
+
             var transactionData = new TransactionData(request.Name, request.Description, request.Value, category);
             accountHolder.CreateRecurringTransaction(request.AccountId, transactionData, request.Cron);
         }

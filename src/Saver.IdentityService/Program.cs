@@ -18,6 +18,7 @@ app.UseDefaultSwagger();
 if (app.Environment.IsDevelopment())
 {
     app.ApplyMigrations();
+    await app.SeedSampleDataAsync();
 }
 
 app.Run();

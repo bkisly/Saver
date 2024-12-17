@@ -1,8 +1,9 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Saver.FinanceService.Commands;
-using Saver.FinanceService.Dto;
+using Saver.FinanceService.Contracts.Transactions;
 using Saver.FinanceService.Queries;
 
 namespace Saver.FinanceService.Api;
@@ -16,7 +17,7 @@ public static class TransactionsApi
         api.MapGet("/account/{id:guid}", GetTransactionsForAccountAsync);
         api.MapGet("/{id:guid}", GetTransactionByIdAsync);
         api.MapPost("/", CreateTransactionAsync);
-        api.MapPut("/{id:guid}", EditTransactionAsync);
+        api.MapPut("/", EditTransactionAsync);
         api.MapDelete("/{id:guid}", DeleteTransaction);
 
         api.MapGet("/recurring/account/{id:guid}", GetRecurringTransactionsForAccountAsync);
@@ -44,15 +45,17 @@ public static class TransactionsApi
     }
 
     private static async Task<Results<Created, ProblemHttpResult>> CreateTransactionAsync(
-        CreateTransactionCommand command, [FromServices] IMediator mediator)
+        CreateTransactionRequest request, [FromServices] IMediator mediator, [FromServices] IMapper mapper)
     {
+        var command = mapper.Map<CreateTransactionRequest, CreateTransactionCommand>(request);
         var result = await mediator.Send(command);
         return result.IsSuccess ? TypedResults.Created() : result.ToHttpProblem();
     }
 
     private static async Task<Results<NoContent, ProblemHttpResult>> EditTransactionAsync(
-        Guid id, [FromBody] EditTransactionCommand command, [FromServices] IMediator mediator)
+        [FromBody] EditTransactionRequest request, [FromServices] IMediator mediator, [FromServices] IMapper mapper)
     {
+        var command = mapper.Map<EditTransactionRequest, EditTransactionCommand>(request);
         var result = await mediator.Send(command);
         return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
     }
@@ -80,8 +83,9 @@ public static class TransactionsApi
     }
 
     private static async Task<Results<Created, ProblemHttpResult>> CreateRecurringTransactionAsync(
-        CreateRecurringTransactionCommand command, [FromServices] IMediator mediator)
+        CreateRecurringTransactionRequest request, [FromServices] IMediator mediator, [FromServices] IMapper mapper)
     {
+        var command = mapper.Map<CreateRecurringTransactionRequest, CreateRecurringTransactionCommand>(request);
         var result = await mediator.Send(command);
         return result.IsSuccess ? TypedResults.Created() : result.ToHttpProblem();
     }

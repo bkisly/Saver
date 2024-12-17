@@ -541,8 +541,7 @@ namespace Saver.FinanceService.Infrastructure.Migrations
                                 .HasColumnType("character varying(256)");
 
                             b1.Property<decimal>("Value")
-                                .HasPrecision(2)
-                                .HasColumnType("numeric(2)");
+                                .HasColumnType("numeric");
 
                             b1.HasKey("RecurringTransactionDefinitionId");
 
@@ -587,8 +586,7 @@ namespace Saver.FinanceService.Infrastructure.Migrations
                                 .HasColumnType("character varying(256)");
 
                             b1.Property<decimal>("Value")
-                                .HasPrecision(2)
-                                .HasColumnType("numeric(2)");
+                                .HasColumnType("numeric");
 
                             b1.HasKey("TransactionId");
 

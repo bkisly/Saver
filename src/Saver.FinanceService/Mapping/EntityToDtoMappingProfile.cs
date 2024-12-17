@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Saver.FinanceService.Contracts.Categories;
 using Saver.FinanceService.Domain.AccountHolderModel;
-using Saver.FinanceService.Dto;
 
 namespace Saver.FinanceService.Mapping;
 
