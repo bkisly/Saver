@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Saver.AccountIntegrationService.BankServiceProviders;
 using Saver.AccountIntegrationService.Data;
 using Saver.ServiceDefaults;
 
@@ -16,6 +17,8 @@ public static class AccountIntegrationServiceApplicationExtensions
         });
 
         builder.EnrichNpgsqlDbContext<AccountIntegrationDbContext>();
+
+        builder.Services.AddSingleton<IBankServiceProvidersRegistry, BankServiceProvidersRegistry>();
 
         return builder;
     }

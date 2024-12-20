@@ -1,9 +1,11 @@
-﻿@using Saver.AccountIntegrationService.Contracts
+﻿@using System.Web
+@using Saver.AccountIntegrationService.Contracts
 @using Saver.FinanceService.Contracts.BankAccounts
 @inherits ModalFormComponentBase
 
 @inject IBankServiceProvidersApiClient BankServiceProvidersApiClient
 @inject IBankAccountsApiClient BankAccountApiClient
+@inject NavigationManager NavigationManager
 
 <div class="modal fade" id="@FormName" tabindex="-1" aria-labelledby="@FormName-title" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
@@ -46,13 +48,14 @@
 
     public const string FormName = "new-external-bank-account-form";
 
-    private NewExternalBankAccountViewModel Model { get; set; } = new();
+    private NewExternalBankAccountViewModel Model { get; set; } = null!;
     private EditContext? _editContext;
     private ValidationMessageStore? _messageStore;
     private IEnumerable<BankServiceProviderDto>? _supportedBankServiceProviders;
 
     protected override void OnInitialized()
     {
+        Model = new NewExternalBankAccountViewModel();
         _editContext = new EditContext(Model);
         _editContext.OnValidationRequested += (_, _) => _messageStore?.Clear();
         _messageStore = new ValidationMessageStore(_editContext);
@@ -65,6 +68,13 @@
 
     private async Task SaveAsync()
     {
+        var oauthUrl = (await BankServiceProvidersApiClient.GetOAuthLoginUrlAsync(Model.ProviderId, HttpUtility.UrlEncode("nativexo://paypalpay"))).Content;
+        if (oauthUrl is null)
+        {
+            return;
+        }
+
+        NavigationManager.NavigateTo(oauthUrl.Url);
         await HideModalAsync(FormName);
     }
 }

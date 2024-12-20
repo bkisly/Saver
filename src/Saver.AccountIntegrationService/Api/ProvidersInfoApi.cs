@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Saver.AccountIntegrationService.BankServiceProviders;
 using Saver.AccountIntegrationService.Contracts;
-using Saver.Common.DDD;
 
 namespace Saver.AccountIntegrationService.Api;
 
@@ -9,16 +9,28 @@ public static class ProvidersInfoApi
 {
     public static IEndpointRouteBuilder MapProvidersInfoApi(this IEndpointRouteBuilder builder)
     {
-        builder.MapGet("/api/account-integration/providers", GetSupportedBankServiceProviders);
+        var api = builder.MapGroup("/api/account-integration/providers");
+
+        api.MapGet("/", GetSupportedBankServiceProviders);
+        api.MapGet("/oauth-url/{providerType}/{redirectUrl}", GetOAuthLoginUrlForProvider);
+
         return builder;
     }
 
-    private static Ok<IEnumerable<BankServiceProviderDto>> GetSupportedBankServiceProviders()
+    private static Ok<IEnumerable<BankServiceProviderDto>> GetSupportedBankServiceProviders(
+        [FromServices] IBankServiceProvidersRegistry providersRegistry)
     {
-        return TypedResults.Ok(Enumeration.GetAll<BankServiceProvider>().Select(x => new BankServiceProviderDto
+        return TypedResults.Ok(providersRegistry.GetAllProviders().Select(x => new BankServiceProviderDto
         {
-            Id = x.Id,
+            Id = (int)x.ProviderType,
             Name = x.Name
         }));
+    }
+
+    private static Ok<OAuthLoginUrl> GetOAuthLoginUrlForProvider(
+        BankServiceProviderType providerType, string redirectUrl, [FromServices] IBankServiceProvidersRegistry providersRegistry)
+    {
+        var url = providersRegistry.GetByProviderType(providerType).GetOAuthUrl(redirectUrl);
+        return TypedResults.Ok(new OAuthLoginUrl { Url = url});
     }
 }
