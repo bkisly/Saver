@@ -34,6 +34,7 @@ public static class ClientApplicationServicesExtensions
 
         services.AddIdentityServiceClients();
         services.AddFinanceServiceClients();
+        services.AddAccountIntegrationServiceClients();
 
         return builder;
     }
