@@ -68,7 +68,7 @@
 
     private async Task SaveAsync()
     {
-        var oauthUrl = (await BankServiceProvidersApiClient.GetOAuthLoginUrlAsync(Model.ProviderId, HttpUtility.UrlEncode("nativexo://paypalpay"))).Content;
+        var oauthUrl = (await BankServiceProvidersApiClient.GetOAuthLoginUrlAsync(Model.ProviderId, HttpUtility.UrlEncode("https://127.0.0.1:7142/finalizeintegration"))).Content;
         if (oauthUrl is null)
         {
             return;

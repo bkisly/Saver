@@ -57,7 +57,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.AccountIntegrationSer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.AccountIntegrationService.Tests", "test\Saver.AccountIntegrationService.Tests\Saver.AccountIntegrationService.Tests.csproj", "{8B18C3DC-A18D-4191-9B02-EF43B2535994}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saver.AccountIntegrationService.Contracts", "src\Saver.AccountIntegrationService.Contracts\Saver.AccountIntegrationService.Contracts.csproj", "{3BC2F37B-9EAD-4763-8CCB-1AA04B06C984}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.AccountIntegrationService.Contracts", "src\Saver.AccountIntegrationService.Contracts\Saver.AccountIntegrationService.Contracts.csproj", "{3BC2F37B-9EAD-4763-8CCB-1AA04B06C984}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
