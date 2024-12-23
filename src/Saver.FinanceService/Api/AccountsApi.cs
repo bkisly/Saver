@@ -20,6 +20,7 @@ public static class AccountsApi
         api.MapPut("/default/{id:guid}", SetAccountAsDefaultAsync);
         api.MapPost("/manual", CreateManualAccountAsync);
         api.MapPut("/manual", EditManualAccountAsync);
+        api.MapPost("/external", CreateExternalAccountAsync);
         api.MapDelete("/{id:guid}", DeleteAccountAsync);
 
         api.RequireAuthorization();
@@ -68,6 +69,14 @@ public static class AccountsApi
         var command = mapper.Map<EditManualBankAccountRequest, EditManualBankAccountCommand>(request);
         var result = await mediator.Send(command);
         return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
+    }
+
+    private static async Task<Results<Created, ProblemHttpResult>> CreateExternalAccountAsync(
+        CreateExternalBankAccountRequest request, [FromServices] IMediator mediator, [FromServices] IMapper mapper)
+    {
+        var command = mapper.Map<CreateExternalBankAccountRequest, CreateExternalBankAccountCommand>(request);
+        var result = await mediator.Send(command);
+        return result.IsSuccess ? TypedResults.Created() : result.ToHttpProblem();
     }
 
     private static async Task<Results<NoContent, ProblemHttpResult>> DeleteAccountAsync(

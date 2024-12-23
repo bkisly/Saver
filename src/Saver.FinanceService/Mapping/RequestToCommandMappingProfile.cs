@@ -12,6 +12,7 @@ public class RequestToCommandMappingProfile : Profile
     {
         CreateMap<CreateManualBankAccountRequest, CreateManualBankAccountCommand>();
         CreateMap<EditManualBankAccountRequest, EditManualBankAccountCommand>();
+        CreateMap<CreateExternalBankAccountRequest, CreateExternalBankAccountCommand>();
 
         CreateMap<CreateCategoryRequest, CreateCategoryCommand>();
         CreateMap<EditCategoryRequest, EditCategoryCommand>();

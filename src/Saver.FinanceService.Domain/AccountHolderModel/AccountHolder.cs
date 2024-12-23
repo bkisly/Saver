@@ -27,8 +27,10 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
     public ManualBankAccount CreateManualAccount(string name, Currency currency, decimal initialBalance)
     {
         if (_accounts.Any(x => x.Name == name))
-            throw new FinanceDomainException($"An account with name: {name} already exists.", 
+        {
+            throw new FinanceDomainException($"An account with name: {name} already exists.",
                 FinanceDomainErrorCode.NameConflict);
+        }
 
         var account = new ManualBankAccount(name, currency, initialBalance, Id);
         _accounts.Add(account);
@@ -45,6 +47,20 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
                 FinanceDomainErrorCode.NameConflict);
 
         account.EditAccount(newName, newCurrency, exchangeRate);
+    }
+
+    public ExternalBankAccount CreateExternalBankAccount(string name, Currency currency, int providerId)
+    {
+        if (_accounts.Any(x => x.Name == name))
+        {
+            throw new FinanceDomainException($"An account with name: {name} already exists.",
+                FinanceDomainErrorCode.NameConflict);
+        }
+
+        var account = new ExternalBankAccount(name, currency, Id, providerId);
+        _accounts.Add(account);
+        DefaultAccount ??= new DefaultBankAccount(Id, account);
+        return account;
     }
 
     public void SetDefaultAccount(Guid accountId)
