@@ -1,10 +1,17 @@
-﻿namespace Saver.AccountIntegrationService.BankServiceProviders;
+﻿using Saver.AccountIntegrationService.BankServiceProviders.PayPal;
+using Saver.AccountIntegrationService.Data;
+using Saver.AccountIntegrationService.Services;
 
-public class BankServiceProvidersRegistry(IConfiguration configuration) : IBankServiceProvidersRegistry
+namespace Saver.AccountIntegrationService.BankServiceProviders;
+
+public class BankServiceProvidersRegistry(
+    IProviderConfiguration providerConfiguration, 
+    AccountIntegrationDbContext context, 
+    IUserInfoService userInfoService) : IBankServiceProvidersRegistry
 {
     private readonly Dictionary<BankServiceProviderType, IBankServiceProvider> _registry = new()
     {
-        [BankServiceProviderType.PayPal] = new PayPalBankServiceProvider(configuration)
+        [BankServiceProviderType.PayPal] = new PayPalBankServiceProvider(providerConfiguration, context, userInfoService)
     };
 
     public IBankServiceProvider this[BankServiceProviderType providerType] => _registry[providerType];

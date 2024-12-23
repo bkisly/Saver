@@ -12,6 +12,12 @@ var app = builder.Build();
 app.MapDefaultEndpoints();
 
 app.MapGet("/", () => "Hello World!");
-app.MapProvidersInfoApi();
+app.MapProvidersInfoApi()
+    .MapIntegrationsApi();
+
+if (app.Environment.IsDevelopment())
+{
+    app.ApplyMigrations();
+}
 
 app.Run();
