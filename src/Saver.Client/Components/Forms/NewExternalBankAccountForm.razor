@@ -1,11 +1,15 @@
 ﻿@using System.Web
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using Saver.AccountIntegrationService.Contracts
+@using Saver.Client.Infrastructure
 @using Saver.FinanceService.Contracts.BankAccounts
+
 @inherits ModalFormComponentBase
 
 @inject IBankServiceProvidersApiClient BankServiceProvidersApiClient
 @inject IBankAccountsApiClient BankAccountApiClient
 @inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage SessionStorage
 
 <div class="modal fade" id="@FormName" tabindex="-1" aria-labelledby="@FormName-title" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
@@ -74,6 +78,7 @@
             return;
         }
 
+        await SessionStorage.SetAsync(SessionDataKeys.ExternalBankAccountFormData, Model);
         NavigationManager.NavigateTo(oauthUrl.Url);
         await HideModalAsync(FormName);
     }

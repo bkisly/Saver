@@ -1,0 +1,22 @@
+﻿@page "/finalizeintegration"
+
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Saver.Client.Infrastructure
+
+@inject ProtectedSessionStorage SessionStorage
+@inject NavigationManager NavigationManager
+
+@code {
+    [Parameter, SupplyParameterFromQuery] public string Code { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await SessionStorage.GetAsync<NewExternalBankAccountViewModel>(SessionDataKeys.ExternalBankAccountFormData) is { Success: true } value)
+        {
+            // @TODO: process finalization
+        }
+
+        NavigationManager.NavigateTo("/accounts");
+    }
+
+}
