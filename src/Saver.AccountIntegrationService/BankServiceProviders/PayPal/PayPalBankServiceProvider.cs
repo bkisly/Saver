@@ -2,6 +2,7 @@
 using System.Web;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using Saver.AccountIntegrationService.BankServiceProviders.PayPal.Transactions;
 using Saver.AccountIntegrationService.Data;
 using Saver.AccountIntegrationService.Models;
 using Saver.AccountIntegrationService.Services;
@@ -16,7 +17,7 @@ public class PayPalBankServiceProvider : IBankServiceProvider
 
     private readonly HttpClient _httpClient;
     private readonly AccountIntegrationDbContext _context;
-    private IUserInfoService _userInfoService;
+    private readonly IUserInfoService _userInfoService;
 
     private static readonly JsonSerializerOptions ResponseSerializerOptions = new()
     {
@@ -56,7 +57,8 @@ public class PayPalBankServiceProvider : IBankServiceProvider
 
     public async Task IntegrateAccountAsync(Guid accountId, string authorizationCode)
     {
-        if (_userInfoService.GetUserId() is not { } userId)
+        if (_userInfoService.GetUserId() is not { } userId || 
+            _context.AccountIntegrations.SingleOrDefault(x => x.AccountId == accountId) is not null)
         {
             return;
         }
@@ -65,9 +67,7 @@ public class PayPalBankServiceProvider : IBankServiceProvider
         // 1. Authenticate against api and save tokens - done
         // 2. Fetch account information (existing transactions)
         // 3. Register webhooks for new incoming transactions
-        var authResponse = await GetAuthorizationData(accountId, authorizationCode);
-
-        if (authResponse is null)
+        if (await GetAuthorizationData(authorizationCode) is not { } authResponse)
         {
             return;
         }
@@ -83,9 +83,16 @@ public class PayPalBankServiceProvider : IBankServiceProvider
         });
 
         await _context.SaveChangesAsync();
+
+        if (await GetAccessTokenAsync(accountId) is not { } accessToken)
+        {
+            return;
+        }
+
+        var transactions = GetTransactions(accessToken);
     }
 
-    private async Task<PayPalOAuthResponse?> GetAuthorizationData(Guid accountId, string authCode)
+    private async Task<PayPalOAuthResponse?> GetAuthorizationData(string authCode)
     {
         var formDictionary = new Dictionary<string, string>
         {
@@ -112,5 +119,99 @@ public class PayPalBankServiceProvider : IBankServiceProvider
     {
         var bytes = Encoding.UTF8.GetBytes(str);
         return Convert.ToBase64String(bytes);
+    }
+
+    private async Task<string?> GetAccessTokenAsync(Guid accountId)
+    {
+        var integrationRecord = _context.AccountIntegrations.SingleOrDefault(x => x.AccountId == accountId);
+        if (integrationRecord is null)
+        {
+            return null;
+        }
+
+        if (integrationRecord.ExpiresIn >= DateTimeOffset.UtcNow.AddMinutes(10))
+        {
+            return integrationRecord.AccessToken;
+        }
+
+        var formDictionary = new Dictionary<string, string>
+        {
+            ["grant_type"] = "refresh_token",
+            ["refresh_token"] = integrationRecord.RefreshToken
+        };
+
+        var form = new FormUrlEncodedContent(formDictionary);
+        var request = new HttpRequestMessage(HttpMethod.Post, "v1/oauth2/token")
+        {
+            Headers =
+            {
+                Authorization = new AuthenticationHeaderValue("Basic", ConvertStringToBase64($"{_clientId}:{_clientSecret}"))
+            },
+            Content = form,
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var oauthResponse = await JsonSerializer.DeserializeAsync<PayPalOAuthResponse>(await response.Content.ReadAsStreamAsync(), ResponseSerializerOptions);
+
+        if (oauthResponse is null)
+        {
+            return null;
+        }
+
+        integrationRecord.AccessToken = oauthResponse.AccessToken;
+        integrationRecord.RefreshToken = oauthResponse.RefreshToken;
+        integrationRecord.ExpiresIn = DateTimeOffset.UtcNow.AddSeconds(oauthResponse.ExpiresIn);
+        await _context.SaveChangesAsync();
+
+        return integrationRecord.AccessToken;
+    }
+
+    private async Task<PayPalTransactionsListResponse> GetTransactions(string accessToken)
+    {
+        (DateTime FromDate, DateTime ToDate) datesRange = (DateTime.UtcNow.Subtract(TimeSpan.FromDays(31)), DateTime.UtcNow);
+        var fetchedItemsCount = int.MaxValue;
+
+        const string requestUrlBase = "v1/reporting/transactions";
+        var transactions = new PayPalTransactionsListResponse();
+
+        do
+        {
+            var queryHelper = HttpUtility.ParseQueryString(string.Empty);
+            queryHelper["start_date"] = datesRange.FromDate.ToJsonString();
+            queryHelper["end_date"] = datesRange.ToDate.ToJsonString();
+
+            var currentPage = 1;
+            var totalPages = int.MaxValue;
+
+            do
+            {
+                queryHelper["page"] = currentPage.ToString();
+
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{requestUrlBase}?{queryHelper}");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                var apiResponse = await _httpClient.SendAsync(request);
+                apiResponse.EnsureSuccessStatusCode();
+                var contentStream = await apiResponse.Content.ReadAsStreamAsync();
+                var deserializedResponse = JsonSerializer.Deserialize<PayPalTransactionsListResponse>(contentStream, ResponseSerializerOptions);
+
+                if (deserializedResponse is null)
+                {
+                    continue;
+                }
+
+                fetchedItemsCount = deserializedResponse.TotalItems;
+                totalPages = deserializedResponse.TotalPages;
+
+                transactions.TransactionDetails.AddRange(deserializedResponse.TransactionDetails);
+                currentPage++;
+
+            } while (currentPage <= totalPages);
+
+            datesRange.FromDate = datesRange.FromDate.Subtract(TimeSpan.FromDays(31));
+            datesRange.ToDate = datesRange.ToDate.Subtract(TimeSpan.FromDays(31));
+        } while (fetchedItemsCount > 0 && datesRange.FromDate > DateTime.MinValue);
+
+        return transactions;
     }
 }
