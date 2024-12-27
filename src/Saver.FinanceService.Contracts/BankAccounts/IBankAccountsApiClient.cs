@@ -23,7 +23,7 @@ public interface IBankAccountsApiClient
     Task<HttpResponseMessage> EditManualBankAccountAsync([Body] EditManualBankAccountRequest request);
 
     [Post("/api/finance/accounts/external")]
-    Task<HttpResponseMessage> CreateExternalBankAccountAsync([Body] CreateExternalBankAccountRequest request);
+    Task<ApiResponse<BankAccountDto>> CreateExternalBankAccountAsync([Body] CreateExternalBankAccountRequest request);
 
     [Delete("/api/finance/accounts/{id}")]
     Task<HttpResponseMessage> DeleteBankAccountAsync(Guid id);

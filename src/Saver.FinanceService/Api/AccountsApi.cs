@@ -71,12 +71,12 @@ public static class AccountsApi
         return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
     }
 
-    private static async Task<Results<Created, ProblemHttpResult>> CreateExternalAccountAsync(
-        CreateExternalBankAccountRequest request, [FromServices] IMediator mediator, [FromServices] IMapper mapper)
+    private static async Task<Results<Created<BankAccountDto>, ProblemHttpResult>> CreateExternalAccountAsync(
+        HttpContext context, CreateExternalBankAccountRequest request, [FromServices] IMediator mediator, [FromServices] IMapper mapper)
     {
         var command = mapper.Map<CreateExternalBankAccountRequest, CreateExternalBankAccountCommand>(request);
         var result = await mediator.Send(command);
-        return result.IsSuccess ? TypedResults.Created() : result.ToHttpProblem();
+        return result.IsSuccess ? TypedResults.Created(context.Request.Path.Value, result.Value) : result.ToHttpProblem();
     }
 
     private static async Task<Results<NoContent, ProblemHttpResult>> DeleteAccountAsync(

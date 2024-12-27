@@ -1,32 +1,35 @@
 ﻿using MediatR;
 using Saver.Common.DDD;
+using Saver.FinanceService.Contracts.BankAccounts;
 using Saver.FinanceService.Domain.AccountHolderModel;
 using Saver.FinanceService.Domain.Exceptions;
 using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public class CreateExternalBankAccountCommand(string name, int providerId, string currencyCode) : IRequest<CommandResult>
+public class CreateExternalBankAccountCommand(string name, int providerId, string currencyCode) : IRequest<CommandResult<BankAccountDto>>
 {
     public string Name => name;
     public int ProviderId => providerId;
     public string CurrencyCode => currencyCode;
 }
 
-public class CreateExternalBankAccountCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork) : IRequestHandler<CreateExternalBankAccountCommand, CommandResult>
+public class CreateExternalBankAccountCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork) 
+    : IRequestHandler<CreateExternalBankAccountCommand, CommandResult<BankAccountDto>>
 {
-    public async Task<CommandResult> Handle(CreateExternalBankAccountCommand request, CancellationToken cancellationToken)
+    public async Task<CommandResult<BankAccountDto>> Handle(CreateExternalBankAccountCommand request, CancellationToken cancellationToken)
     {
         if (await accountHolderService.GetCurrentAccountHolder() is not { } accountHolder)
         {
-            return CommandResult.Error(FinanceDomainErrorCode.NotFound);
+            return CommandResult<BankAccountDto>.Error(FinanceDomainErrorCode.NotFound);
         }
 
         var repository = accountHolderService.Repository;
+        ExternalBankAccount account;
 
         try
         {
-            accountHolder.CreateExternalBankAccount(
+            account = accountHolder.CreateExternalBankAccount(
                 request.Name, 
                 Enumeration.FromName<Currency>(request.CurrencyCode),
                 request.ProviderId);
@@ -34,11 +37,27 @@ public class CreateExternalBankAccountCommandHandler(IAccountHolderService accou
         }
         catch (FinanceDomainException ex)
         {
-            return CommandResult.Error(ex.ErrorCode);
+            return CommandResult<BankAccountDto>.Error(ex.ErrorCode);
         }
 
         repository.Update(accountHolder);
-        var result = await unitOfWork.SaveEntitiesAsync(cancellationToken);
-        return result ? CommandResult.Success() : CommandResult.Error("Unable to save changes.");
+
+        if (!await unitOfWork.SaveEntitiesAsync(cancellationToken))
+        {
+            return CommandResult<BankAccountDto>.Error("Unable to save entities.");
+        }
+
+        var dto = new BankAccountDto
+        {
+            Balance = account.Balance,
+            CurrencyCode = account.Currency.Name,
+            Description = null,
+            Id = account.Id,
+            IsDefault = accountHolder.DefaultAccount?.BankAccount == account,
+            IsExternal = true,
+            Name = account.Name
+        };
+
+        return CommandResult<BankAccountDto>.Success(dto);
     }
 }

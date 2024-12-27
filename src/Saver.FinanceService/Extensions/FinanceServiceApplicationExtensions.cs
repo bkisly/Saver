@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Saver.AccountIntegrationService.IntegrationEvents;
 using Saver.Common.DDD;
 using Saver.EventBus.IntegrationEventLog;
 using Saver.EventBus.RabbitMQ;
@@ -50,6 +51,7 @@ public static class FinanceServiceApplicationExtensions
         builder.AddRabbitMQEventBus(ServicesNames.RabbitMQ)
             .AddSubscription<UserRegisteredIntegrationEvent, UserRegisteredIntegrationEventHandler>()
             .AddSubscription<UserDeletedIntegrationEvent, UserDeletedIntegrationEventHandler>()
+            .AddSubscription<AccountIntegratedIntegrationEvent, AccountIntegratedIntegrationEventHandler>()
             .WithIntegrationEventLogs<FinanceDbContext>(new FinanceServiceIntegrationEventsAssemblyProvider());
 
         services.AddScoped<IAccountHolderRepository, AccountHolderRepository>();

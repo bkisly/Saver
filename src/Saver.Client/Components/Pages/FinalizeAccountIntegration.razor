@@ -10,6 +10,8 @@
 @inject IBankAccountsApiClient BankAccountsApiClient
 @inject IAccountIntegrationsApiClient AccountIntegrationsApiClient
 
+<p>Please wait...</p>
+
 @code {
     [Parameter, SupplyParameterFromQuery] public string Code { get; set; } = string.Empty;
 
@@ -17,19 +19,22 @@
     {
         if (await SessionStorage.GetAsync<NewExternalBankAccountViewModel>(SessionDataKeys.ExternalBankAccountFormData) is { Success: true, Value: not null } value)
         {
-            await BankAccountsApiClient.CreateExternalBankAccountAsync(new CreateExternalBankAccountRequest
+            var accountResponse = await BankAccountsApiClient.CreateExternalBankAccountAsync(new CreateExternalBankAccountRequest
             {
                 Name = value.Value.Name,
                 ProviderId = value.Value.ProviderId,
                 CurrencyCode = "EUR"
             });
 
-            await AccountIntegrationsApiClient.CreateAccountIntegrationAsync(new CreateAccountIntegrationRequest
+            if (accountResponse is { IsSuccessStatusCode: true, Content: not null })
             {
-                AccountId = Guid.NewGuid(),
-                ProviderId = value.Value.ProviderId,
-                AuthorizationCode = Code
-            });
+                await AccountIntegrationsApiClient.CreateAccountIntegrationAsync(new CreateAccountIntegrationRequest
+                {
+                    AccountId = accountResponse.Content.Id,
+                    ProviderId = value.Value.ProviderId,
+                    AuthorizationCode = Code
+                });
+            }
         }
 
 

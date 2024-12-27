@@ -117,6 +117,7 @@ public class PayPalBankServiceProvider : IBankServiceProvider
             }
 
             var evt = new AccountIntegratedIntegrationEvent(
+                userId,
                 accountId,
                 primaryBalance.Currency,
                 primaryBalance.AvailableBalance.Value,

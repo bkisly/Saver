@@ -9,7 +9,7 @@ public record CommandResult
     public FinanceDomainErrorCode? DomainErrorCode { get; init; }
     public string? Message { get; init; }
 
-    private CommandResult() { }
+    protected CommandResult() { }
 
     public static CommandResult Success() => new();
 
@@ -34,4 +34,16 @@ public record CommandResult
             _ => TypedResults.Problem(Message, statusCode: StatusCodes.Status500InternalServerError)
         };
     }
+}
+
+public record CommandResult<T> : CommandResult
+{
+    public T? Value { get; init; }
+
+    public static CommandResult<T> Success(T value) => new() { Value = value };
+
+    public new static CommandResult<T> Error(FinanceDomainErrorCode? errorCode = null, string message = "") =>
+        new() { DomainErrorCode = errorCode, Message = message };
+
+    public new static CommandResult<T> Error(string message) => new() { Message = message };
 }
