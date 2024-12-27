@@ -1,4 +1,4 @@
-﻿namespace System.Text.Json;
+﻿namespace Saver.AccountIntegrationService.Extensions;
 
 public static class DateTimeExtensions
 {

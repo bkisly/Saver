@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Saver.AccountIntegrationService.BankServiceProviders;
 using Saver.AccountIntegrationService.Data;
+using Saver.AccountIntegrationService.IntegrationEvents;
 using Saver.AccountIntegrationService.Services;
+using Saver.EventBus.IntegrationEventLog;
+using Saver.EventBus.RabbitMQ;
 using Saver.ServiceDefaults;
 
 namespace Saver.AccountIntegrationService.Extensions;
@@ -22,6 +25,9 @@ public static class AccountIntegrationServiceApplicationExtensions
         builder.EnrichNpgsqlDbContext<AccountIntegrationDbContext>();
 
         services.AddHttpContextAccessor();
+
+        builder.AddRabbitMQEventBus(ServicesNames.RabbitMQ)
+            .WithIntegrationEventLogs<AccountIntegrationDbContext>(new AccountIntegrationServiceIntegrationEventsAssemblyProvider());
 
         services.AddScoped<IBankServiceProvidersRegistry, BankServiceProvidersRegistry>();
         services.AddScoped<IProviderConfiguration, ProviderConfiguration>();

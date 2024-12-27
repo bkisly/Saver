@@ -59,6 +59,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.AccountIntegrationSer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Saver.AccountIntegrationService.Contracts", "src\Saver.AccountIntegrationService.Contracts\Saver.AccountIntegrationService.Contracts.csproj", "{3BC2F37B-9EAD-4763-8CCB-1AA04B06C984}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saver.AccountIntegrationService.IntegrationEvents", "src\Saver.AccountIntegrationService.IntegrationEvents\Saver.AccountIntegrationService.IntegrationEvents.csproj", "{E5A07E76-3F53-4679-BC42-D47E598B6D39}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -157,6 +159,10 @@ Global
 		{3BC2F37B-9EAD-4763-8CCB-1AA04B06C984}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BC2F37B-9EAD-4763-8CCB-1AA04B06C984}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BC2F37B-9EAD-4763-8CCB-1AA04B06C984}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5A07E76-3F53-4679-BC42-D47E598B6D39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5A07E76-3F53-4679-BC42-D47E598B6D39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5A07E76-3F53-4679-BC42-D47E598B6D39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5A07E76-3F53-4679-BC42-D47E598B6D39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -179,6 +185,7 @@ Global
 		{5BD19E68-35BC-4054-87FC-F7EFC49A1D91} = {57C92852-2A3F-4259-BE0B-E663C5A75399}
 		{8B18C3DC-A18D-4191-9B02-EF43B2535994} = {57C92852-2A3F-4259-BE0B-E663C5A75399}
 		{3BC2F37B-9EAD-4763-8CCB-1AA04B06C984} = {57C92852-2A3F-4259-BE0B-E663C5A75399}
+		{E5A07E76-3F53-4679-BC42-D47E598B6D39} = {57C92852-2A3F-4259-BE0B-E663C5A75399}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F7A33F48-0641-40F7-B71B-249707021A45}

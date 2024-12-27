@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Saver.AccountIntegrationService.Contracts\Saver.AccountIntegrationService.Contracts.csproj" />
+    <ProjectReference Include="..\Saver.AccountIntegrationService.IntegrationEvents\Saver.AccountIntegrationService.IntegrationEvents.csproj" />
     <ProjectReference Include="..\Saver.Common\Saver.Common.csproj" />
     <ProjectReference Include="..\Saver.ServiceDefaults\Saver.ServiceDefaults.csproj" />
   </ItemGroup>

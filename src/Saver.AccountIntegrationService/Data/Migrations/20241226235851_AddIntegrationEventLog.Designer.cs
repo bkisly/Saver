@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Saver.AccountIntegrationService.Data;
@@ -11,9 +12,11 @@ using Saver.AccountIntegrationService.Data;
 namespace Saver.AccountIntegrationService.Data.Migrations
 {
     [DbContext(typeof(AccountIntegrationDbContext))]
-    partial class AccountIntegrationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241226235851_AddIntegrationEventLog")]
+    partial class AddIntegrationEventLog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
