@@ -2,8 +2,8 @@
 
 public interface IBankService
 {
+    BankServiceConfiguration Configuration { get; }
     BankServiceType BankServiceType { get; }
-    string Name { get; }
     string GetOAuthUrl(string redirectUrl);
     Task IntegrateAccountAsync(Guid accountId, string authorizationCode);
     Task ImportTransactionsAsync(Guid integrationId, DateTime? startingDate);

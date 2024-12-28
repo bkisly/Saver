@@ -19,10 +19,10 @@ public static class IntegrationsApi
     }
 
     private static async Task<NoContent> CreateIntegrationAsync(
-        CreateAccountIntegrationRequest request, [FromServices] IBankServicesRegistry registry)
+        CreateAccountIntegrationRequest request, [FromServices] IBankServicesResolver resolver)
     {
-        var provider = registry.GetByBankServiceType(Enumeration.FromId<BankServiceType>(request.ProviderId));
-        await provider.IntegrateAccountAsync(request.AccountId, request.AuthorizationCode);
+        var bankService = resolver.GetByBankServiceType(Enumeration.FromId<BankServiceType>(request.ProviderId));
+        await bankService.IntegrateAccountAsync(request.AccountId, request.AuthorizationCode);
         return TypedResults.NoContent();
     }
 }

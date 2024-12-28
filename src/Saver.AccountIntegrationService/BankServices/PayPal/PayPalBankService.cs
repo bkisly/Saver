@@ -7,6 +7,7 @@ using Saver.AccountIntegrationService.BankServices.PayPal.Converters;
 using Saver.AccountIntegrationService.Data;
 using Saver.AccountIntegrationService.Extensions;
 using Saver.AccountIntegrationService.IntegrationEvents;
+using Saver.AccountIntegrationService.Jobs;
 using Saver.AccountIntegrationService.Models;
 using Saver.AccountIntegrationService.Services;
 using Saver.EventBus;
@@ -16,14 +17,12 @@ namespace Saver.AccountIntegrationService.BankServices.PayPal;
 
 public class PayPalBankService : IBankService
 {
-    private readonly string _clientId;
-    private readonly string _clientSecret;
-    private readonly string _oauthLoginBaseUrl;
-
     private readonly HttpClient _httpClient;
     private readonly AccountIntegrationDbContext _context;
+    private readonly IConfiguration _configuration;
     private readonly IUserInfoService _userInfoService;
     private readonly IIntegrationEventService<AccountIntegrationDbContext> _integrationEventService;
+    private readonly ITransactionsImportJobService _transactionsImportJobService;
 
     private static readonly JsonSerializerOptions ResponseSerializerOptions = new()
     {
@@ -36,25 +35,25 @@ public class PayPalBankService : IBankService
         }
     };
 
+    public BankServiceConfiguration Configuration => new(BankServiceType, _configuration);
     public BankServiceType BankServiceType => BankServiceType.PayPal;
-    public string Name => "PayPal";
 
     public PayPalBankService(
-        IProviderConfiguration configuration, 
+        IConfiguration configuration, 
         AccountIntegrationDbContext context, 
         IUserInfoService userInfoService, 
-        IIntegrationEventService<AccountIntegrationDbContext> integrationEventService)
+        IIntegrationEventService<AccountIntegrationDbContext> integrationEventService,
+        ITransactionsImportJobService transactionsImportJobService)
     {
-        _clientId = configuration.GetClientId(BankServiceType);
-        _clientSecret = configuration.GetClientSecret(BankServiceType);
-        _oauthLoginBaseUrl = configuration.GetBaseOAuthLoginUrl(BankServiceType);
         _context = context;
         _userInfoService = userInfoService;
         _integrationEventService = integrationEventService;
+        _configuration = configuration;
+        _transactionsImportJobService = transactionsImportJobService;
 
         _httpClient = new HttpClient
         {
-            BaseAddress = new Uri(configuration.GetApiUrl(BankServiceType))
+            BaseAddress = new Uri(Configuration.ApiBaseUrl)
         };
     }
 
@@ -62,9 +61,9 @@ public class PayPalBankService : IBankService
     {
         var urlBuilder = new StringBuilder();
 
-        urlBuilder.Append(_oauthLoginBaseUrl);
+        urlBuilder.Append(Configuration.OAuthBaseUrl);
         urlBuilder.Append("signin/authorize?flowEntry=static");
-        urlBuilder.Append($"&client_id={_clientId}");
+        urlBuilder.Append($"&client_id={Configuration.ClientId}");
         urlBuilder.Append($"&scope={HttpUtility.UrlEncode("openid https://uri.paypal.com/services/paypalattributes")}");
         urlBuilder.Append($"&redirect_uri={redirectUrl}");
 
@@ -91,7 +90,7 @@ public class PayPalBankService : IBankService
                 return;
             }
 
-            _context.AccountIntegrations.Add(new AccountIntegration
+            var accountIntegration = _context.AccountIntegrations.Add(new AccountIntegration
             {
                 UserId = userId,
                 BankServiceType = BankServiceType,
@@ -99,7 +98,7 @@ public class PayPalBankService : IBankService
                 RefreshToken = authResponse.RefreshToken,
                 ExpiresIn = DateTimeOffset.UtcNow.AddSeconds(authResponse.ExpiresIn),
                 AccountId = accountId
-            });
+            }).Entity;
 
             await _context.SaveChangesAsync();
 
@@ -133,12 +132,16 @@ public class PayPalBankService : IBankService
             {
                 await _integrationEventService.PublishEventsThroughEventBusAsync(_context.Database.CurrentTransaction.TransactionId);
             }
+
+            await _transactionsImportJobService.RegisterJobAsync(accountIntegration, Configuration.TransactionsImportInterval);
         });
     }
 
-    public Task ImportTransactionsAsync(Guid integrationId, DateTime? startingDate)
+    public async Task ImportTransactionsAsync(Guid integrationId, DateTime? startingDate)
     {
-        throw new NotImplementedException();
+        startingDate ??= DateTime.UnixEpoch;
+
+
     }
 
     private async Task<PayPalOAuthTokens?> GetAuthorizationData(string authCode)
@@ -154,7 +157,7 @@ public class PayPalBankService : IBankService
         {
             Headers =
             {
-                Authorization = new AuthenticationHeaderValue("Basic", ConvertStringToBase64($"{_clientId}:{_clientSecret}"))
+                Authorization = new AuthenticationHeaderValue("Basic", ConvertStringToBase64($"{Configuration.ClientId}:{Configuration.ClientSecret}"))
             },
             Content = form,
         };
@@ -194,7 +197,7 @@ public class PayPalBankService : IBankService
         {
             Headers =
             {
-                Authorization = new AuthenticationHeaderValue("Basic", ConvertStringToBase64($"{_clientId}:{_clientSecret}"))
+                Authorization = new AuthenticationHeaderValue("Basic", ConvertStringToBase64($"{Configuration.ClientId}:{Configuration.ClientSecret}"))
             },
             Content = form,
         };

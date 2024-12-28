@@ -1,9 +1,7 @@
 ﻿namespace Saver.AccountIntegrationService.BankServices;
 
-public interface IBankServicesRegistry
+public interface IBankServicesResolver
 {
-    IBankService this[BankServiceType bankServiceType] { get; }
-
     IEnumerable<IBankService> GetAllBankServices();
     IBankService GetByBankServiceType(BankServiceType bankServiceType);
 }

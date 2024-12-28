@@ -19,19 +19,19 @@ public static class BankServicesInfoApi
     }
 
     private static Ok<IEnumerable<BankServiceDto>> GetSupportedBankServices(
-        [FromServices] IBankServicesRegistry bankServicesRegistry)
+        [FromServices] IBankServicesResolver bankServicesResolver)
     {
-        return TypedResults.Ok(bankServicesRegistry.GetAllBankServices().Select(x => new BankServiceDto
+        return TypedResults.Ok(bankServicesResolver.GetAllBankServices().Select(x => new BankServiceDto
         {
             Id = x.BankServiceType.Id,
-            Name = x.Name
+            Name = x.BankServiceType.Name
         }));
     }
 
     private static Ok<OAuthLoginUrl> GetOAuthLoginUrlForBankService(
-        int bankServiceTypeId, string redirectUrl, [FromServices] IBankServicesRegistry bankServicesRegistry)
+        int bankServiceTypeId, string redirectUrl, [FromServices] IBankServicesResolver bankServicesResolver)
     {
-        var bankService = bankServicesRegistry.GetByBankServiceType(Enumeration.FromId<BankServiceType>(bankServiceTypeId));
+        var bankService = bankServicesResolver.GetByBankServiceType(Enumeration.FromId<BankServiceType>(bankServiceTypeId));
         var url = bankService.GetOAuthUrl(redirectUrl);
         return TypedResults.Ok(new OAuthLoginUrl { Url = url });
     }

@@ -1,12 +1,11 @@
 ﻿using Quartz;
-using Saver.AccountIntegrationService.BankServices;
 using Saver.AccountIntegrationService.Models;
 
 namespace Saver.AccountIntegrationService.Jobs;
 
-public class TransactionImportJobService(ISchedulerFactory schedulerFactory, IProviderConfiguration providerConfiguration) : ITransactionImportJobService
+public class TransactionsImportJobService(ISchedulerFactory schedulerFactory) : ITransactionsImportJobService
 {
-    public async Task RegisterJobAsync(AccountIntegration integration)
+    public async Task RegisterJobAsync(AccountIntegration integration, int interval)
     {
         var scheduler = await schedulerFactory.GetScheduler();
         var integrationId = integration.Id;
@@ -21,7 +20,7 @@ public class TransactionImportJobService(ISchedulerFactory schedulerFactory, IPr
         var trigger = TriggerBuilder.Create()
             .WithIdentity($"transactionsImport-trigger-{integrationId}")
             .StartNow()
-            .WithSimpleSchedule(x => x.WithIntervalInSeconds(providerConfiguration.GetTransactionsImportInterval(bankServiceType)))
+            .WithSimpleSchedule(x => x.WithIntervalInMinutes(interval))
             .Build();
 
         await scheduler.ScheduleJob(job, trigger);

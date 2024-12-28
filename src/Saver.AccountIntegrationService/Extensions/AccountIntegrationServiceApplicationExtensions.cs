@@ -3,6 +3,7 @@ using Quartz;
 using Saver.AccountIntegrationService.BankServices;
 using Saver.AccountIntegrationService.Data;
 using Saver.AccountIntegrationService.IntegrationEvents;
+using Saver.AccountIntegrationService.Jobs;
 using Saver.AccountIntegrationService.Services;
 using Saver.EventBus.IntegrationEventLog;
 using Saver.EventBus.RabbitMQ;
@@ -41,9 +42,11 @@ public static class AccountIntegrationServiceApplicationExtensions
         builder.AddRabbitMQEventBus(ServicesNames.RabbitMQ)
             .WithIntegrationEventLogs<AccountIntegrationDbContext>(new AccountIntegrationServiceIntegrationEventsAssemblyProvider());
 
-        services.AddScoped<IBankServicesRegistry, BankServicesRegistry>();
-        services.AddScoped<IProviderConfiguration, ProviderConfiguration>();
+        services.AddSingleton<ITransactionsImportJobService, TransactionsImportJobService>();
+        services.AddScoped<IBankServicesResolver, BankServicesResolver>();
         services.AddTransient<IUserInfoService, UserInfoService>();
+
+        services.AddBankServices();
 
         return builder;
     }
