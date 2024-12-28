@@ -84,7 +84,7 @@ public class PayPalBankService : IBankService
             // 1. Authenticate against api and save tokens - done
             // 2. Fetch account information (existing transactions) - done
             // 3. Publish integration event that an account was integrated - done
-            // 4. Initialize a job to import transactions periodically
+            // 4. Initialize a job to import transactions periodically - done
             if (await GetAuthorizationData(authorizationCode) is not { } authResponse)
             {
                 return;
@@ -97,7 +97,8 @@ public class PayPalBankService : IBankService
                 AccessToken = authResponse.AccessToken,
                 RefreshToken = authResponse.RefreshToken,
                 ExpiresIn = DateTimeOffset.UtcNow.AddSeconds(authResponse.ExpiresIn),
-                AccountId = accountId
+                AccountId = accountId,
+                LastSynced = DateTime.UtcNow
             }).Entity;
 
             await _context.SaveChangesAsync();
@@ -137,11 +138,42 @@ public class PayPalBankService : IBankService
         });
     }
 
-    public async Task ImportTransactionsAsync(Guid integrationId, DateTime? startingDate)
+    public async Task ImportTransactionsAsync(Guid integrationId)
     {
-        startingDate ??= DateTime.UnixEpoch;
+        if (_context.AccountIntegrations.SingleOrDefault(x => x.Id == integrationId) is not { } integration)
+        {
+            return;
+        }
 
+        if (await GetAccessTokenAsync(integration.AccountId) is not { } accessToken)
+        {
+            return;
+        }
 
+        var transactions = await GetTransactionsAsync(accessToken, integration.LastSynced);
+
+        if (transactions.TransactionDetails.Count == 0)
+        {
+            return;
+        }
+
+        await ResilientTransaction.New(_context).ExecuteAsync(async () =>
+        {
+            var evt = new TransactionsImportedIntegrationEvent(
+                integration.AccountId,
+                integration.UserId,
+                transactions.TransactionDetails.Select(x => new TransactionInfo(
+                    x.TransactionInfo.TransactionSubject,
+                    x.TransactionInfo.TransactionAmount.Value,
+                    x.TransactionInfo.TransactionInitiationDate)));
+
+            await _integrationEventService.AddIntegrationEventAsync(evt);
+
+            if (_context.Database.CurrentTransaction is not null)
+            {
+                await _integrationEventService.PublishEventsThroughEventBusAsync(_context.Database.CurrentTransaction.TransactionId);
+            }
+        });
     }
 
     private async Task<PayPalOAuthTokens?> GetAuthorizationData(string authCode)
@@ -219,19 +251,20 @@ public class PayPalBankService : IBankService
         return integrationRecord.AccessToken;
     }
 
-    private async Task<PayPalTransactionsList> GetTransactionsAsync(string accessToken)
+    private async Task<PayPalTransactionsList> GetTransactionsAsync(string accessToken, DateTime? startingDate = null)
     {
-        var (fromDate, toDate) = (DateTime.UtcNow.Subtract(TimeSpan.FromDays(31)), DateTime.UtcNow);
-        var fetchedItemsCount = int.MaxValue;
+        var startDate = startingDate ?? DateTime.UtcNow.Subtract(TimeSpan.FromDays(90));
+        var endDate = startDate + TimeSpan.FromDays(31);
+        var dateLimit = DateTime.UtcNow;
 
-        const string requestUrlBase = "v1/reporting/transactions";
         var transactions = new PayPalTransactionsList();
 
-        do
+        while (startDate < dateLimit)
         {
             var queryHelper = HttpUtility.ParseQueryString(string.Empty);
-            queryHelper["start_date"] = fromDate.ToJsonString();
-            queryHelper["end_date"] = toDate.ToJsonString();
+            queryHelper["start_date"] = startDate.ToJsonString();
+            queryHelper["end_date"] = endDate.ToJsonString();
+            queryHelper["page_size"] = "500";
 
             var currentPage = 1;
             var totalPages = int.MaxValue;
@@ -240,10 +273,13 @@ public class PayPalBankService : IBankService
             {
                 queryHelper["page"] = currentPage.ToString();
 
-                var request = new HttpRequestMessage(HttpMethod.Get, $"{requestUrlBase}?{queryHelper}");
+                var request = new HttpRequestMessage(HttpMethod.Get, $"v1/reporting/transactions?{queryHelper}");
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
                 var apiResponse = await _httpClient.SendAsync(request);
-                apiResponse.EnsureSuccessStatusCode();
+                if (!apiResponse.IsSuccessStatusCode)
+                {
+                    break;
+                }
                 var contentStream = await apiResponse.Content.ReadAsStreamAsync();
                 var deserializedResponse = JsonSerializer.Deserialize<PayPalTransactionsList>(contentStream, ResponseSerializerOptions);
 
@@ -252,7 +288,6 @@ public class PayPalBankService : IBankService
                     continue;
                 }
 
-                fetchedItemsCount = deserializedResponse.TotalItems;
                 totalPages = deserializedResponse.TotalPages;
 
                 transactions.TransactionDetails.AddRange(deserializedResponse.TransactionDetails.Where(x => x.TransactionInfo.TransactionStatus == "S"));
@@ -260,9 +295,9 @@ public class PayPalBankService : IBankService
 
             } while (currentPage <= totalPages);
 
-            fromDate = fromDate.Subtract(TimeSpan.FromDays(31));
-            toDate = toDate.Subtract(TimeSpan.FromDays(31));
-        } while (fetchedItemsCount > 0 && fromDate > DateTime.MinValue);
+            startDate = startDate.AddDays(31);
+            endDate = endDate.AddDays(31);
+        }
 
         return transactions;
     }

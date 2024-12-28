@@ -27,7 +27,8 @@ public class TransactionDomainService(IAccountHolderRepository accountHolderRepo
         return transaction;
     }
 
-    public IEnumerable<Transaction> CreateTransactions(AccountHolder accountHolder, Guid accountId, IEnumerable<(TransactionData TransactionData, DateTime CreationDate)> transactions)
+    public IEnumerable<Transaction> CreateTransactions(AccountHolder accountHolder, Guid accountId, 
+        IEnumerable<(TransactionData TransactionData, DateTime CreationDate)> transactions, decimal? customBalance = null)
     {
         var createdTransactions = new List<Transaction>();
         var account = accountHolder.FindAccountById(accountId);
@@ -46,7 +47,7 @@ public class TransactionDomainService(IAccountHolderRepository accountHolderRepo
             createdTransactions.Add(transaction);
         }
 
-        account.UpdateBalance(account.Balance + createdTransactions.Sum(x => x.TransactionData.Value));
+        account.UpdateBalance(customBalance ?? account.Balance + createdTransactions.Sum(x => x.TransactionData.Value));
         accountHolderRepository.Update(accountHolder);
 
         return createdTransactions;

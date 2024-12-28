@@ -15,6 +15,6 @@ public class TransactionsImportJob(IBankServicesResolver resolver) : IJob
         var integrationId = Guid.Parse((string)context.JobDetail.JobDataMap[IntegrationIdJobDataKey]);
 
         var provider = resolver.GetByBankServiceType(providerType);
-        await provider.ImportTransactionsAsync(integrationId, context.PreviousFireTimeUtc?.UtcDateTime);
+        await provider.ImportTransactionsAsync(integrationId);
     }
 }

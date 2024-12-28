@@ -19,8 +19,11 @@ public class AccountIntegratedIntegrationEventHandler(
             return;
         }
 
-        transactionService.CreateTransactions(accountHolder, e.AccountId,
-            e.Transactions.Select(x => (new TransactionData(x.Name, null, x.Value, null), x.Date)));
+        transactionService.CreateTransactions(
+            accountHolder, 
+            e.AccountId,
+            e.Transactions.Select(x => (new TransactionData(x.Name, null, x.Value, null), x.Date)), 
+            e.AccountBalance);
 
         await unitOfWork.SaveEntitiesAsync();
     }

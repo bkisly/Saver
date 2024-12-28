@@ -52,6 +52,7 @@ public static class FinanceServiceApplicationExtensions
             .AddSubscription<UserRegisteredIntegrationEvent, UserRegisteredIntegrationEventHandler>()
             .AddSubscription<UserDeletedIntegrationEvent, UserDeletedIntegrationEventHandler>()
             .AddSubscription<AccountIntegratedIntegrationEvent, AccountIntegratedIntegrationEventHandler>()
+            .AddSubscription<TransactionsImportedIntegrationEvent, TransactionsImportedIntegrationEventHandler>()
             .WithIntegrationEventLogs<FinanceDbContext>(new FinanceServiceIntegrationEventsAssemblyProvider());
 
         services.AddScoped<IAccountHolderRepository, AccountHolderRepository>();
