@@ -6,4 +6,5 @@ public interface IProviderConfiguration
     string GetApiUrl(BankServiceProviderType providerType);
     string GetClientId(BankServiceProviderType providerType);
     string GetClientSecret(BankServiceProviderType providerType);
+    int GetTransactionsImportInterval(BankServiceProviderType providerType);
 }

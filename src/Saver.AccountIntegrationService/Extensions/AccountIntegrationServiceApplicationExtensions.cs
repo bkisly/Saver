@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Quartz;
 using Saver.AccountIntegrationService.BankServiceProviders;
 using Saver.AccountIntegrationService.Data;
 using Saver.AccountIntegrationService.IntegrationEvents;
@@ -23,6 +24,18 @@ public static class AccountIntegrationServiceApplicationExtensions
         });
 
         builder.EnrichNpgsqlDbContext<AccountIntegrationDbContext>();
+
+        services.AddQuartz(q =>
+        {
+            q.UsePersistentStore(options =>
+            {
+                options.UsePostgres(builder.Configuration.GetConnectionString(ServicesNames.AccountIntegrationServiceDatabase) 
+                                    ?? throw new NullReferenceException("DB connection string not found."));
+                options.PerformSchemaValidation = true;
+            });
+        });
+
+        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
         services.AddHttpContextAccessor();
 

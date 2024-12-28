@@ -24,6 +24,11 @@ public class ProviderConfiguration(IConfiguration configuration) : IProviderConf
         return GetProviderSection(providerType).GetRequiredValue<string>("ClientSecret");
     }
 
+    public int GetTransactionsImportInterval(BankServiceProviderType providerType)
+    {
+        return GetProviderSection(providerType).GetRequiredValue<int>("TransactionsImportInterval");
+    }
+
     private IConfigurationSection GetProviderSection(BankServiceProviderType providerType)
     {
         return configuration.GetRequiredSection(providerType.ToString());

@@ -85,7 +85,7 @@ public class PayPalBankServiceProvider : IBankServiceProvider
             // 1. Authenticate against api and save tokens - done
             // 2. Fetch account information (existing transactions) - done
             // 3. Publish integration event that an account was integrated - done
-            // 4. Register webhooks for new incoming transactions
+            // 4. Initialize a job to import transactions periodically
             if (await GetAuthorizationData(authorizationCode) is not { } authResponse)
             {
                 return;
@@ -134,6 +134,11 @@ public class PayPalBankServiceProvider : IBankServiceProvider
                 await _integrationEventService.PublishEventsThroughEventBusAsync(_context.Database.CurrentTransaction.TransactionId);
             }
         });
+    }
+
+    public Task ImportTransactionsAsync(Guid integrationId, DateTime? startingDate)
+    {
+        throw new NotImplementedException();
     }
 
     private async Task<PayPalOAuthTokens?> GetAuthorizationData(string authCode)
