@@ -2,8 +2,8 @@
 using System.Text;
 using System.Text.Json;
 using System.Web;
-using Saver.AccountIntegrationService.BankServiceProviders.PayPal.ApiResponses;
-using Saver.AccountIntegrationService.BankServiceProviders.PayPal.Converters;
+using Saver.AccountIntegrationService.BankServices.PayPal.ApiResponses;
+using Saver.AccountIntegrationService.BankServices.PayPal.Converters;
 using Saver.AccountIntegrationService.Data;
 using Saver.AccountIntegrationService.Extensions;
 using Saver.AccountIntegrationService.IntegrationEvents;
@@ -12,9 +12,9 @@ using Saver.AccountIntegrationService.Services;
 using Saver.EventBus;
 using Saver.EventBus.IntegrationEventLog.Utilities;
 
-namespace Saver.AccountIntegrationService.BankServiceProviders.PayPal;
+namespace Saver.AccountIntegrationService.BankServices.PayPal;
 
-public class PayPalBankServiceProvider : IBankServiceProvider
+public class PayPalBankService : IBankService
 {
     private readonly string _clientId;
     private readonly string _clientSecret;
@@ -36,25 +36,25 @@ public class PayPalBankServiceProvider : IBankServiceProvider
         }
     };
 
-    public BankServiceProviderType ProviderType => BankServiceProviderType.PayPal;
+    public BankServiceType BankServiceType => BankServiceType.PayPal;
     public string Name => "PayPal";
 
-    public PayPalBankServiceProvider(
+    public PayPalBankService(
         IProviderConfiguration configuration, 
         AccountIntegrationDbContext context, 
         IUserInfoService userInfoService, 
         IIntegrationEventService<AccountIntegrationDbContext> integrationEventService)
     {
-        _clientId = configuration.GetClientId(ProviderType);
-        _clientSecret = configuration.GetClientSecret(ProviderType);
-        _oauthLoginBaseUrl = configuration.GetBaseOAuthLoginUrl(ProviderType);
+        _clientId = configuration.GetClientId(BankServiceType);
+        _clientSecret = configuration.GetClientSecret(BankServiceType);
+        _oauthLoginBaseUrl = configuration.GetBaseOAuthLoginUrl(BankServiceType);
         _context = context;
         _userInfoService = userInfoService;
         _integrationEventService = integrationEventService;
 
         _httpClient = new HttpClient
         {
-            BaseAddress = new Uri(configuration.GetApiUrl(ProviderType))
+            BaseAddress = new Uri(configuration.GetApiUrl(BankServiceType))
         };
     }
 
@@ -94,7 +94,7 @@ public class PayPalBankServiceProvider : IBankServiceProvider
             _context.AccountIntegrations.Add(new AccountIntegration
             {
                 UserId = userId,
-                Provider = ProviderType,
+                BankServiceType = BankServiceType,
                 AccessToken = authResponse.AccessToken,
                 RefreshToken = authResponse.RefreshToken,
                 ExpiresIn = DateTimeOffset.UtcNow.AddSeconds(authResponse.ExpiresIn),

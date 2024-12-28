@@ -12,7 +12,7 @@ var app = builder.Build();
 app.MapDefaultEndpoints();
 
 app.MapGet("/", () => "Hello World!");
-app.MapProvidersInfoApi()
+app.MapBankServicesInfoApi()
     .MapIntegrationsApi();
 
 if (app.Environment.IsDevelopment())

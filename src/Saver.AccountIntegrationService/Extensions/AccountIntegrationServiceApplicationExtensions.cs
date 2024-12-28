@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Quartz;
-using Saver.AccountIntegrationService.BankServiceProviders;
+using Saver.AccountIntegrationService.BankServices;
 using Saver.AccountIntegrationService.Data;
 using Saver.AccountIntegrationService.IntegrationEvents;
 using Saver.AccountIntegrationService.Services;
@@ -29,8 +29,7 @@ public static class AccountIntegrationServiceApplicationExtensions
         {
             q.UsePersistentStore(options =>
             {
-                options.UsePostgres(builder.Configuration.GetConnectionString(ServicesNames.AccountIntegrationServiceDatabase) 
-                                    ?? throw new NullReferenceException("DB connection string not found."));
+                options.UsePostgres(opts => opts.ConnectionStringName = ServicesNames.AccountIntegrationServiceDatabase);
                 options.PerformSchemaValidation = true;
             });
         });
@@ -42,7 +41,7 @@ public static class AccountIntegrationServiceApplicationExtensions
         builder.AddRabbitMQEventBus(ServicesNames.RabbitMQ)
             .WithIntegrationEventLogs<AccountIntegrationDbContext>(new AccountIntegrationServiceIntegrationEventsAssemblyProvider());
 
-        services.AddScoped<IBankServiceProvidersRegistry, BankServiceProvidersRegistry>();
+        services.AddScoped<IBankServicesRegistry, BankServicesRegistry>();
         services.AddScoped<IProviderConfiguration, ProviderConfiguration>();
         services.AddTransient<IUserInfoService, UserInfoService>();
 

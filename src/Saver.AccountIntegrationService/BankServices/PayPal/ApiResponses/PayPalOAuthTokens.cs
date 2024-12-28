@@ -1,4 +1,4 @@
-﻿namespace Saver.AccountIntegrationService.BankServiceProviders.PayPal.ApiResponses;
+﻿namespace Saver.AccountIntegrationService.BankServices.PayPal.ApiResponses;
 
 public record PayPalOAuthTokens
 {

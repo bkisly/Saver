@@ -37,7 +37,7 @@ public static class RefitClientExtensions
 
     public static IServiceCollection AddAccountIntegrationServiceClients(this IServiceCollection services)
     {
-        services.AddApiClient<IBankServiceProvidersApiClient>(ServicesNames.AccountIntegrationService);
+        services.AddApiClient<IBankServicesApiClient>(ServicesNames.AccountIntegrationService);
         services.AddApiClient<IAccountIntegrationsApiClient>(ServicesNames.AccountIntegrationService);
 
         return services;

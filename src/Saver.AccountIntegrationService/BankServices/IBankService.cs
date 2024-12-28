@@ -1,8 +1,8 @@
-﻿namespace Saver.AccountIntegrationService.BankServiceProviders;
+﻿namespace Saver.AccountIntegrationService.BankServices;
 
-public interface IBankServiceProvider
+public interface IBankService
 {
-    BankServiceProviderType ProviderType { get; }
+    BankServiceType BankServiceType { get; }
     string Name { get; }
     string GetOAuthUrl(string redirectUrl);
     Task IntegrateAccountAsync(Guid accountId, string authorizationCode);

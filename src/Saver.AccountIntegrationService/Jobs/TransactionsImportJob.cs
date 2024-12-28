@@ -1,19 +1,19 @@
 ﻿using Quartz;
-using Saver.AccountIntegrationService.BankServiceProviders;
+using Saver.AccountIntegrationService.BankServices;
 
 namespace Saver.AccountIntegrationService.Jobs;
 
-public class TransactionsImportJob(IBankServiceProvidersRegistry providersRegistry) : IJob
+public class TransactionsImportJob(IBankServicesRegistry providersRegistry) : IJob
 {
-    public const string ProviderTypeJobDataKey = "ProviderType";
+    public const string ProviderTypeJobDataKey = "BankServiceType";
     public const string IntegrationIdJobDataKey = "IntegrationId";
 
     public async Task Execute(IJobExecutionContext context)
     {
-        var providerType = (BankServiceProviderType)context.JobDetail.JobDataMap[ProviderTypeJobDataKey];
+        var providerType = (BankServiceType)context.JobDetail.JobDataMap[ProviderTypeJobDataKey];
         var integrationId = (Guid)context.JobDetail.JobDataMap[IntegrationIdJobDataKey];
 
-        var provider = providersRegistry.GetByProviderType(providerType);
+        var provider = providersRegistry.GetByBankServiceType(providerType);
         await provider.ImportTransactionsAsync(integrationId, context.PreviousFireTimeUtc?.UtcDateTime);
     }
 }

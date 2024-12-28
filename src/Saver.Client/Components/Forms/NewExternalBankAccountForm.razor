@@ -6,7 +6,7 @@
 
 @inherits ModalFormComponentBase
 
-@inject IBankServiceProvidersApiClient BankServiceProvidersApiClient
+@inject IBankServicesApiClient BankServicesApiClient
 @inject IBankAccountsApiClient BankAccountApiClient
 @inject NavigationManager NavigationManager
 @inject ProtectedSessionStorage SessionStorage
@@ -29,7 +29,7 @@
                     <div class="mb-3">
                         <label class="form-label">Bank services provider</label>
                         <InputSelect class="form-select" @bind-Value="Model.ProviderId">
-                            @foreach (var provider in _supportedBankServiceProviders?.OrderBy(x => x.Name) ?? Enumerable.Empty<BankServiceProviderDto>())
+                            @foreach (var provider in _supportedBankServiceProviders?.OrderBy(x => x.Name) ?? Enumerable.Empty<BankServiceDto>())
                             {
                                 <option value="@provider.Id">@provider.Name</option>
                             }
@@ -55,7 +55,7 @@
     private NewExternalBankAccountViewModel Model { get; set; } = null!;
     private EditContext? _editContext;
     private ValidationMessageStore? _messageStore;
-    private IEnumerable<BankServiceProviderDto>? _supportedBankServiceProviders;
+    private IEnumerable<BankServiceDto>? _supportedBankServiceProviders;
 
     protected override void OnInitialized()
     {
@@ -67,12 +67,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _supportedBankServiceProviders = (await BankServiceProvidersApiClient.GetSupportedBankServiceProvidersAsync()).Content;
+        _supportedBankServiceProviders = (await BankServicesApiClient.GetSupportedBankServiceProvidersAsync()).Content;
     }
 
     private async Task SaveAsync()
     {
-        var oauthUrl = (await BankServiceProvidersApiClient.GetOAuthLoginUrlAsync(Model.ProviderId, HttpUtility.UrlEncode("https://127.0.0.1:7142/finalizeintegration"))).Content;
+        var oauthUrl = (await BankServicesApiClient.GetOAuthLoginUrlAsync(Model.ProviderId, HttpUtility.UrlEncode("https://127.0.0.1:7142/finalizeintegration"))).Content;
         if (oauthUrl is null)
         {
             return;

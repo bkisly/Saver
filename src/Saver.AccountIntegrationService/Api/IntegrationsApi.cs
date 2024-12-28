@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Saver.AccountIntegrationService.BankServiceProviders;
+using Saver.AccountIntegrationService.BankServices;
 using Saver.AccountIntegrationService.Contracts;
+using Saver.Common.DDD;
 
 namespace Saver.AccountIntegrationService.Api;
 
@@ -18,9 +19,9 @@ public static class IntegrationsApi
     }
 
     private static async Task<NoContent> CreateIntegrationAsync(
-        CreateAccountIntegrationRequest request, [FromServices] IBankServiceProvidersRegistry registry)
+        CreateAccountIntegrationRequest request, [FromServices] IBankServicesRegistry registry)
     {
-        var provider = registry.GetByProviderType((BankServiceProviderType)request.ProviderId);
+        var provider = registry.GetByBankServiceType(Enumeration.FromId<BankServiceType>(request.ProviderId));
         await provider.IntegrateAccountAsync(request.AccountId, request.AuthorizationCode);
         return TypedResults.NoContent();
     }

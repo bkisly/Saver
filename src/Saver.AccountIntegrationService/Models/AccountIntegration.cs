@@ -1,4 +1,4 @@
-﻿using Saver.AccountIntegrationService.BankServiceProviders;
+﻿using Saver.AccountIntegrationService.BankServices;
 
 namespace Saver.AccountIntegrationService.Models;
 
@@ -10,5 +10,5 @@ public class AccountIntegration
     public string AccessToken { get; set; } = string.Empty;
     public string RefreshToken { get; set; } = string.Empty;
     public DateTimeOffset ExpiresIn { get; set; }
-    public BankServiceProviderType Provider { get; set; }
+    public BankServiceType BankServiceType { get; set; } = null!;
 }

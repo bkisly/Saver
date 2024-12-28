@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Saver.AccountIntegrationService.BankServiceProviders.PayPal.Converters;
+namespace Saver.AccountIntegrationService.BankServices.PayPal.Converters;
 
 public class PayPalDecimalStringJsonConverter : JsonConverter<decimal>
 {

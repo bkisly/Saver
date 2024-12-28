@@ -1,9 +1,10 @@
-﻿using Saver.AccountIntegrationService.BankServiceProviders;
+﻿using Saver.AccountIntegrationService.BankServices;
+using Saver.AccountIntegrationService.Models;
 
 namespace Saver.AccountIntegrationService.Jobs;
 
 public interface ITransactionImportJobService
 {
-    Task RegisterJobAsync(Guid integrationId, BankServiceProviderType providerType);
+    Task RegisterJobAsync(AccountIntegration integration);
     Task UnregisterJobAsync(Guid integrationId);
 }
