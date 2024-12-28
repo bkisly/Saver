@@ -10,7 +10,7 @@ public static class BankServicesInfoApi
 {
     public static IEndpointRouteBuilder MapBankServicesInfoApi(this IEndpointRouteBuilder builder)
     {
-        var api = builder.MapGroup("/api/account-integration/providers");
+        var api = builder.MapGroup("/api/account-integration/bank-services");
 
         api.MapGet("/", GetSupportedBankServices);
         api.MapGet("/oauth-url/{bankServiceTypeId:int}/{redirectUrl}", GetOAuthLoginUrlForBankService);
@@ -18,13 +18,12 @@ public static class BankServicesInfoApi
         return builder;
     }
 
-    private static Ok<IEnumerable<BankServiceDto>> GetSupportedBankServices(
-        [FromServices] IBankServicesResolver bankServicesResolver)
+    private static Ok<IEnumerable<BankServiceDto>> GetSupportedBankServices()
     {
-        return TypedResults.Ok(bankServicesResolver.GetAllBankServices().Select(x => new BankServiceDto
+        return TypedResults.Ok(Enumeration.GetAll<BankServiceType>().Select(x => new BankServiceDto
         {
-            Id = x.BankServiceType.Id,
-            Name = x.BankServiceType.Name
+            Id = x.Id,
+            Name = x.Name
         }));
     }
 

@@ -13,14 +13,14 @@ public class TransactionsImportJobService(ISchedulerFactory schedulerFactory) : 
 
         var job = JobBuilder.Create<TransactionsImportJob>()
             .WithIdentity($"transactionsImport-job-{integrationId}")
-            .UsingJobData(TransactionsImportJob.IntegrationIdJobDataKey, integrationId)
-            .UsingJobData(TransactionsImportJob.ProviderTypeJobDataKey, bankServiceType.Id)
+            .UsingJobData(TransactionsImportJob.IntegrationIdJobDataKey, integrationId.ToString())
+            .UsingJobData(TransactionsImportJob.BankServiceTypeJobDataKey, bankServiceType.Name)
             .Build();
 
         var trigger = TriggerBuilder.Create()
             .WithIdentity($"transactionsImport-trigger-{integrationId}")
             .StartNow()
-            .WithSimpleSchedule(x => x.WithIntervalInMinutes(interval))
+            .WithSimpleSchedule(x => x.WithIntervalInSeconds(interval).RepeatForever())
             .Build();
 
         await scheduler.ScheduleJob(job, trigger);

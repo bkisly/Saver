@@ -32,6 +32,8 @@ public static class AccountIntegrationServiceApplicationExtensions
             {
                 options.UsePostgres(opts => opts.ConnectionStringName = ServicesNames.AccountIntegrationServiceDatabase);
                 options.PerformSchemaValidation = true;
+                options.UseNewtonsoftJsonSerializer();
+                options.UseProperties = true;
             });
         });
 
