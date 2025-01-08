@@ -474,6 +474,9 @@ namespace Saver.FinanceService.Infrastructure.Migrations
                 {
                     b.HasBaseType("Saver.FinanceService.Domain.AccountHolderModel.BankAccount");
 
+                    b.Property<int>("ProviderId")
+                        .HasColumnType("integer");
+
                     b.HasDiscriminator().HasValue("ExternalBankAccount");
                 });
 

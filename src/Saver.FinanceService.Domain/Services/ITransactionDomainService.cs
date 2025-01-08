@@ -9,7 +9,7 @@ public interface ITransactionDomainService
         TransactionData transactionData, DateTime creationDate);
 
     IEnumerable<Transaction> CreateTransactions(AccountHolder accountHolder, Guid accountId, 
-        IEnumerable<(TransactionData TransactionData, DateTime CreationDate)> transactions);
+        IEnumerable<(TransactionData TransactionData, DateTime CreationDate)> transactions, decimal? customBalance = null);
 
     Task EditTransactionAsync(AccountHolder accountHolder, Guid transactionId, 
         TransactionData newTransactionData, DateTime newCreationDate);

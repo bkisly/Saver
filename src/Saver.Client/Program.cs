@@ -1,5 +1,6 @@
 using Saver.Client.Components;
 using Saver.Client.Extensions;
+using Saver.Client.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 var app = builder.Build();
+
+app.UseMiddleware<LocalhostRedirectionMiddleware>();
 
 app.MapDefaultEndpoints();
 

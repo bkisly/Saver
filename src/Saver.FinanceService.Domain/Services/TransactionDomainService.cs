@@ -27,7 +27,8 @@ public class TransactionDomainService(IAccountHolderRepository accountHolderRepo
         return transaction;
     }
 
-    public IEnumerable<Transaction> CreateTransactions(AccountHolder accountHolder, Guid accountId, IEnumerable<(TransactionData TransactionData, DateTime CreationDate)> transactions)
+    public IEnumerable<Transaction> CreateTransactions(AccountHolder accountHolder, Guid accountId, 
+        IEnumerable<(TransactionData TransactionData, DateTime CreationDate)> transactions, decimal? customBalance = null)
     {
         var createdTransactions = new List<Transaction>();
         var account = accountHolder.FindAccountById(accountId);
@@ -46,7 +47,7 @@ public class TransactionDomainService(IAccountHolderRepository accountHolderRepo
             createdTransactions.Add(transaction);
         }
 
-        account.UpdateBalance(account.Balance + createdTransactions.Sum(x => x.TransactionData.Value));
+        account.UpdateBalance(customBalance ?? account.Balance + createdTransactions.Sum(x => x.TransactionData.Value));
         accountHolderRepository.Update(accountHolder);
 
         return createdTransactions;
@@ -68,18 +69,22 @@ public class TransactionDomainService(IAccountHolderRepository accountHolderRepo
 
         var account = accountHolder.FindAccountById(transaction.AccountId);
 
-        if (account is not ManualBankAccount manualAccount)
+        if (account is ExternalBankAccount)
         {
-            throw new FinanceDomainException("Transactions can be edited only for manual accounts.",
-                FinanceDomainErrorCode.InvalidOperation);
+            var newData = new TransactionData(newTransactionData.Name, newTransactionData.Description,
+                transaction.TransactionData.Value, newTransactionData.Category);
+            transaction.EditTransaction(newData, transaction.CreationDate);
+            transactionRepository.Update(transaction);
         }
+        else
+        {
+            var oldTransactionData = transaction.TransactionData;
+            transaction.EditTransaction(newTransactionData, newCreationDate);
+            transactionRepository.Update(transaction);
 
-        var oldTransactionData = transaction.TransactionData;
-        transaction.EditTransaction(newTransactionData, newCreationDate);
-        transactionRepository.Update(transaction);
-
-        manualAccount.UpdateBalance(manualAccount.Balance + (newTransactionData.Value - oldTransactionData.Value));
-        accountHolderRepository.Update(accountHolder);
+            account.UpdateBalance(account.Balance + (newTransactionData.Value - oldTransactionData.Value));
+            accountHolderRepository.Update(accountHolder);
+        }
     }
 
     public async Task DeleteTransactionAsync(AccountHolder accountHolder, Guid transactionId)

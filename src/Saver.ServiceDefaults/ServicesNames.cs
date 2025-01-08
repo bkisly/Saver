@@ -11,7 +11,7 @@ public static class ServicesNames
     public const string BudgetServiceDatabase = "budgetservice-db";
     public const string FinanceService = "financeservice";
     public const string FinanceServiceDatabase = "financeservice-db";
-    public const string PredictionsService = "predictionsservice";
-    public const string PredictionsServiceDatabase = "predictionsservice-db";
+    public const string AccountIntegrationService = "accountintegrationservice";
+    public const string AccountIntegrationServiceDatabase = "accountintegrationservice-db";
     public const string Client = "client";
 }

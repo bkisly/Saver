@@ -8,4 +8,5 @@ public record BankAccountDto
     public required decimal Balance { get; init; }
     public required string CurrencyCode { get; set; }
     public required bool IsDefault { get; init; }
+    public bool IsExternal { get; init; }
 }

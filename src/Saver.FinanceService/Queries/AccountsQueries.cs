@@ -35,7 +35,8 @@ public class AccountsQueries(IAccountHolderService accountHolderService)
             Description = null,
             Balance = entity.Balance,
             CurrencyCode = entity.Currency.Name,
-            IsDefault = accountHolder.DefaultAccount?.BankAccount.Id == entity.Id
+            IsDefault = accountHolder.DefaultAccount?.BankAccount.Id == entity.Id,
+            IsExternal = entity is ExternalBankAccount
         };
     }
 }

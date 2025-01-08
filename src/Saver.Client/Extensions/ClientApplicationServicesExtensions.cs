@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Saver.Client.Infrastructure;
+using Saver.ServiceDefaults;
 
 namespace Saver.Client.Extensions;
 
@@ -8,6 +9,8 @@ public static class ClientApplicationServicesExtensions
     public static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
     {
         var services = builder.Services;
+
+        services.AddTransient<LocalhostRedirectionMiddleware>();
 
         builder.AddJwtAuthorization(options =>
         {
@@ -34,6 +37,7 @@ public static class ClientApplicationServicesExtensions
 
         services.AddIdentityServiceClients();
         services.AddFinanceServiceClients();
+        services.AddAccountIntegrationServiceClients();
 
         return builder;
     }

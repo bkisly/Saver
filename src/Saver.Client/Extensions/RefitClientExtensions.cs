@@ -1,4 +1,5 @@
 ﻿using Refit;
+using Saver.AccountIntegrationService.Contracts;
 using Saver.Client.Infrastructure;
 using Saver.FinanceService.Contracts.BankAccounts;
 using Saver.FinanceService.Contracts.Categories;
@@ -30,6 +31,14 @@ public static class RefitClientExtensions
         services.AddApiClient<ITransactionsApiClient>(ServicesNames.FinanceService);
         services.AddApiClient<IReportsApiClient>(ServicesNames.FinanceService);
         services.AddApiClient<ICurrencyApiClient>(ServicesNames.FinanceService);
+
+        return services;
+    }
+
+    public static IServiceCollection AddAccountIntegrationServiceClients(this IServiceCollection services)
+    {
+        services.AddApiClient<IBankServicesApiClient>(ServicesNames.AccountIntegrationService);
+        services.AddApiClient<IAccountIntegrationsApiClient>(ServicesNames.AccountIntegrationService);
 
         return services;
     }

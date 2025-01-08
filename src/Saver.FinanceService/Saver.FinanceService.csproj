@@ -16,7 +16,7 @@
     <PackageReference Include="FluentValidation" Version="11.10.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="MediatR" Version="12.4.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Saver.AccountIntegrationService.IntegrationEvents\Saver.AccountIntegrationService.IntegrationEvents.csproj" />
     <ProjectReference Include="..\Saver.FinanceService.Contracts\Saver.FinanceService.Contracts.csproj" />
     <ProjectReference Include="..\Saver.FinanceService.Domain\Saver.FinanceService.Domain.csproj" />
     <ProjectReference Include="..\Saver.FinanceService.Infrastructure\Saver.FinanceService.Infrastructure.csproj" />

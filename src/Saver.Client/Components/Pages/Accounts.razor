@@ -12,12 +12,21 @@
 
 <h1 class="h3">Manage and create your bank accounts here.</h1>
 
-<button type="button" class="btn btn-secondary rounded-3 my-3" data-bs-toggle="modal" data-bs-target="#@NewBankAccountForm.FormName">
-    <span>
-        <i class="bi-plus-lg"></i>
-    </span>
-    <span>New bank account</span>
-</button>
+<div class="my-3 d-flex">
+    <button type="button" class="btn btn-secondary rounded-3 me-2" data-bs-toggle="modal" data-bs-target="#@NewBankAccountForm.FormName">
+        <span>
+            <i class="bi-plus-lg"></i>
+        </span>
+        <span>New manual bank account</span>
+    </button>
+    <button type="button" class="btn btn-secondary rounded-3 me-2" data-bs-toggle="modal" data-bs-target="#@NewExternalBankAccountForm.FormName">
+        <span>
+            <i class="bi-box-arrow-up-right me-1"></i>
+        </span>
+        <span>New external bank account</span>
+    </button>
+</div>
+
 
 <div class="mx-2">
     @if (!BankAccounts.Any())
@@ -40,9 +49,12 @@
                     <button class="border-0 bg-transparent my-auto mx-2 text-black" @onclick="() => MarkAccountAsDefaultAsync(account.Id)">
                         <i class="fs-5 @(account.IsDefault ? "bi-star-fill" : "bi-star")"></i>
                     </button>
-                    <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#@EditBankAccountForm.FormName" @onclick="() => SelectAccountForEdit(account.Id)">
-                        <i class="fs-5 bi-pen"></i>
-                    </button>
+                    @if (!account.IsExternal)
+                    {
+                        <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#@EditBankAccountForm.FormName" @onclick="() => SelectAccountForEdit(account.Id)">
+                            <i class="fs-5 bi-pen"></i>
+                        </button>
+                    }
                     <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#delete-modal" @onclick="() => SelectAccount(account.Id)">
                         <i class="fs-5 bi-trash"></i>
                     </button>
@@ -60,6 +72,8 @@
     @ref="_editForm"
     SupportedCurrencyCodes="_supportedCurrencyCodes"
     OnSave="HandleBankAccountEditedAsync"/>
+
+<NewExternalBankAccountForm/>
 
 <!-- Delete confirmation modal -->
 <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-confirmation-title" aria-hidden="true">
