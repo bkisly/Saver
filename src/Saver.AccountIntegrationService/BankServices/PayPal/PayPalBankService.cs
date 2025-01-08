@@ -12,6 +12,7 @@ using Saver.AccountIntegrationService.Models;
 using Saver.AccountIntegrationService.Services;
 using Saver.EventBus;
 using Saver.EventBus.IntegrationEventLog.Utilities;
+using Saver.ServiceDefaults;
 
 namespace Saver.AccountIntegrationService.BankServices.PayPal;
 
@@ -23,6 +24,7 @@ public class PayPalBankService : IBankService
     private readonly IUserInfoService _userInfoService;
     private readonly IIntegrationEventService<AccountIntegrationDbContext> _integrationEventService;
     private readonly ITransactionsImportJobService _transactionsImportJobService;
+    private readonly string _tokenEncryptionKey;
 
     private static readonly JsonSerializerOptions ResponseSerializerOptions = new()
     {
@@ -50,6 +52,7 @@ public class PayPalBankService : IBankService
         _integrationEventService = integrationEventService;
         _configuration = configuration;
         _transactionsImportJobService = transactionsImportJobService;
+        _tokenEncryptionKey = _configuration.GetRequiredValue<string>("TokenEncryptionKey");
 
         _httpClient = new HttpClient
         {
@@ -80,11 +83,6 @@ public class PayPalBankService : IBankService
                 return;
             }
 
-            // @TODO:
-            // 1. Authenticate against api and save tokens - done
-            // 2. Fetch account information (existing transactions) - done
-            // 3. Publish integration event that an account was integrated - done
-            // 4. Initialize a job to import transactions periodically - done
             if (await GetAuthorizationData(authorizationCode) is not { } authResponse)
             {
                 return;
@@ -94,8 +92,8 @@ public class PayPalBankService : IBankService
             {
                 UserId = userId,
                 BankServiceType = BankServiceType,
-                AccessToken = authResponse.AccessToken,
-                RefreshToken = authResponse.RefreshToken,
+                AccessToken = authResponse.AccessToken.Encrypt(_tokenEncryptionKey),
+                RefreshToken = authResponse.RefreshToken.Encrypt(_tokenEncryptionKey),
                 ExpiresIn = DateTimeOffset.UtcNow.AddSeconds(authResponse.ExpiresIn),
                 AccountId = accountId,
                 LastSynced = DateTime.UtcNow
@@ -218,13 +216,13 @@ public class PayPalBankService : IBankService
 
         if (integrationRecord.ExpiresIn >= DateTimeOffset.UtcNow.AddMinutes(10))
         {
-            return integrationRecord.AccessToken;
+            return integrationRecord.AccessToken.Decrypt(_tokenEncryptionKey);
         }
 
         var formDictionary = new Dictionary<string, string>
         {
             ["grant_type"] = "refresh_token",
-            ["refresh_token"] = integrationRecord.RefreshToken
+            ["refresh_token"] = integrationRecord.RefreshToken.Decrypt(_tokenEncryptionKey)
         };
 
         var form = new FormUrlEncodedContent(formDictionary);
@@ -246,12 +244,12 @@ public class PayPalBankService : IBankService
             return null;
         }
 
-        integrationRecord.AccessToken = oauthResponse.AccessToken;
-        integrationRecord.RefreshToken = oauthResponse.RefreshToken;
+        integrationRecord.AccessToken = oauthResponse.AccessToken.Encrypt(_tokenEncryptionKey);
+        integrationRecord.RefreshToken = oauthResponse.RefreshToken.Encrypt(_tokenEncryptionKey);
         integrationRecord.ExpiresIn = DateTimeOffset.UtcNow.AddSeconds(oauthResponse.ExpiresIn);
         await _context.SaveChangesAsync();
 
-        return integrationRecord.AccessToken;
+        return oauthResponse.AccessToken;
     }
 
     private async Task<PayPalTransactionsList> GetTransactionsAsync(string accessToken, DateTime? startingDate = null)
