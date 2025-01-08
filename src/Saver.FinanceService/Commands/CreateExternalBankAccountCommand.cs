@@ -7,11 +7,10 @@ using Saver.FinanceService.Services;
 
 namespace Saver.FinanceService.Commands;
 
-public class CreateExternalBankAccountCommand(string name, int providerId, string currencyCode) : IRequest<CommandResult<BankAccountDto>>
+public class CreateExternalBankAccountCommand(string name, int providerId) : IRequest<CommandResult<BankAccountDto>>
 {
     public string Name => name;
     public int ProviderId => providerId;
-    public string CurrencyCode => currencyCode;
 }
 
 public class CreateExternalBankAccountCommandHandler(IAccountHolderService accountHolderService, IUnitOfWork unitOfWork) 
@@ -31,7 +30,6 @@ public class CreateExternalBankAccountCommandHandler(IAccountHolderService accou
         {
             account = accountHolder.CreateExternalBankAccount(
                 request.Name, 
-                Enumeration.FromName<Currency>(request.CurrencyCode),
                 request.ProviderId);
 
         }

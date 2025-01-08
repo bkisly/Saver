@@ -4,6 +4,7 @@ using Saver.AccountIntegrationService.BankServices;
 using Saver.AccountIntegrationService.Data;
 using Saver.AccountIntegrationService.IntegrationEvents;
 using Saver.AccountIntegrationService.Jobs;
+using Saver.AccountIntegrationService.Repositories;
 using Saver.AccountIntegrationService.Services;
 using Saver.EventBus.IntegrationEventLog;
 using Saver.EventBus.RabbitMQ;
@@ -46,6 +47,7 @@ public static class AccountIntegrationServiceApplicationExtensions
 
         services.AddSingleton<ITransactionsImportJobService, TransactionsImportJobService>();
         services.AddScoped<IBankServicesResolver, BankServicesResolver>();
+        services.AddScoped<IAccountIntegrationRepository, AccountIntegrationRepository>();
         services.AddTransient<IUserInfoService, UserInfoService>();
 
         services.AddBankServices();

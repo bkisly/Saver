@@ -70,7 +70,7 @@ public class PayPalBankService : IBankService
         return urlBuilder.ToString();
     }
 
-    public async Task IntegrateAccountAsync(Guid accountId, string authorizationCode)
+    public async Task ConnectAccountAsync(Guid accountId, string authorizationCode)
     {
         await ResilientTransaction.New(_context).ExecuteAsync(async () =>
         {

@@ -3,5 +3,5 @@
 public class PayPalMoney
 {
     public decimal Value { get; set; }
-    public string CurrencyCode { get; set; } = null!;
+    public string CurrencyCode { get; set; } = string.Empty;
 }

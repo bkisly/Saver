@@ -1,6 +1,7 @@
 ﻿using Saver.AccountIntegrationService.IntegrationEvents;
 using Saver.Common.DDD;
 using Saver.EventBus;
+using Saver.FinanceService.Domain.AccountHolderModel;
 using Saver.FinanceService.Domain.Repositories;
 using Saver.FinanceService.Domain.Services;
 using Saver.FinanceService.Domain.TransactionModel;
@@ -18,6 +19,9 @@ public class AccountIntegratedIntegrationEventHandler(
         {
             return;
         }
+
+        accountHolder.SetAccountCurrency(e.AccountId, Enumeration.FromName<Currency>(e.CurrencyCode));
+        accountHolderRepository.Update(accountHolder);
 
         transactionService.CreateTransactions(
             accountHolder, 

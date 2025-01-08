@@ -7,9 +7,14 @@ public class ExternalBankAccount : BankAccount
     private ExternalBankAccount()
     { }
 
-    public ExternalBankAccount(string name, Currency currency, Guid accountHolderId, int providerId)
-        : base(name, currency, accountHolderId)
+    public ExternalBankAccount(string name, Guid accountHolderId, int providerId)
+        : base(name, Currency.USD, accountHolderId)
     {
         ProviderId = providerId;
+    }
+
+    internal void SetCurrency(Currency currency)
+    {
+        Currency = currency;
     }
 }

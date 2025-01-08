@@ -22,7 +22,7 @@ public static class IntegrationsApi
         CreateAccountIntegrationRequest request, [FromServices] IBankServicesResolver resolver)
     {
         var bankService = resolver.GetByBankServiceType(Enumeration.FromId<BankServiceType>(request.ProviderId));
-        await bankService.IntegrateAccountAsync(request.AccountId, request.AuthorizationCode);
+        await bankService.ConnectAccountAsync(request.AccountId, request.AuthorizationCode);
         return TypedResults.NoContent();
     }
 }

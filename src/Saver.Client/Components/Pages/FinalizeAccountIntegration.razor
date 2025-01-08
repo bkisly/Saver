@@ -22,8 +22,7 @@
             var accountResponse = await BankAccountsApiClient.CreateExternalBankAccountAsync(new CreateExternalBankAccountRequest
             {
                 Name = value.Value.Name,
-                ProviderId = value.Value.ProviderId,
-                CurrencyCode = "EUR"
+                ProviderId = value.Value.ProviderId
             });
 
             if (accountResponse is { IsSuccessStatusCode: true, Content: not null })
@@ -36,7 +35,6 @@
                 });
             }
         }
-
 
         NavigationManager.NavigateTo("/accounts");
     }

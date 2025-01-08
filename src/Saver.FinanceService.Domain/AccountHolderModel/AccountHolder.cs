@@ -49,7 +49,7 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         account.EditAccount(newName, newCurrency, exchangeRate);
     }
 
-    public ExternalBankAccount CreateExternalBankAccount(string name, Currency currency, int providerId)
+    public ExternalBankAccount CreateExternalBankAccount(string name, int providerId)
     {
         if (_accounts.Any(x => x.Name == name))
         {
@@ -57,10 +57,15 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
                 FinanceDomainErrorCode.NameConflict);
         }
 
-        var account = new ExternalBankAccount(name, currency, Id, providerId);
+        var account = new ExternalBankAccount(name, Id, providerId);
         _accounts.Add(account);
         DefaultAccount ??= new DefaultBankAccount(Id, account);
         return account;
+    }
+
+    public void SetAccountCurrency(Guid accountId, Currency currency)
+    {
+        FindExternalBankAccountById(accountId).SetCurrency(currency);
     }
 
     public void SetDefaultAccount(Guid accountId)
@@ -179,6 +184,23 @@ public class AccountHolder : EventPublishingEntity<Guid>, IAggregateRoot
         }
 
         return manualAccount;
+    }
+
+    private ExternalBankAccount FindExternalBankAccountById(Guid accountId)
+    {
+        if (FindAccountById(accountId) is not { } account)
+        {
+            throw new FinanceDomainException("Could not find requested external account.",
+                FinanceDomainErrorCode.InvalidOperation);
+        }
+
+        if (account is not ExternalBankAccount externalAccount)
+        {
+            throw new FinanceDomainException("Operation is possible to perform only for external accounts.",
+                FinanceDomainErrorCode.InvalidOperation);
+        }
+
+        return externalAccount;
     }
 
     private void SetOrCreateDefaultAccount(BankAccount account)
