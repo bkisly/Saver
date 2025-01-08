@@ -10,6 +10,7 @@ using Saver.FinanceService.EventHandlers.Integration;
 using Saver.FinanceService.Infrastructure;
 using Saver.FinanceService.Infrastructure.Repositories;
 using Saver.FinanceService.Infrastructure.ServiceAgents.ExchangeRate;
+using Saver.FinanceService.Infrastructure.ServiceAgents.OpenAI;
 using Saver.FinanceService.IntegrationEvents;
 using Saver.FinanceService.Middleware;
 using Saver.FinanceService.Queries;
@@ -70,6 +71,7 @@ public static class FinanceServiceApplicationExtensions
         services.AddScoped<ICurrencyQueries, CurrencyQueries>();
 
         services.AddTransient<IExchangeRateServiceAgent, ExchangeRateServiceAgent>();
+        services.AddTransient<IOpenAiServiceAgent, OpenAiServiceAgent>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         services.AddHttpClient("ExchangeRateApiClient", options =>
