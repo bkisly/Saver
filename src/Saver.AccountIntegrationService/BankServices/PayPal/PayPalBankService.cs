@@ -157,6 +157,8 @@ public class PayPalBankService : IBankService
             return;
         }
 
+        var balance = await GetBalancesAsync(accessToken);
+
         await ResilientTransaction.New(_context).ExecuteAsync(async () =>
         {
             var evt = new TransactionsImportedIntegrationEvent(
@@ -165,7 +167,8 @@ public class PayPalBankService : IBankService
                 transactions.TransactionDetails.Select(x => new TransactionInfo(
                     x.TransactionInfo.TransactionSubject,
                     x.TransactionInfo.TransactionAmount.Value,
-                    x.TransactionInfo.TransactionInitiationDate)));
+                    x.TransactionInfo.TransactionInitiationDate)),
+                balance.Balances.FirstOrDefault(x => x.Primary)?.AvailableBalance.Value);
 
             await _integrationEventService.AddIntegrationEventAsync(evt);
 

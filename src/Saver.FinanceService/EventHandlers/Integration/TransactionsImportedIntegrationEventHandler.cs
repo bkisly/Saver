@@ -22,8 +22,11 @@ public class TransactionsImportedIntegrationEventHandler(
                 return;
             }
 
-            transactionService.CreateTransactions(accountHolder, e.AccountId,
-                e.Transactions.Select(x => (new TransactionData(x.Name, null, x.Value, null), x.Date)));
+            transactionService.CreateTransactions(
+                accountHolder, 
+                e.AccountId,
+                e.Transactions.Select(x => (new TransactionData(x.Name, null, x.Value, null), x.Date)),
+                e.NewBalance);
 
             await unitOfWork.SaveEntitiesAsync();
         }
