@@ -23,16 +23,19 @@
                         <InputText class="form-control" @bind-Value="TransactionViewModel.Description" placeholder="Some description of your transaction" />
                         <ValidationMessage For="() => TransactionViewModel.Description" />
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Date</label>
-                        <InputDate class="form-control" Type="InputDateType.Date" @bind-Value="TransactionViewModel.CreatedDate"/>
-                        <ValidationMessage For="() => TransactionViewModel.CreatedDate" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Value</label>
-                        <InputNumber TValue="decimal" class="form-control" @bind-Value="TransactionViewModel.Value" @bind-Value:format="N2"/>
-                        <ValidationMessage For="@(() => TransactionViewModel.Value)" />
-                    </div>
+                    @if (!IsFromExternalAccount)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            <InputDate class="form-control" Type="InputDateType.Date" @bind-Value="TransactionViewModel.CreatedDate"/>
+                            <ValidationMessage For="() => TransactionViewModel.CreatedDate" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Value</label>
+                            <InputNumber TValue="decimal" class="form-control" @bind-Value="TransactionViewModel.Value" @bind-Value:format="N2"/>
+                            <ValidationMessage For="@(() => TransactionViewModel.Value)" />
+                        </div>
+                    }
                     <div class="mb-3">
                         <label class="form-label">Category</label>
                         <InputSelect @bind-Value="TransactionViewModel.CategoryId" class="form-select">
@@ -59,6 +62,7 @@
     [Parameter, EditorRequired] public List<CategoryDto> Categories { get; set; } = [];
     [Parameter, EditorRequired] public Guid AccountId { get; set; }
     [Parameter] public EventCallback<TransactionViewModel> OnSave { get; set; }
+    [Parameter] public bool IsFromExternalAccount { get; set; } = false;
 
     public TransactionViewModel TransactionViewModel { get; set; } = new();
 

@@ -49,9 +49,12 @@
                     <button class="border-0 bg-transparent my-auto mx-2 text-black" @onclick="() => MarkAccountAsDefaultAsync(account.Id)">
                         <i class="fs-5 @(account.IsDefault ? "bi-star-fill" : "bi-star")"></i>
                     </button>
-                    <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#@EditBankAccountForm.FormName" @onclick="() => SelectAccountForEdit(account.Id)">
-                        <i class="fs-5 bi-pen"></i>
-                    </button>
+                    @if (!account.IsExternal)
+                    {
+                        <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#@EditBankAccountForm.FormName" @onclick="() => SelectAccountForEdit(account.Id)">
+                            <i class="fs-5 bi-pen"></i>
+                        </button>
+                    }
                     <button type="button" class="border-0 bg-transparent my-auto text-black" data-bs-toggle="modal" data-bs-target="#delete-modal" @onclick="() => SelectAccount(account.Id)">
                         <i class="fs-5 bi-trash"></i>
                     </button>
