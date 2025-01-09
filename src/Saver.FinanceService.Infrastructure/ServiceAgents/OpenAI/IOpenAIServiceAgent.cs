@@ -8,5 +8,5 @@ public interface IOpenAiServiceAgent
     /// <summary>
     /// Tries to automatically categorize given transactions having empty categories.
     /// </summary>
-    Task<IEnumerable<TransactionModel>> CategorizeTransactionsAsync(IEnumerable<TransactionModel> transactions, IEnumerable<CategoryModel> availableCategories);
+    Task<CategorizationResults> CategorizeTransactionsAsync(IEnumerable<TransactionModel> transactions, IEnumerable<CategoryModel> availableCategories);
 }

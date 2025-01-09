@@ -69,9 +69,11 @@ public class AutoCategorizeTransactionsCommandHandler(
                     Description = x.Description
                 }));
 
-        foreach (var (originalTransaction, categorizedTransaction) in transactionsList.Zip(categorizedTransactions))
+        foreach (var (originalTransaction, categorizedTransaction) in transactionsList.Join(
+                     categorizedTransactions.Results, o => o.Id, c => c.TransactionId,
+                     (transaction, model) => (transaction, model)))
         {
-            if (!categorizedTransaction.CategoryId.HasValue || 
+            if (!categorizedTransaction.CategoryId.HasValue ||
                 !categoriesDict.TryGetValue(categorizedTransaction.CategoryId.Value, out var category))
             {
                 continue;
