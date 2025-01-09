@@ -12,7 +12,7 @@ var budgetServiceDb = postgres.AddDatabase("budgetservice-db");
 var financeServiceDb = postgres.AddDatabase("financeservice-db");
 var accountIntegrationServiceDb = postgres.AddDatabase("accountintegrationservice-db");
 
-var publicKey = builder.Configuration.GetValue<string>("Identity:PublicKey")
+var publicKey = builder.Configuration.GetRequiredSection("Identity").GetValue<string>("PublicKey")
                 ?? throw new InvalidOperationException("Could not find Identity:PublicKey configuration value.");
 
 var identityService = builder.AddProject<Projects.Saver_IdentityService>("identityservice")
@@ -32,7 +32,8 @@ var financeService = builder.AddProject<Projects.Saver_FinanceService>("finances
     .WithReference(financeServiceDb)
     .WithReference(rabbitMq)
     .WithReference(redis)
-    .WithIdentityEnvironment(identityEndpoint, publicKey);
+    .WithIdentityEnvironment(identityEndpoint, publicKey)
+    .WithOpenAiEnvironment(builder.Configuration);
 
 var accountIntegrationService = builder.AddProject<Projects.Saver_AccountIntegrationService>("accountintegrationservice")
     .WithReference(accountIntegrationServiceDb)

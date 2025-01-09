@@ -1,6 +1,8 @@
-﻿using Refit;
+﻿using Microsoft.Extensions.Http.Resilience;
+using Refit;
 using Saver.AccountIntegrationService.Contracts;
 using Saver.Client.Infrastructure;
+using Saver.FinanceService.Contracts.AiOperations;
 using Saver.FinanceService.Contracts.BankAccounts;
 using Saver.FinanceService.Contracts.Categories;
 using Saver.FinanceService.Contracts.Currency;
@@ -31,6 +33,27 @@ public static class RefitClientExtensions
         services.AddApiClient<ITransactionsApiClient>(ServicesNames.FinanceService);
         services.AddApiClient<IReportsApiClient>(ServicesNames.FinanceService);
         services.AddApiClient<ICurrencyApiClient>(ServicesNames.FinanceService);
+
+        services.AddRefitClient<IAiOperationsApiClient>()
+            .ConfigureHttpClient(config => config.BaseAddress = new Uri($"https://{ServicesNames.FinanceService}"))
+            .AddHttpMessageHandler<AuthorizationHeaderHandler>()
+            .AddStandardResilienceHandler(config =>
+            {
+                config.AttemptTimeout = new HttpTimeoutStrategyOptions
+                {
+                    Timeout = TimeSpan.FromMinutes(1)
+                };
+
+                config.CircuitBreaker = new HttpCircuitBreakerStrategyOptions
+                {
+                    SamplingDuration = TimeSpan.FromMinutes(2)
+                };
+
+                config.TotalRequestTimeout = new HttpTimeoutStrategyOptions
+                {
+                    Timeout = TimeSpan.FromMinutes(3)
+                };
+            });
 
         return services;
     }

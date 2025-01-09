@@ -2,11 +2,13 @@
 @using Saver.FinanceService.Contracts.BankAccounts
 @using Saver.FinanceService.Contracts.Transactions
 @using Saver.Client.Components.Forms
+@using Saver.FinanceService.Contracts.AiOperations
 @using Saver.FinanceService.Contracts.Categories
 
 @inject IBankAccountsApiClient BankAccountsApiClient
 @inject ITransactionsApiClient TransactionsApiClient
 @inject ICategoriesApiClient CategoriesApiClient
+@inject IAiOperationsApiClient AiOperationsApiClient
 
 @attribute [Authorize]
 
@@ -26,6 +28,12 @@
                 <span>New transaction</span>
             </button>
         }
+        <button class="btn btn-secondary rounded-3 me-2 @(CategorizationInProgress ? "disabled" : "")" @onclick="CategorizeTransactionsAsync">
+            <span>
+                <i class="bi-stars"></i>
+            </span>
+            <span>Categorize using AI</span>
+        </button>
         <a class="btn btn-light rounded-3" href="/categories">
             <span>
                 <i class="bi-tags-fill"></i>
@@ -124,6 +132,7 @@ else
     private TransactionForm _transactionForm = null!;
 
     private Guid _transactionIdToDelete;
+    private bool CategorizationInProgress { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -172,5 +181,14 @@ else
     private void SetFormToNewTransaction()
     {
         _transactionForm.ClearForm();
+    }
+
+    private async Task CategorizeTransactionsAsync()
+    {
+        CategorizationInProgress = true;
+        await AiOperationsApiClient.AutoCategorizeTransactionsAsync(SelectedBankAccountId);
+        CategorizationInProgress = false;
+        _transactionsForSelectedAccount = (await TransactionsApiClient.GetTransactionsForAccountAsync(SelectedBankAccountId)).Content?.ToList() ?? [];
+        StateHasChanged();
     }
 }

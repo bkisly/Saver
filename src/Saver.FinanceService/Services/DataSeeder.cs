@@ -42,8 +42,8 @@ public static class DataSeeder
         ]);
 
         transactionsService.CreateTransactions(accountHolder, account2.Id, [
-            CreateTransaction("Transaction 1", "Sample description", -90.35M, new DateTime(2024, 12, 6)),
-            CreateTransaction("Transaction 2", "Sample description", -102.49M, new DateTime(2024, 12, 1)),
+            CreateTransaction("Żabka", "Sample description", -90.35M, new DateTime(2024, 12, 6)),
+            CreateTransaction("morele.net", "Sample description", -102.49M, new DateTime(2024, 12, 1)),
             CreateTransaction("Transaction 3", "Sample description", -2.31M, new DateTime(2024, 12, 9), foodCategory),
             CreateTransaction("Transaction 4", "Sample description", 4000.90M, new DateTime(2024, 12, 1), salaryCategory),
             CreateTransaction("Transaction 5", "Sample description", -102.37M, new DateTime(2024, 11, 21), entertainmentCategory),
