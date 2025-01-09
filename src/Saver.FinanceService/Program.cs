@@ -17,7 +17,8 @@ app.MapAccountsApi()
     .MapTransactionsApi()
     .MapCategoriesApi()
     .MapReportsApi()
-    .MapCurrencyApi();
+    .MapCurrencyApi()
+    .MapAiOperationsApi();
 
 app.UseDefaultSwagger();
 app.UseMiddleware<ValidationExceptionHandlingMiddleware>();

@@ -25,8 +25,6 @@ public static class TransactionsApi
         api.MapPost("/recurring", CreateRecurringTransactionAsync);
         api.MapDelete("/recurring/{id:guid}", DeleteRecurringTransactionAsync);
 
-        api.MapPut("/categorize/{accountId:guid}", AutoCategorizeTransactionsAsync);
-
         api.RequireAuthorization();
 
         return builder;
@@ -96,13 +94,6 @@ public static class TransactionsApi
         Guid id, [FromServices] IMediator mediator)
     {
         var command = new DeleteRecurringTransactionCommand(id);
-        var result = await mediator.Send(command);
-        return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
-    }
-
-    private static async Task<Results<NoContent, ProblemHttpResult>> AutoCategorizeTransactionsAsync(Guid accountId, IMediator mediator)
-    {
-        var command = new AutoCategorizeTransactionsCommand(accountId);
         var result = await mediator.Send(command);
         return result.IsSuccess ? TypedResults.NoContent() : result.ToHttpProblem();
     }

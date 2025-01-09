@@ -2,11 +2,13 @@
 @using Saver.FinanceService.Contracts.BankAccounts
 @using Saver.FinanceService.Contracts.Transactions
 @using Saver.Client.Components.Forms
+@using Saver.FinanceService.Contracts.AiOperations
 @using Saver.FinanceService.Contracts.Categories
 
 @inject IBankAccountsApiClient BankAccountsApiClient
 @inject ITransactionsApiClient TransactionsApiClient
 @inject ICategoriesApiClient CategoriesApiClient
+@inject IAiOperationsApiClient AiOperationsApiClient
 
 @attribute [Authorize]
 
@@ -184,7 +186,7 @@ else
     private async Task CategorizeTransactionsAsync()
     {
         CategorizationInProgress = true;
-        await TransactionsApiClient.AutoCategorizeTransactionsAsync(SelectedBankAccountId);
+        await AiOperationsApiClient.AutoCategorizeTransactionsAsync(SelectedBankAccountId);
         CategorizationInProgress = false;
         _transactionsForSelectedAccount = (await TransactionsApiClient.GetTransactionsForAccountAsync(SelectedBankAccountId)).Content?.ToList() ?? [];
         StateHasChanged();

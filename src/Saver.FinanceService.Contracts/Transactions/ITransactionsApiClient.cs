@@ -30,7 +30,4 @@ public interface ITransactionsApiClient
 
     [Delete("/api/finance/transactions/recurring/{id}")]
     Task<HttpResponseMessage> DeleteRecurringTransactionAsync(Guid id);
-
-    [Put("/api/finance/transactions/categorize/{accountId}")]
-    Task<HttpResponseMessage> AutoCategorizeTransactionsAsync(Guid accountId);
 }
