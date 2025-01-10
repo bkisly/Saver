@@ -1,0 +1,85 @@
+﻿@using System.Web
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Saver.AccountIntegrationService.Contracts
+@using Saver.Client.Infrastructure
+@using Saver.FinanceService.Contracts.BankAccounts
+
+@inherits ModalFormComponentBase
+
+@inject IBankServicesApiClient BankServicesApiClient
+@inject IBankAccountsApiClient BankAccountApiClient
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage SessionStorage
+
+<div class="modal fade" id="@FormName" tabindex="-1" aria-labelledby="@FormName-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="@FormName-title">New external bank account</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <EditForm FormName="@FormName" EditContext="_editContext" OnValidSubmit="SaveAsync">
+                <div class="modal-body">
+                    <DataAnnotationsValidator />
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <InputText class="form-control" @bind-Value="Model.Name" placeholder="Your bank account name" />
+                        <ValidationMessage For="() => Model.Name" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bank services provider</label>
+                        <InputSelect class="form-select" @bind-Value="Model.ProviderId">
+                            @foreach (var provider in _supportedBankServiceProviders?.OrderBy(x => x.Name) ?? Enumerable.Empty<BankServiceDto>())
+                            {
+                                <option value="@provider.Id">@provider.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => Model.ProviderId" />
+                    </div>
+                    <p>Note: once you click "Create account", you will be redirected to provider's log in page to finish account connection process.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success rounded-3">Create account</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback<BankAccountDto> OnSave { get; set; }
+
+    public const string FormName = "new-external-bank-account-form";
+
+    private NewExternalBankAccountViewModel Model { get; set; } = null!;
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
+    private IEnumerable<BankServiceDto>? _supportedBankServiceProviders;
+
+    protected override void OnInitialized()
+    {
+        Model = new NewExternalBankAccountViewModel();
+        _editContext = new EditContext(Model);
+        _editContext.OnValidationRequested += (_, _) => _messageStore?.Clear();
+        _messageStore = new ValidationMessageStore(_editContext);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _supportedBankServiceProviders = (await BankServicesApiClient.GetSupportedBankServiceProvidersAsync()).Content;
+    }
+
+    private async Task SaveAsync()
+    {
+        var oauthUrl = (await BankServicesApiClient.GetOAuthLoginUrlAsync(Model.ProviderId, HttpUtility.UrlEncode("https://127.0.0.1:7142/finalizeintegration"))).Content;
+        if (oauthUrl is null)
+        {
+            return;
+        }
+
+        await SessionStorage.SetAsync(SessionDataKeys.ExternalBankAccountFormData, Model);
+        NavigationManager.NavigateTo(oauthUrl.Url);
+        await HideModalAsync(FormName);
+    }
+}

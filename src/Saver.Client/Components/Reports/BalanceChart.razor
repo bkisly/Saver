@@ -1,0 +1,50 @@
+﻿@using Saver.FinanceService.Contracts.Reports
+@inject IJSRuntime JsRuntime
+
+<div class="p-3 bg-light rounded-3">
+    <p>@Header</p>
+    @if (TransactionsReport != null)
+    {
+        <canvas id="balance-chart"></canvas>
+    }
+    else
+    {
+        <p>Loading...</p>
+    }
+</div>
+
+@code {
+    [Parameter] public string Header { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public ReportDto? TransactionsReport { get; set; }
+
+    private bool _reportLoaded;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender && _reportLoaded)
+        {
+            return;
+        }
+
+        if (TransactionsReport != null)
+        {
+            _reportLoaded = true;
+            await JsRuntime.InvokeVoidAsync("createChart", 
+                TransactionsReport.ReportEntries.Select(x => x.Date).ToList(), 
+                TransactionsReport.ReportEntries.Select(x => x.Value).ToList());
+        }
+    }
+
+    public async Task RefreshAsync()
+    {
+        if (TransactionsReport != null)
+        {
+            await JsRuntime.InvokeVoidAsync("updateChart", 
+                TransactionsReport.ReportEntries.Select(x => x.Date).ToList(), 
+                TransactionsReport.ReportEntries.Select(x => x.Value).ToList());
+
+            StateHasChanged();
+        }
+        
+    }
+}

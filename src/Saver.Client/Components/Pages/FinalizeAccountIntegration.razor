@@ -1,0 +1,42 @@
+﻿@page "/finalizeintegration"
+
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Saver.AccountIntegrationService.Contracts
+@using Saver.Client.Infrastructure
+@using Saver.FinanceService.Contracts.BankAccounts
+
+@inject ProtectedSessionStorage SessionStorage
+@inject NavigationManager NavigationManager
+@inject IBankAccountsApiClient BankAccountsApiClient
+@inject IAccountIntegrationsApiClient AccountIntegrationsApiClient
+
+<p>Please wait...</p>
+
+@code {
+    [Parameter, SupplyParameterFromQuery] public string Code { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await SessionStorage.GetAsync<NewExternalBankAccountViewModel>(SessionDataKeys.ExternalBankAccountFormData) is { Success: true, Value: not null } value)
+        {
+            var accountResponse = await BankAccountsApiClient.CreateExternalBankAccountAsync(new CreateExternalBankAccountRequest
+            {
+                Name = value.Value.Name,
+                ProviderId = value.Value.ProviderId
+            });
+
+            if (accountResponse is { IsSuccessStatusCode: true, Content: not null })
+            {
+                await AccountIntegrationsApiClient.CreateAccountIntegrationAsync(new CreateAccountIntegrationRequest
+                {
+                    AccountId = accountResponse.Content.Id,
+                    ProviderId = value.Value.ProviderId,
+                    AuthorizationCode = Code
+                });
+            }
+        }
+
+        NavigationManager.NavigateTo("/accounts");
+    }
+
+}

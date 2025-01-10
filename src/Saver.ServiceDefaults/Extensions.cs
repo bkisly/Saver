@@ -1,12 +1,17 @@
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ServiceDiscovery;
+using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using Saver.ServiceDefaults;
 
 namespace Microsoft.Extensions.Hosting
 {
@@ -33,10 +38,10 @@ namespace Microsoft.Extensions.Hosting
             });
 
             // Uncomment the following to restrict the allowed schemes for service discovery.
-            // builder.Services.Configure<ServiceDiscoveryOptions>(options =>
-            // {
-            //     options.AllowedSchemes = ["https"];
-            // });
+            builder.Services.Configure<ServiceDiscoveryOptions>(options =>
+            {
+                options.AllowedSchemes = ["https"];
+            });
 
             return builder;
         }
@@ -45,6 +50,44 @@ namespace Microsoft.Extensions.Hosting
         {
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            return builder;
+        }
+
+        public static IHostApplicationBuilder AddJwtAuthorization(this IHostApplicationBuilder builder, Action<JwtBearerOptions>? additionalOptions = null)
+        {
+            var identityConfig = builder.Configuration.GetSection("Identity");
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                var issuer = identityConfig.GetRequiredValue<string>("Issuer");
+                var audience = identityConfig.GetRequiredValue<string>("Audience");
+                var publicKey = identityConfig.GetRequiredValue<string>("PublicKey");
+
+                var rsa = RSA.Create();
+                rsa.ImportRSAPublicKey(new ReadOnlySpan<byte>(Convert.FromBase64String(publicKey)), out _);
+
+                options.Authority = issuer;
+                options.Audience = audience;
+                options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = false,
+                    ValidIssuer = issuer,
+                    ValidAudience = audience,
+                    ValidateIssuer = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new RsaSecurityKey(rsa),
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                additionalOptions?.Invoke(options);
+            });
+
+            builder.Services.AddAuthorization();
             return builder;
         }
 
@@ -101,6 +144,17 @@ namespace Microsoft.Extensions.Hosting
                 // Add a default liveness check to ensure app is responsive
                 .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
 
+            return builder;
+        }
+
+        public static IHostApplicationBuilder AddEndpointsAuthorization(this IHostApplicationBuilder builder)
+        {
+            builder.Services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
             return builder;
         }
 

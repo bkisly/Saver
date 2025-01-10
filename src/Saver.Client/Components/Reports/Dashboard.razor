@@ -1,0 +1,77 @@
+﻿@page "/dashboard"
+
+@attribute [Authorize]
+
+@rendermode InteractiveServer
+
+@inject IReportsApiClient ReportsApiClient
+@inject IBankAccountsApiClient BankAccountsApiClient
+
+@using Saver.FinanceService.Contracts.BankAccounts
+@using Saver.FinanceService.Contracts.Reports
+@using Saver.FinanceService.Contracts.Transactions
+
+<PageTitle>Dashboard</PageTitle>
+
+@if (DefaultBankAccount is not null)
+{
+    <h1 class="h3">Here are key details about your main account: @DefaultBankAccount.Name.</h1>
+
+    <div class="row row-gap-4 row-cols-1 row-cols-md-2 row-cols-lg-3 mt-4">
+        <div class="col d-flex align-items-stretch">
+            <BalanceReport BankAccount="DefaultBankAccount"/>
+        </div>
+        <div class="col d-flex">
+            <TopCategoriesReport 
+                CurrencyCode="@DefaultBankAccount.CurrencyCode" 
+                CategoriesReport="CategoriesReport?.IncomeCategories"
+                Header="TOP BENEFITS IN LAST 30 DAYS" 
+                TransactionType="TransactionType.Income"/>
+        </div>
+        <div class="col d-flex">
+            <TopCategoriesReport 
+                CurrencyCode="@DefaultBankAccount.CurrencyCode" 
+                CategoriesReport="CategoriesReport?.OutcomeCategories.OrderBy(x => x.Value).ToList()" 
+                Header="TOP EXPENSES IN LAST 30 DAYS" 
+                TransactionType="TransactionType.Outcome"/>
+        </div>
+    </div>
+
+    <div class="my-4">
+        <BalanceChart TransactionsReport="TransactionsReport" Header="BALANCE CHANGES IN LAST 30 DAYS"/>
+    </div>
+}
+else
+{
+    <p>You don't have any bank accounts, go and create one!</p>
+}
+
+
+@code {
+    private BankAccountDto? DefaultBankAccount { get; set; }
+    private CategoriesReportDto? CategoriesReport { get; set; }
+    private ReportDto? TransactionsReport { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        DefaultBankAccount = (await BankAccountsApiClient.GetDefaultBankAccountAsync()).Content;
+
+        if (DefaultBankAccount is null)
+        {
+            return;
+        }
+
+        StateHasChanged();
+
+        CategoriesReport = (await ReportsApiClient.GetCategoriesReportForAccountAsync(DefaultBankAccount.Id)).Content;
+        StateHasChanged();
+
+        TransactionsReport = (await ReportsApiClient.GetReportForAccountAsync(DefaultBankAccount.Id, new ReportFiltersDto
+        {
+            FromDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(30)),
+            ToDate = DateTime.UtcNow
+        })).Content;
+
+        StateHasChanged();
+    }
+}

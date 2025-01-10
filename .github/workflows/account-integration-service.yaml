@@ -1,0 +1,19 @@
+name: CI/CD pipeline for AccountIntegrationService
+
+on:
+  push:
+    branches:
+      - dev/AccountIntegrationService/**
+      - release/AccountIntegrationService
+
+jobs:
+  build:
+    uses: ./.github/workflows/service-build.yaml
+    with:
+      service-name: AccountIntegrationService
+
+  release:
+    needs: build
+    uses: ./.github/workflows/service-release.yaml
+    with:
+      service-name: AccountIntegrationService

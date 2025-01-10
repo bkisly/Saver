@@ -1,0 +1,14 @@
+﻿@inject IJSRuntime JsRuntime
+
+@code {
+
+    protected async Task ShowModalAsync(string modalId)
+    {
+        await JsRuntime.InvokeVoidAsync("showModal", $"#{modalId}");
+    }
+
+    protected async Task HideModalAsync(string modalId)
+    {
+        await JsRuntime.InvokeVoidAsync("hideModal", $"#{modalId}");
+    }
+}
