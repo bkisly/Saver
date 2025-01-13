@@ -5,6 +5,7 @@ public abstract class BankAccount : EventPublishingEntity<Guid>
     public override Guid Id { get; protected set; } = Guid.NewGuid();
     public string Name { get; protected set; } = null!;
 
+    public decimal InitialBalance { get; protected set; }
     public decimal Balance { get; protected set; }
     public Currency Currency { get; protected set; } = null!;
 
@@ -13,9 +14,10 @@ public abstract class BankAccount : EventPublishingEntity<Guid>
     protected BankAccount()
     { }
 
-    protected BankAccount(string name, Currency currency, Guid accountHolderId)
+    protected BankAccount(string name, decimal initialBalance, Currency currency, Guid accountHolderId)
     {
         Name = name;
+        InitialBalance = initialBalance;
         Currency = currency;
         AccountHolderId = accountHolderId;
     }

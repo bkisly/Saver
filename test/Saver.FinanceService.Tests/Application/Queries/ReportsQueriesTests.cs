@@ -8,7 +8,7 @@ namespace Saver.FinanceService.Tests.Application.Queries;
 public sealed class ReportsQueriesTests(InMemoryDbContextFactory contextFactory, ReportQueriesFixture fixture) 
     : IClassFixture<InMemoryDbContextFactory>, IClassFixture<ReportQueriesFixture>, IDisposable
 {
-    private readonly FinanceDbContext _context = contextFactory.BuildSqliteInMemoryDbContext();
+    private readonly FinanceDbContext _context = contextFactory.BuildInMemoryDbContext();
 
     [Fact]
     public async Task GetReportForAccount_ShouldReturnNull_ForInvalidData()
