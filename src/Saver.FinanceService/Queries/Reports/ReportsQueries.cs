@@ -44,7 +44,7 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper,
 
         foreach (var transactionGroup in transactions.GroupBy(x => x.CreationDate.Date))
         {
-            var valueSum = previousSum + transactionGroup.Sum(x => x.TransactionData.Value);
+            var valueSum = transactionGroup.Sum(x => x.TransactionData.Value) + (filters?.TransactionType is null ? previousSum : 0);
             reportEntries.Add(new ReportEntryDto
             {
                 Date = transactionGroup.Key,

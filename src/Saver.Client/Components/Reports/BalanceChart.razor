@@ -5,7 +5,14 @@
     <p>@Header</p>
     @if (TransactionsReport != null)
     {
-        <canvas id="balance-chart"></canvas>
+        @if (TransactionsReport.ReportEntries.Any())
+        {
+            <canvas id="balance-chart"></canvas>
+        }
+        else
+        {
+            <p>No data found for the given time period.</p>
+        }
     }
     else
     {
