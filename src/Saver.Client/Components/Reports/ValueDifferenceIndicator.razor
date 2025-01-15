@@ -19,7 +19,7 @@
         _ => "bi-caret-right-fill"
     };
 
-    private string CaretColorClass => ValueIncludingInversion switch
+    private string CaretColorClass => Value switch
     {
         > 0 => "text-success",
         < 0 => "text-danger",
