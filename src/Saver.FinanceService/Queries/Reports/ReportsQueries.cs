@@ -29,18 +29,30 @@ public class ReportsQueries(IIdentityService identityService, IMapper mapper,
             RegisterFilters(queryBuilder, filters);
         }
 
-        //var balanceBeforeFilters = filters?.FromDate != null
-        //    ? account.Balance + await context.Transactions.Where(x => x.AccountId == accountId && x.CreationDate < filters.FromDate.Value.ToUniversalTime())
-        //        .SumAsync(x => x.TransactionData.Value)
-        //    : account.Balance;
-        // @TODO: fix balance changes report and find a way to test
+        var previousBalanceToAdd = filters switch
+        {
+            null => account.InitialBalance,
+            { FromDate: not null, TransactionType: null } => account.InitialBalance + await context.Transactions
+                .Where(x => x.AccountId == accountId && x.CreationDate < filters.FromDate.Value.ToUniversalTime())
+                .SumAsync(x => x.TransactionData.Value),
+            _ => 0
+        };
 
         var transactions = queryBuilder.Build();
-        var reportEntries = transactions.Select(transaction => new ReportEntryDto
+        var reportEntries = new List<ReportEntryDto>();
+        var previousSum = previousBalanceToAdd;
+
+        foreach (var transactionGroup in transactions.GroupBy(x => x.CreationDate.Date))
         {
-            Date = transaction.CreationDate, 
-            Value = transaction.TransactionData.Value   // + balanceBeforeFilters
-        }).ToList();
+            var valueSum = transactionGroup.Sum(x => x.TransactionData.Value) + (filters?.TransactionType is null ? previousSum : 0);
+            reportEntries.Add(new ReportEntryDto
+            {
+                Date = transactionGroup.Key,
+                Value = valueSum
+            });
+
+            previousSum = valueSum;
+        }
 
         return new ReportDto
         {

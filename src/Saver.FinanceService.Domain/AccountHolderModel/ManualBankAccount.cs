@@ -13,7 +13,7 @@ public class ManualBankAccount : BankAccount
     { }
 
     public ManualBankAccount(string name, Currency currency, decimal initialBalance, Guid accountHolderId) 
-        : base(name, currency, accountHolderId)
+        : base(name, initialBalance, currency, accountHolderId)
     {
         Balance = initialBalance;
     }
