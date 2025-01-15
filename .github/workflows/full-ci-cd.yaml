@@ -62,8 +62,8 @@ jobs:
     - name: Install azd
       uses: Azure/setup-azd@v1.0.0
 
-    - name: Install .NET Aspire workload
-      run: dotnet workload install aspire
+    - name: Install workload
+      run: dotnet workload restore
 
     - name: Log in with Azure
       run: |
