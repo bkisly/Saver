@@ -19,9 +19,6 @@ public class AccountIntegrationDbContext(DbContextOptions<AccountIntegrationDbCo
             entityBuilder.HasIndex(x => x.AccountId)
                 .IsUnique();
 
-            entityBuilder.HasIndex(x => x.UserId)
-                .IsUnique();
-
             entityBuilder.Property(x => x.BankServiceType)
                 .HasConversion(x => x.Id, x => Enumeration.FromId<BankServiceType>(x))
                 .HasColumnName("BankServiceTypeId");

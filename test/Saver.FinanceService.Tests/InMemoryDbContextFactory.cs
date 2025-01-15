@@ -22,6 +22,15 @@ public sealed class InMemoryDbContextFactory : IDisposable
         return context;
     }
 
+    public FinanceDbContext BuildInMemoryDbContext()
+    {
+        var options = new DbContextOptionsBuilder<FinanceDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+
+        return new FinanceDbContext(new Mock<IMediator>().Object, options);
+    }
+
     public void Dispose()
     {
         _connection.Dispose();

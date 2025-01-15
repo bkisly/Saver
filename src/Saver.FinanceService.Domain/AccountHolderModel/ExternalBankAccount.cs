@@ -8,7 +8,7 @@ public class ExternalBankAccount : BankAccount
     { }
 
     public ExternalBankAccount(string name, Guid accountHolderId, int providerId)
-        : base(name, Currency.USD, accountHolderId)
+        : base(name, 0M, Currency.USD, accountHolderId)
     {
         ProviderId = providerId;
     }

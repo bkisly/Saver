@@ -121,8 +121,8 @@ public class PayPalBankService : IBankService
                 primaryBalance.AvailableBalance.Value,
                 transactions.TransactionDetails.Select(x =>
                     new TransactionInfo(
-                        x.TransactionInfo.TransactionSubject,
-                        x.TransactionInfo.TransactionAmount.Value - (x.TransactionInfo.FeeAmount?.Value ?? 0),
+                        GetTransactionName(x.TransactionInfo),
+                        x.TransactionInfo.TransactionAmount.Value + (x.TransactionInfo.FeeAmount?.Value ?? 0),
                         x.TransactionInfo.TransactionInitiationDate)));
 
             await _integrationEventService.AddIntegrationEventAsync(evt);
@@ -163,8 +163,8 @@ public class PayPalBankService : IBankService
                 integration.AccountId,
                 integration.UserId,
                 transactions.TransactionDetails.Select(x => new TransactionInfo(
-                    x.TransactionInfo.TransactionSubject,
-                    x.TransactionInfo.TransactionAmount.Value,
+                    GetTransactionName(x.TransactionInfo),
+                    x.TransactionInfo.TransactionAmount.Value + (x.TransactionInfo.FeeAmount?.Value ?? 0),
                     x.TransactionInfo.TransactionInitiationDate)),
                 balance.Balances.FirstOrDefault(x => x.Primary)?.AvailableBalance.Value);
 
@@ -310,5 +310,17 @@ public class PayPalBankService : IBankService
         var response = await _httpClient.SendAsync(request);
         var parsedResponse = JsonSerializer.Deserialize<PayPalBalancesList>(await response.Content.ReadAsStreamAsync(), ResponseSerializerOptions);
         return parsedResponse ?? new PayPalBalancesList();
+    }
+
+    private static string GetTransactionName(PayPalTransactionInfo transactionInfo)
+    {
+        var name = transactionInfo.TransactionSubject ?? transactionInfo.TransactionNote;
+
+        if (name is not null)
+        {
+            return name;
+        }
+
+        return transactionInfo.TransactionAmount.Value > 0 ? "Incoming transaction" : "Outgoing transaction";
     }
 }

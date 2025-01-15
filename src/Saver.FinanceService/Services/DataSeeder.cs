@@ -29,27 +29,28 @@ public static class DataSeeder
         var transactionsService = serviceProvider.GetRequiredService<ITransactionDomainService>();
 
         transactionsService.CreateTransactions(accountHolder, account1.Id, [
-            CreateTransaction("Transaction 1", "Sample description", -20.35M, new DateTime(2024, 12, 1), foodCategory),
-            CreateTransaction("Transaction 2", "Sample description", -102.49M, new DateTime(2024, 12, 1), foodCategory),
-            CreateTransaction("Transaction 3", "Sample description", -99M, new DateTime(2024, 12, 5), foodCategory),
-            CreateTransaction("Transaction 4", "Sample description", -52.31M, new DateTime(2024, 12, 6)),
-            CreateTransaction("Transaction 5", "Sample description", 2851.19M, new DateTime(2024, 12, 1), salaryCategory),
-            CreateTransaction("Transaction 6", "Sample description", -23.3M, new DateTime(2024, 12, 3), entertainmentCategory),
-            CreateTransaction("Transaction 7", "Sample description", -80M, new DateTime(2024, 11, 28), entertainmentCategory),
-            CreateTransaction("Transaction 8", "Sample description", -102.37M, new DateTime(2024, 11, 20), entertainmentCategory),
-            CreateTransaction("Transaction 9", "Sample description", -91.9M, new DateTime(2024, 12, 4), entertainmentCategory),
-            CreateTransaction("Transaction 10", "Sample description", 209.45M, new DateTime(2024, 12, 2), salaryCategory)
+            CreateTransaction("Grocery Store Purchase", "Weekly groceries", -20.35M, new DateTime(2025, 1, 1), foodCategory),
+            CreateTransaction("Supermarket Run", "Bulk food purchase", -102.49M, new DateTime(2025, 1, 1), foodCategory),
+            CreateTransaction("Dinner at Restaurant", "Family dinner outing", -99M, new DateTime(2025, 1, 5), foodCategory),
+            CreateTransaction("Utility Bill Payment", "Electricity bill", -52.31M, new DateTime(2025, 1, 6)),
+            CreateTransaction("Monthly Salary", "Salary for January", 2851.19M, new DateTime(2025, 1, 1), salaryCategory),
+            CreateTransaction("Cinema Tickets", "Weekend movie", -23.3M, new DateTime(2025, 1, 3), entertainmentCategory),
+            CreateTransaction("Concert Tickets", "Music concert tickets", -80M, new DateTime(2024, 12, 28), entertainmentCategory),
+            CreateTransaction("Streaming Subscription", "Monthly subscription fee", -102.37M, new DateTime(2024, 12, 20), entertainmentCategory),
+            CreateTransaction("Theme Park Visit", "Family trip to theme park", -91.9M, new DateTime(2025, 1, 4), entertainmentCategory),
+            CreateTransaction("Bonus Payment", "Year-end performance bonus", 209.45M, new DateTime(2025, 1, 2), salaryCategory)
         ]);
 
         transactionsService.CreateTransactions(accountHolder, account2.Id, [
-            CreateTransaction("Żabka", "Sample description", -90.35M, new DateTime(2024, 12, 6)),
-            CreateTransaction("morele.net", "Sample description", -102.49M, new DateTime(2024, 12, 1)),
-            CreateTransaction("Transaction 3", "Sample description", -2.31M, new DateTime(2024, 12, 9), foodCategory),
-            CreateTransaction("Transaction 4", "Sample description", 4000.90M, new DateTime(2024, 12, 1), salaryCategory),
-            CreateTransaction("Transaction 5", "Sample description", -102.37M, new DateTime(2024, 11, 21), entertainmentCategory),
-            CreateTransaction("Transaction 6", "Sample description", -41.9M, new DateTime(2024, 12, 4), entertainmentCategory),
-            CreateTransaction("Transaction 7", "Sample description", 209.45M, new DateTime(2024, 12, 1), salaryCategory)
+            CreateTransaction("Żabka Convenience Store", "Groceries and essentials", -90.35M, new DateTime(2025, 1, 6)),
+            CreateTransaction("Morele.net Electronics", "Purchase of computer accessories", -102.49M, new DateTime(2025, 1, 1)),
+            CreateTransaction("Bakery Purchase", "Fresh bread and pastries", -2.31M, new DateTime(2025, 1, 9), foodCategory),
+            CreateTransaction("Monthly Salary", "January salary payment", 4000.90M, new DateTime(2025, 1, 1), salaryCategory),
+            CreateTransaction("Streaming Service Payment", "Monthly subscription fee", -102.37M, new DateTime(2024, 12, 21), entertainmentCategory),
+            CreateTransaction("Cinema Night", "Movie outing with friends", -41.9M, new DateTime(2025, 1, 4), entertainmentCategory),
+            CreateTransaction("Bonus Payment", "Performance-based year-end bonus", 209.45M, new DateTime(2025, 1, 1), salaryCategory)
         ]);
+
 
         await unitOfWork.SaveChangesAsync();
     }
